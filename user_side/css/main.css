@@ -92,6 +92,22 @@ section{
 
 
 
+/* Style for the SweetAlert2 popup */
+.larger-swal {
+    font-size: 2.2em; /* Increase overall font size */
+    border-radius: 10px; /* Optional: Add rounded corners */
+}
+
+/* Style for the title */
+.larger-swal-title {
+    font-size: 2.5em; /* Increase the title font size */
+    font-weight: bold; /* Optional: Make the title bold */
+}
+
+/* Style for the content (text inside the popup) */
+.larger-swal-content {
+    font-size: 2.2em; /* Increase the content font size */
+}
 
 
 /*================for profile=============*/
@@ -652,7 +668,6 @@ section{
 
 /*drop down*/
 .event-filter form .dropdown-container{
-    margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;

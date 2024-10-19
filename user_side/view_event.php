@@ -134,9 +134,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+        
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
+
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <link rel="stylesheet" href="css/main.css">
     </head>
@@ -331,27 +334,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!--CONFIRMATION BUTTON-->
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Function to display confirmation dialog when saving changes
+                
+                // Function to display SweetAlert2 confirmation dialog when saving changes
                 function confirmSaveChanges(event) {
                     // Prevent the default form submission behavior
                     event.preventDefault();
 
-                    // Display confirmation dialog
-                    var confirmation = confirm("Join Event?");
-                    if (confirmation) {
-                        // If user confirms, submit the form
-                        event.target.submit();
-                    } else {
-                        // If user cancels, do nothing
-                        return false;
-                    }
+                    // Display SweetAlert2 confirmation dialog
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you want to join this event?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, join!',
+                        cancelButtonText: 'No, cancel',
+                        width: '800px', // Set custom width
+                        width: '800px', // Set custom width
+                        padding: '3rem', // Set custom padding
+                        customClass: {
+                        popup: 'larger-swal' // Custom class for more styling
+                        }                  
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // If user confirms, submit the form
+                                event.target.submit();
+                            } else {
+                                // If user cancels, do nothing
+                                return false;
+                            }
+                        });
                 }
 
                 // Attach the confirmation function to the form submit event
                 document.querySelector('form').addEventListener('submit', confirmSaveChanges);
             });
-        </script>
-        
+            </script>
 
 
         <!--JS -->

@@ -9,10 +9,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $MI = $_POST["MI"];
     $Gender = $_POST["Gender"];
     $Email = $_POST["Email"];
-    $ContactNo = $_POST["ContactNo"];
-    $Address = $_POST["Address"];
-    $Affiliation = $_POST["Affiliation"];
-    $Position = $_POST["Position"];
+    $ContactNo = !empty($_POST["ContactNo"]) ? $_POST["ContactNo"] : "N/A";
+    $Address = !empty($_POST["Address"]) ? $_POST["Address"] : "N/A";
+    $Affiliation = !empty($_POST["Affiliation"]) ? $_POST["Affiliation"] : "N/A";
+    $Position = !empty($_POST["Position"]) ? $_POST["Position"] : "N/A";
     $Password = $_POST["Password"];
     $ConfirmPassword = $_POST["ConfirmPassword"];
 

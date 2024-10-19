@@ -53,6 +53,7 @@
                     <form action="function/F.signUp.php" class="sign-up-form" method="POST">
                         <h2 class="title">Sign up</h2>
     
+                        <h3 lass="title" style="margin-top:1rem;">Personal Information</h3>
                         <div class="input-field">
                             <i class="fa-solid fa-circle-user"></i>
                             <input type="text" name="LastName" placeholder="Last Name" required>
@@ -77,12 +78,13 @@
                             </select>
                         </div>
 
+                        <h3 lass="title" style="margin-top:1rem;">Account Information</h3>
                         <div class="input-field">
                             <i class="fas fa-envelope"></i>
                             <input type="email" name="Email" placeholder="Email" required>
                         </div>
 
-                        <div class="input-field">
+                        <!-- <div class="input-field">
                             <i class="fa-solid fa-phone"></i>
                             <input type="number" name="ContactNo" placeholder="Contact Number" required>
                         </div>
@@ -100,7 +102,7 @@
                         <div class="input-field">
                             <i class="fa-solid fa-address-card"></i>
                             <input type="text" name="Position" placeholder="Position" required>
-                        </div>
+                        </div> -->
 
                         <div class="input-field">
                             <i class="fas fa-lock"></i>

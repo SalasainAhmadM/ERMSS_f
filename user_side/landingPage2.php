@@ -163,7 +163,7 @@
                                     <p>Display <span>*</span></p>
                                     <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
                                     <div class="lists">
-                                        <a href="landingPage.php"><p class="items">List</p></a>
+                                        <a href="landingPageU.php"><p class="items">List</p></a>
                                         <a href="landingPage2.php"><p class="items">Grid</p></a>
                                     </div>
                                 </div>
