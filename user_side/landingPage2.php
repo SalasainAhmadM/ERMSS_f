@@ -146,19 +146,37 @@
             <div class="containerr">
                 <h3 class="dashboard">EVENTS</h3>
 
-                <!--======= event filter starts ======= -->
                 <section class="event-filter"> <!--dapat naka drop down ito-->
 
-                    <h1 class="heading">filter events</h1>
+                <h1 class="heading"></h1>
+
+                <div style="display: flex; gap: 10px; margin-bottom:10px"> 
+
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                        
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                
+                                <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
+                                <div class="lists">
+                                        
+                                    <a href="landingPageU.php"><p class="items">List</p></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+                    <!-- <h1 class="heading">filter events</h1> -->
 
                     <form action="" method="post">
                         <div class="flex">
                             <div class="box">
                                 <p>Event Title <span>*</span></p>
-                                <input type="text" id="eventTitleInput" placeholder="filter event title" class="input">
+                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
                             </div>
 
-                            <div class="dropdown-container">
+                            <!-- <div class="dropdown-container">
                                 <div class="dropdown">
                                     <p>Display <span>*</span></p>
                                     <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
@@ -167,7 +185,7 @@
                                         <a href="landingPage2.php"><p class="items">Grid</p></a>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="dropdown-container">
@@ -209,28 +227,29 @@
                         </div>
                         
                     </form>
+                </div>
+                
 
-                </section>
+                <div>
+
+                <div class="containerr">
+                    <!--========= all event start =============-->
+                    <section class="event-container">
+                        <div class="box-container" style="display: flex; flex-wrap: wrap;">
+                            <!-- Just include the F.getEvent.php for grid display -->
+                            <?php include('../function/F.getEventU.php'); ?>
+                        </div>
+                    </section>
+                </div>
+
+
+                </div>
+
+
                 <!-- ======= event filter ends ========-->
-
             </div>
 
 
-            <div class="containerr">
-                <!--========= all event start =============-->
-                <section class="event-container">
-
-                    <h1 class="heading">events</h1>
-
-                    <div class="box-container">
-                        <!--just include the F.getEvent.php for grid display-->
-                        <?php include('../function/F.getEventU.php'); ?>
-                                           
-                    </div>
-
-                </section>                
-                <!-- ============all event ends ========-->
-            </div>
         </div>
 
 

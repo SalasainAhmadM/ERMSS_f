@@ -334,13 +334,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!--CONFIRMATION BUTTON-->
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                
-                // Function to display SweetAlert2 confirmation dialog when saving changes
                 function confirmSaveChanges(event) {
-                    // Prevent the default form submission behavior
+
                     event.preventDefault();
 
-                    // Display SweetAlert2 confirmation dialog
                     Swal.fire({
                         title: 'Are you sure?',
                         text: "Do you want to join this event?",
@@ -350,24 +347,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, join!',
                         cancelButtonText: 'No, cancel',
-                        width: '800px', // Set custom width
-                        width: '800px', // Set custom width
-                        padding: '3rem', // Set custom padding
+                        width: '800px', 
+                        width: '800px', 
+                        padding: '3rem', 
                         customClass: {
-                        popup: 'larger-swal' // Custom class for more styling
+                        popup: 'larger-swal' 
                         }                  
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // If user confirms, submit the form
                                 event.target.submit();
                             } else {
-                                // If user cancels, do nothing
                                 return false;
                             }
                         });
                 }
-
-                // Attach the confirmation function to the form submit event
                 document.querySelector('form').addEventListener('submit', confirmSaveChanges);
             });
             </script>

@@ -269,7 +269,7 @@
                 const thElements = tblHead.getElementsByTagName('th');
 
                 for (let th of thElements) {
-                    th.style.left = -${scrollLeft}px;
+                    th.style.left = `-${scrollLeft}px`;
                 }
             });
         });

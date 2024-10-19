@@ -85,28 +85,9 @@ body{
 }
 
 section{
-    padding: 2rem;
-    margin: 0 auto;
+    padding: 0;
+    /* margin: 0 auto; */
     max-width: 1200px;
-}
-
-
-
-/* Style for the SweetAlert2 popup */
-.larger-swal {
-    font-size: 2.2em; /* Increase overall font size */
-    border-radius: 10px; /* Optional: Add rounded corners */
-}
-
-/* Style for the title */
-.larger-swal-title {
-    font-size: 2.5em; /* Increase the title font size */
-    font-weight: bold; /* Optional: Make the title bold */
-}
-
-/* Style for the content (text inside the popup) */
-.larger-swal-content {
-    font-size: 2.2em; /* Increase the content font size */
 }
 
 
@@ -634,7 +615,8 @@ section{
     box-shadow: var(--box-shadow);
     border: var(--border);
     border-radius: .5rem;
-    padding: 2rem;
+    width: 30%;
+    padding:15px;
 }
 
 .event-filter form .flex{
@@ -734,7 +716,6 @@ section{
 
 /* =================== EVENT  STARTS ==============*/
 .event-container .box-container{
-    display: grid;
     grid-template-columns: repeat(auto-fit, 35rem);
     gap: 1.5rem;
     align-items: flex-start;
@@ -750,6 +731,12 @@ section{
     overflow-x: hidden;
     display: block;
 }
+
+.box-container > div {
+    width: calc(33.33% - 10px); /* Ensure 3 blocks per line */
+    box-sizing: border-box;
+}
+
 
 .event-container .box-container .box[style*="none"]{
     display: none;
@@ -1537,3 +1524,25 @@ section{
         margin-bottom: 5px;
     }
 }
+
+
+
+
+
+/* Style for the SweetAlert2 popup */
+.larger-swal {
+    font-size: 2em; /* Increase overall font size */
+    border-radius: 10px; /* Optional: Add rounded corners */
+}
+
+/* Style for the title */
+.larger-swal-title {
+    font-size: 2em; /* Increase the title font size */
+    font-weight: bold; /* Optional: Make the title bold */
+}
+
+/* Style for the content (text inside the popup) */
+.larger-swal-content {
+    font-size: 2em; /* Increase the content font size */
+}
+  

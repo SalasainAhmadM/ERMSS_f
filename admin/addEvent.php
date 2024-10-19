@@ -265,28 +265,40 @@
 
 
         <!--CONFIRMATION===========-->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Function to display confirmation dialog when saving changes
                 function confirmSaveChanges(event) {
-                    // Prevent the default form submission behavior
                     event.preventDefault();
 
-                    // Display confirmation dialog
-                    var confirmation = confirm("Create Event?");
-                    if (confirmation) {
-                        // If user confirms, submit the form
-                        event.target.submit();
-                    } else {
-                        // If user cancels, do nothing
-                        return false;
-                    }
+                    Swal.fire({
+                        title: 'Create Event?',
+                        text: 'Are you sure you want to create this event?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, join!',
+                        cancelButtonText: 'No, cancel',
+                        width: '800px', 
+                        width: '900px', 
+                        padding: '3rem', 
+                        customClass: {
+                        popup: 'larger-swal' 
+                        }          
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            event.target.submit();
+                        }
+                    });
                 }
 
-                // Attach the confirmation function to the form submit event
                 document.querySelector('form').addEventListener('submit', confirmSaveChanges);
             });
         </script>
+
 
 
         <script>

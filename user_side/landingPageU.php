@@ -155,7 +155,7 @@
 
                     <h1 class="heading"></h1>
 
-                    <form action="" method="post">
+                    <form action="" method="post" style="margin-bottom:1rem; ">
                         
                         <div class="dropdown-container">
                             <div class="dropdown">
@@ -171,6 +171,8 @@
                     </form>
 
                 </section>
+
+                
                 <!-- ======= event filter ends ========-->
 
             </div>
