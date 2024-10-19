@@ -15,7 +15,7 @@
         <link rel="icon" href="assets/img/wesmaarrdec.jpg" type="image/png">
 
 
-        
+        <!-- Kaizoku -->
         <!-- remixicons-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
 
