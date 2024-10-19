@@ -27,7 +27,7 @@ require_once('db.connection/connection.php');
         <!-- HEADER -->
         <header class="header" id="header">
             <nav class="nav container">
-                <a href="index.html" class="nav__logo">WESMAARRDEC YOYO</a>
+                <a href="index.html" class="nav__logo">WESMAARRDEC</a>
 
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
@@ -81,7 +81,7 @@ require_once('db.connection/connection.php');
 
                     <div class="home__content grid">
                         <div class="home__data grid">
-                            <h1 class="home__name">EVENT RECORD</h1>
+                            <h1 class="home__name">EVENT RECORD NZRO</h1>
 
                             <h2 class="home__profession">MANAGEMENT SYSTEM</h2> <!-- MODIFY MODIFY MODIFY -->
 
