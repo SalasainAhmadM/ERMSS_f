@@ -81,7 +81,7 @@ require_once('db.connection/connection.php');
 
                     <div class="home__content grid">
                         <div class="home__data grid">
-                            <h1 class="home__name">EVENT RECORD</h1>
+                            <h1 class="home__name">EVENT RECORD NZRO</h1>
 
                             <h2 class="home__profession">MANAGEMENT SYSTEM</h2> <!-- MODIFY MODIFY MODIFY -->
 
