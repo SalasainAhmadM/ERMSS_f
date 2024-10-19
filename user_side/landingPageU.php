@@ -154,7 +154,7 @@
                 <section class="event-filter"> <!--dapat naka drop down ito-->
 
                     <h1 class="heading"></h1>
-
+                    <h1 class="heading">filter events</h1>
                     <form action="" method="post" style="margin-bottom:1rem; ">
                         
                         <div class="dropdown-container">
@@ -166,7 +166,7 @@
                                     <a href="landingPage2.php"><p class="items">Grid</p></a>
                                 </div>
                             </div>
-                        </div>
+                        </div>               
                         
                     </form>
 

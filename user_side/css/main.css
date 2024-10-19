@@ -85,8 +85,8 @@ body{
 }
 
 section{
-    padding: 0;
-    /* margin: 0 auto; */
+    padding: 2rem;
+    margin: 0 auto;
     max-width: 1200px;
 }
 
@@ -513,9 +513,9 @@ section{
 
 
 .heading{
-    text-align: center;
+    /* text-align: center; */
     margin-bottom: 2rem;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: #000;
     text-transform: capitalize;
     padding: 1rem 0;
@@ -791,7 +791,7 @@ section{
 .event-container .box-container .box .tags{
     display: flex;
     flex-wrap: wrap;
-    /* gap: .5rem; */
+    gap: .5rem;
     margin: 1.2rem 0;
 }
 
@@ -1003,6 +1003,9 @@ section{
     padding: 2rem;
     box-shadow: var(--box-shadow);
     overflow-x: hidden;
+    width:40%;
+    margin:auto;
+    margin-bottom:2rem;
 }
 
 .event-details .details h3{

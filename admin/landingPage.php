@@ -156,7 +156,8 @@
                 <section class="event-filter">
 
                     <h1 class="heading"></h1>
-
+                    <h1 class="heading">filter events</h1>
+                    
                     <form action="" method="post">
                         
                         <div class="dropdown-container">

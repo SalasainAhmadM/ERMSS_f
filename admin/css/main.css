@@ -523,7 +523,7 @@ section{
 
 
 .heading{
-    text-align: center;
+    /* text-align: center; */
     margin-bottom: 2rem;
     font-size: 3rem;
     color: #000;
@@ -621,12 +621,13 @@ section{
 
 /* =============EVENT FILTER STARTS============*/
 
-.event-filter form{
+.event-filter form {
     background-color: var(--body-color);
     box-shadow: var(--box-shadow);
     border: var(--border);
     border-radius: .5rem;
-    padding: 2rem;
+    width: 30%;
+    padding: 15px;
 }
 
 .event-filter form .flex{
@@ -660,7 +661,7 @@ section{
 
 /*drop down*/
 .event-filter form .dropdown-container{
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
@@ -1021,6 +1022,9 @@ section{
     padding: 2rem;
     box-shadow: var(--box-shadow);
     overflow-x: hidden;
+    width:40%;
+    margin:auto;
+    margin-bottom:2rem;
 }
 
 .event-details .details h3{

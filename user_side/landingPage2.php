@@ -149,6 +149,7 @@
                 <section class="event-filter"> <!--dapat naka drop down ito-->
 
                 <h1 class="heading"></h1>
+                <h1 class="heading">filter events</h1>
 
                 <div style="display: flex; gap: 10px; margin-bottom:10px"> 
 
@@ -167,9 +168,7 @@
                         
                     </form>
 
-                    <!-- <h1 class="heading">filter events</h1> -->
-
-                    <form action="" method="post">
+                    <form action="" method="post" style="width:65%">
                         <div class="flex">
                             <div class="box">
                                 <p>Event Title <span>*</span></p>
@@ -229,12 +228,14 @@
                     </form>
                 </div>
                 
-
+                </section>
+                
                 <div>
 
                 <div class="containerr">
                     <!--========= all event start =============-->
                     <section class="event-container">
+                    <h2 class="heading">Events</h2>
                         <div class="box-container" style="display: flex; flex-wrap: wrap;">
                             <!-- Just include the F.getEvent.php for grid display -->
                             <?php include('../function/F.getEventU.php'); ?>
@@ -245,7 +246,7 @@
 
                 </div>
 
-
+                                            
                 <!-- ======= event filter ends ========-->
             </div>
 
