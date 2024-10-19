@@ -1,0 +1,535 @@
+/* google fonts*/
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&display=swap');
+
+:root {
+    --header-height: 3.5rem;
+
+    /*colors*/
+    --hue: 255;
+    --first-color: red;
+    --first-color-alt: #1d3557;
+    --first-color-light: hsl(var(--hue), 40%, 80%);
+    --title-color: hsl(var(--hue), 24%, 16%);
+    --text-color: black;
+    --text-color-light: hsl(var(--hue), 8%, 60%);
+    --white-color: hsl(0, 0%, 100%);
+    --body-color: white;
+    --container-color: #f1faee; /*hsl(0, 0%, 100%)*/
+    --shadow-color: hsla(var(--hue), 90%, 30%, .1);
+    --shadow-color2: hsla(200, 50%, 30%, 0.8);
+
+
+    
+
+
+    /*fonts*/
+    --body-font: "Syne", sans-serif;
+    --biggest-font-size: 2rem;
+    --h1-font-size: 1.5rem;
+    --h2-font-size: 1.25rem;
+    --h3-font-size: 1rem;
+    --normal-font-size: .938rem;
+    --small-font-size: .813rem;
+    --smaller-font-size: .75rem;
+    
+    /*fontWeight*/
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semi-bold: 600;
+
+    /*z index*/
+    --z-tooltip: 10;
+    --z-fixed: 100;
+    --z-modal: 1000;
+
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+
+*::selection{
+    background-color: var(--first-color);
+    color: var(--body-color);
+}
+
+
+body, input, select {
+    font-family: var(--body-font);
+    /* font-size: var(--normal-font-size); */
+}
+
+
+
+/* ================= SIGNIN-SIGNUP FORM ============= */
+.container{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--body-color); /*#fff;*/
+    overflow: hidden;
+}
+
+.container:before{
+    content: '';
+    position: absolute;
+    width: 2000px;
+    height: 2000px;
+    border-radius: 50%;
+    background: var(--first-color); /*linear-gradient(-45deg, #606C38, #606C38);*/
+    top: -10%;
+    right: 48%;
+    transform: translateY(-50%);
+    z-index: 6;
+    transition: 1.8s ease-in-out;
+}
+
+.forms-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.signin-signup{
+    position: absolute;
+    top: 50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    display: grid;
+    grid-template-columns: 1fr;
+    z-index: 5;
+    transition: 1s 0.7s ease-in-out;
+}
+
+form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 5rem;
+    overflow: hidden;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    transition: 0.2s 0.7s ease-in-out;
+}
+
+form.sign-in-form{
+    z-index: 2;
+}
+
+form.sign-up-form{
+    z-index: 1;
+    opacity: 0;
+}
+
+.title{
+    font-size: 2.2rem;
+    color: var(--text-color); /*#444;*/
+    margin-bottom: 10px;
+}
+
+/*sign in form*/
+.sign-in-form .input-field{
+    max-width: 300px;
+    width: 100%;
+    height: 55px;
+    background-color: var(--first-color);/*#f0f0f0;*/
+    margin: 10px 0;
+    border-radius: 55px;
+    display: grid;
+    grid-template-columns: 15% 85%;
+    padding: 0 .4rem;
+}
+
+.sign-in-form .input-field i{
+    text-align: center;
+    line-height: 55px;
+    color: var(--body-color);/*#acacac; */
+    font-size: 1.1rem;
+}
+
+.sign-in-form .input-field input{
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--body-color)/*#333; */
+}
+
+.sign-in-form .input-field input::placeholder{
+    color: rgba(255, 255, 255, 0.5);/*#aaa;*/
+    font-weight: 500;
+}
+
+
+
+
+/*sign up form*/
+.sign-up-form {
+    margin-top: -3rem;
+}
+
+.sign-up-form .input-field{
+    max-width: 250px;
+    width: 100%;
+    height: 35px;
+    background-color: var(--first-color);/*#f0f0f0;*/
+    margin: 1.5px 0;
+    border-radius: 55px;
+    display: grid;
+    grid-template-columns: 15% 85%;
+    padding: 0 .1rem;
+}
+
+.sign-up-form .input-field i{
+    text-align: center;
+    line-height: 35px;
+    color: var(--body-color);/*#acacac; */
+    font-size: 1.1rem;
+}
+
+.sign-up-form .input-field input{
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    /* font-weight: 600; */
+    font-size: 1rem;
+    color: var(--body-color)/*#333; */
+}
+
+.sign-up-form .input-field select{
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    /* font-weight: 600; */
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5)/*#333; */
+}
+
+.sign-up-form .input-field input::placeholder,
+.sign-up-form .input-field select::placeholder{
+    color: rgba(255, 255, 255, 0.5);/*#aaa;*/
+    font-weight: 400;
+}
+
+.sign-up-form .input-field select:focus{
+    color: var(--body-color);
+    background-color: red;
+}
+
+
+
+
+
+
+
+
+.btn{
+    width: 150px;
+    height: 49px;
+    border: none;
+    outline: none;
+    border-radius: 49px;
+    cursor: pointer;
+    background-color: var(--first-color);
+    color: var(--body-color);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 10px 0;
+    transition: .5s;
+}
+
+.btn.signUp{
+    width: 100px;
+    height: 39px;
+}
+
+.btn:hover{
+    background-color: var(--first-color-alt);
+}
+
+.options {
+    align-items: center;
+    text-align: center;
+    display: flex;
+}
+
+.social-text{
+    padding: .7rem 0;
+    font-size: 1rem;
+    margin: 0 40px;
+}
+
+.social-text a{
+    color: var(--first-color);
+    text-decoration: none;
+}
+
+.social-text a:hover{
+    color: var(--first-color-alt);
+}
+
+
+.social-media{
+    display: flex;
+    justify-content: center;
+}
+
+.social-icon{
+    height: 46px;
+    width: 46px;
+    border: 1px solid var(--first-color);
+    margin: 0 0.45rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--first-color);
+    font-size: 1.1rem;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.social-icon:hover{
+    color: var(--first-color-alt);
+    border-color: var(--first-color-alt);
+}
+
+.panels-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.panel{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-around;
+    text-align: center;
+    z-index: 7;
+}
+
+.left-panel{
+    pointer-events: all;
+    padding: 3rem 17% 2rem 12%;
+}
+
+.right-panel{
+    pointer-events: none;
+    padding: 3rem 12% 2rem 17%;
+}
+
+.panel .content{
+    color: var(--body-color);
+    transition: .9s .6s ease-in-out;
+}
+
+.panel h3{
+    font-weight: 600;
+    line-height: 1;
+    font-size: 1.5rem;
+}
+
+.panel p{
+    font-size: 0.95rem;
+    padding: 0.7rem 0;
+}
+
+.btn.transparent{
+    margin: 0;
+    background: none;
+    border: 2px solid var(--body-color);
+    width: 130px;
+    height: 41px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.btn.transparent:hover{
+    background-color: var(--first-color-alt);
+    border: 2px solid var(--first-color-alt);
+}
+
+.image{
+    width: 100%;
+    transition: 1.1s .4s ease-in-out;
+}
+
+.right-panel .content, .right-panel .image{
+    transform: translateX(800px);
+}
+
+
+
+/* ANIMATION */ 
+.container.sign-up-mode:before{
+    transform: translate(100%, -50%);
+    right: 52%;
+}
+
+.container.sign-up-mode .left-panel .image,
+.container.sign-up-mode .left-panel .content{
+    transform: translateX(-800px);
+}
+
+.container.sign-up-mode .right-panel .content,
+.container.sign-up-mode .right-panel .image{
+    transform: translateX(0px);
+}
+
+.container.sign-up-mode .left-panel{
+    pointer-events: none;
+}
+
+.container.sign-up-mode .right-panel{
+    pointer-events: all;
+}
+
+.container.sign-up-mode .signin-signup{
+    left: 25%;
+}
+
+.container.sign-up-mode form.sign-in-form{
+    z-index: 1;
+    opacity: 0;
+}
+
+.container.sign-up-mode form.sign-up-form{
+    z-index: 2;
+    opacity: 1;
+}
+
+
+
+
+/* === RESPONSIVE === */
+@media (max-width: 870px){
+    .container{
+        min-height: 800px;
+        height: 100vh;
+    }
+
+    .container:before{
+        width: 1500px;
+        height: 1500px;
+        left: 30%;
+        bottom: 68%;
+        transform: translateX(-50%);
+        right: initial;
+        top: initial;
+        transition: 2s ease-in-out;
+    }
+
+    .signin-signup{
+        width: 100%;
+        left: 50%;
+        top: 95%;
+        transform: translate(-50%, -100%);
+        transition: 1s 0.8s ease-in-out;
+    }
+
+    .panels-container{
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 2fr 1fr;
+    }
+
+    .panel{
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 2.5rem 8%;
+    }
+
+    .panel .content{
+        padding-right: 15%;
+        transition: 0.9s 0.8s ease-in-out;
+    }
+
+    .panel h3{
+        font-size: 1.2rem;
+    }
+
+    .panel p{
+        font-size: 0.7rem;
+        padding: 0.5rem 0;
+    }
+
+    .btn.transparent{
+        width: 110px;
+        height: 35px;
+        font-size: 0.7rem;
+    }
+
+    .image{
+        width: 200px;
+        transition: 0.9s 0.6s ease-in-out;
+    }
+
+    .left-panel{
+        grid-row: 1/ 2;
+    }
+
+    .right-panel{
+        grid-row: 3 / 4;
+    }
+
+    .right-panel .content, .right-panel .image{
+        transform: translateY(300px);
+    }
+
+    .container.sign-up-mode:before{
+        transform: translate(-50%, 100%);
+        bottom: 32%;
+        right: initial;
+    }
+
+    .container.sign-up-mode .left-panel .image,
+    .container.sign-up-mode .left-panel .content{
+        transform: translateY(-300px);
+    }
+
+    .container.sign-up-mode .signin-signup{
+        top: 5%;
+        transform: translate(-50%, 0);
+        left: 50%;
+    }
+}
+
+@media (max-width: 570px){
+    form{
+        padding: 0 1.5rem;
+    }
+
+    .image{
+        display: none;
+    }
+
+    .panel .content{
+        padding: 0.5rem 1rem;
+    }
+
+    .container:before{
+        bottom: 72%;
+        left: 50%;
+    }
+
+    .container.sign-up-mode:before{
+        bottom: 28%;
+        left: 50%;
+    }
+}

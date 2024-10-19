@@ -1,0 +1,227 @@
+<?php
+include('../function/F.profile_retrieveU.php');
+// Fetch total number of cancelled events
+$countCancelledEventsSql = "SELECT COUNT(*) AS totalCancelledEvents FROM Events WHERE event_cancel IS NOT NULL AND event_cancel <> ''";
+$countCancelledEventsResult = mysqli_query($conn, $countCancelledEventsSql);
+$countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
+$totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
+
+// Include your database connection code here
+require_once('../db.connection/connection.php');
+
+// Fetch total number of events joined by the user
+$eventsJoinedSql = "SELECT COUNT(*) AS totalEventsJoined 
+                    FROM EventParticipants 
+                    WHERE UserID = ?";
+$eventsJoinedStmt = $conn->prepare($eventsJoinedSql);
+$eventsJoinedStmt->bind_param("i", $UserID);
+$eventsJoinedStmt->execute();
+$eventsJoinedResult = $eventsJoinedStmt->get_result();
+$eventsJoinedRow = mysqli_fetch_assoc($eventsJoinedResult);
+$totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+
+    <!--boxicons-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!--browser icon-->
+    <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<?php include('sidebar.php'); ?>
+
+
+<div class="main-content">
+    <section class="accounts section--lg">
+        <div class="accounts__container container grid">
+            <div class="account__tabs">
+                <p class="account__tab active-tab" data-target="#dashboard">
+                    <i class="fa-regular fa-user"></i>  My Profile
+                </p>
+
+                <p class="account__tab" data-target="#update-profile">
+                    <i class="fa-solid fa-sliders"></i> Update Profile
+                </p>
+
+                <p class="account__tab" data-target="#change-password">
+                    <i class="fa-solid fa-lock"></i> Change Password
+                </p>
+
+            </div>
+
+            <div class="tabs__content">
+                <div class="tab__content active-tab" content id="dashboard">
+                    <h3 class="tab__header"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></h3>
+
+                    <div class="tab__body">
+                    <?php if (!empty($Image)): ?>
+                    <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon">
+                <?php else: ?>
+                    <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon">
+                <?php endif; ?>
+
+                        <p class="tab__description">
+                            <span>Gender: </span> <?php echo $Gender; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Age: </span> <?php echo $Age; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Email: </span> <?php echo $Email; ?>
+                        </p>
+                        <p class="tab__description">
+                            <span>Phone: </span> <?php echo $ContactNo; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Address: </span> <?php echo $Address; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Position: </span> <?php echo $Position; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Affiliation: </span> <?php echo $Affiliation; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Educational Attainment: </span> <?php echo $EducationalAttainment; ?>
+                        </p>
+
+                        <p class="tab__description">
+                            <span>Total Events Joined: </span> <?php echo $totalEventsJoined; ?>
+                        </p>
+                                    
+                    </div>
+                </div>
+
+                            
+                <div class="tab__content" content id="update-profile">
+                    <h3 class="tab__header">Update Profile</h3>
+                    <div class="tab__body">
+                        <form id="profileForm" action="" method="POST" enctype="multipart/form-data" class="form grid">
+                            <label for="photoUpload">Change Photo</label>
+                            <?php if (!empty($Image)): ?>
+                                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon" id="profilePreview">
+                            <?php else: ?>
+                                <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon" id="profilePreview">
+                            <?php endif; ?>
+                            <input type="file" name="Image" id="Image" accept="image/*" class="form__input" onchange="previewImage(event)">
+
+                            <input type="text" name="FirstName" style="display: none;" value="<?php echo $FirstName; ?>">
+                            <input type="text" name="LastName" style="display: none;"value="<?php echo $LastName; ?>">
+                            <input type="text" name="MI" style="display: none;"value="<?php echo $MI; ?>">
+                            <input type="text" name="Gender" style="display: none;"value="<?php echo $Gender; ?>">
+                            <input type="text" name="Email" style="display: none;"value="<?php echo $Email; ?>">
+                            <input type="password" name="Password" style="display: none;"value="<?php echo $Password; ?>">
+                
+                            <input type="text" name="ContactNo" placeholder="Phone" class="form__input" value="<?php echo $ContactNo; ?>">
+
+                            <input type="text" name="Address" placeholder="Address" class="form__input" value="<?php echo $Address; ?>">
+
+                            <input type="number" name="Age" placeholder="Age" class="form__input" value="<?php echo $Age; ?>" require>
+
+                            <input type="text" name="Position" placeholder="Position" class="form__input" value="<?php echo $Position; ?>">
+
+                            <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input" value="<?php echo $Affiliation; ?>">
+
+                            <input type="text" name="EducationalAttainment"placeholder="Educational Attainment" class="form__input" value="<?php echo $EducationalAttainment; ?>">
+
+                            <div class="form__btn">
+                            <button class="btn btn--md" id="submitBtn" name="Submit">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+                <div class="tab__content" content id="change-password">
+                    <h3 class="tab__header">Change Password</h3>
+
+                    <div class="tab__body">
+                        <form action="" method="POST" enctype="multipart/form-data" class="form grid">
+                            <input type="password" name="currentPassword" placeholder="Current Password" class="form__input">
+
+                            <input type="password" name="newPassword" placeholder="New Password" class="form__input">
+
+                            <input type="password" name="confirmNewPassword" placeholder="Confirm New Password" class="form__input">
+
+                            <div class="form__btn">
+                                <button type="submit" name="submitp" class="btn btn--md">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+
+<!--profile-->
+<!--SWIPER JS CDN-->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    const tabs = document.querySelectorAll('[data-target]'),
+    tabContents = document.querySelectorAll('[content]');
+
+    tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+        const target = document.querySelector(tab.dataset.target);
+        tabContents.forEach((tabContent) => {
+        tabContent.classList.remove('active-tab');
+        });
+
+        target.classList.add('active-tab');
+
+        tabs.forEach((tab) => {
+        tab.classList.remove('active-tab');
+        });
+
+        tab.classList.add('active-tab');
+    });
+    });
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById('profilePreview');
+            output.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+
+<!--JS -->
+<script src="js/eventscript.js"></script>
+
+<!--sidebar functionality-->
+<script src="js/sidebar.js"></script>
+
+<script>
+    let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
+
+    dropdown_items.forEach(items =>{
+        items.onclick = () =>{
+            items_parent = items.parentElement.parentElement;
+            let output = items_parent.querySelector('.output');
+            output.value = items.innerText;
+        }
+    });
+</script>
+</body>
+</html>
