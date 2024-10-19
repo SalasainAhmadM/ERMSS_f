@@ -27,7 +27,7 @@ require_once('db.connection/connection.php');
         <!-- HEADER -->
         <header class="header" id="header">
             <nav class="nav container">
-                <a href="index.html" class="nav__logo">WESMAARRDEC</a>
+                <a href="index.html" class="nav__logo">WESMAARRDEC YOYO</a>
 
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
