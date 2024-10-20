@@ -3,7 +3,7 @@
     require_once('../db.connection/connection.php');
 
     // Fetch upcoming and ongoing events from the database, excluding canceled events
-    $sql = "SELECT * FROM Events WHERE event_cancel IS NULL OR event_cancel = '' ORDER BY date_created DESC";
+    $sql = "SELECT * FROM Events WHERE NOW() < CONCAT(date_end, ' ', time_end) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
     $result = mysqli_query($conn, $sql);
 
     // Loop through each event and generate a box
@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="flex-btn">
-                    <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
+                    <a href="view_eventHistory.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
                 </div>
             </div>
 <?php

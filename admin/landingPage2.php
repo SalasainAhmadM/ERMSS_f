@@ -252,7 +252,7 @@
 
                     <h1 class="heading">events</h1>
 
-                    <div class="box-container">
+                    <div class="box-container" style="display: flex;flex-wrap: wrap;">
                         <!--just include the F.getEvent.php for grid display-->
                         <?php include('../function/F.getEvent.php'); ?>
                                            

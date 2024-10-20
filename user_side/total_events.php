@@ -225,6 +225,84 @@
                 </section>
 
                 
+                <section class="event-filter"> <!--dapat naka drop down ito-->
+
+                <h1 class="heading"></h1>
+                <h1 class="heading">filter events</h1>
+
+                <div style="display: flex; gap: 10px; margin-bottom:10px"> 
+
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                        
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                
+                                <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
+                                <div class="lists">
+                                        
+                                    <a href="total_events_grid.php"><p class="items">Grid</p></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+                    <form action="" method="post" style="width:65%">
+                        <div class="flex">
+                            <div class="box">
+                                <p>Event Title <span>*</span></p>
+                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
+                            </div>
+
+                            <!-- <div class="dropdown-container">
+                                <div class="dropdown">
+                                    <p>Display <span>*</span></p>
+                                    <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
+                                    <div class="lists">
+                                        <a href="landingPageU.php"><p class="items">List</p></a>
+                                        <a href="landingPage2.php"><p class="items">Grid</p></a>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <div class="dropdown-container">
+                            <!-- <div class="dropdown">
+                                <input type="text" readonly name="eventMode" placeholder="event mode" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items">Face-to-Face</p>
+                                    <p class="items">Online</p>
+                                    <p class="items">Hybrid</p>
+                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
+                                </div>
+                            </div> -->
+
+                            <div class="dropdown">
+                                <input type="text" readonly name="eventType" placeholder="event type" maxlength="20" class="output">
+                                <div class="lists">
+                                    <a href="#" onclick='filterEvents("All")'><p class="items">All</p></a>
+                                    <?php
+                                    $sqlEventType = "SELECT DISTINCT event_type FROM events";
+                                    $resultEventType = $conn->query($sqlEventType);
+
+                                    if ($resultEventType->num_rows > 0) {
+                                        while ($row = $resultEventType->fetch_assoc()) {
+                                            echo "<a href='#' onclick='filterEvents(\"" . $row['event_type'] . "\")'><p class='items'>" . $row['event_type'] . "</p></a>";
+                                        }
+                                    } else {
+                                        echo "<p class='items'>No event types found</p>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+
+
+                        
+                        </div>
+                        
+                    </form>
+                </div>
+                
                 
 
                 <!-- ALL EVENTS TABULAR FORM-->

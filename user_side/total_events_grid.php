@@ -1,5 +1,6 @@
 <?php session_start(); // Start the session
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -44,7 +45,6 @@
                             $MI = $row['MI'];
                             $Position = $row['Position']; // Corrected the column name
                             $Image = $row['Image'];
-                            
 
                             // Now, you have the specific admin's data
                         }
@@ -54,12 +54,45 @@
 
                     $stmt->close();
 
+                    // Retrieve the total number of events joined by the user
+                    $countEventsSql = "SELECT COUNT(*) AS totalEventsJoined FROM EventParticipants WHERE UserID = ?";
+                    $countEventsStmt = $conn->prepare($countEventsSql);
+                    $countEventsStmt->bind_param("i", $UserID);
+                    $countEventsStmt->execute();
+                    $countEventsResult = $countEventsStmt->get_result();
+                    $countEventsRow = $countEventsResult->fetch_assoc();
+                    $totalEventsJoined = $countEventsRow['totalEventsJoined'];
+
+                // Retrieve the total number of upcoming events joined by the user
+                    $countUpcomingEventsSql = "SELECT COUNT(*) AS totalUpcomingEvents FROM Events
+                                            INNER JOIN EventParticipants ON Events.event_id = EventParticipants.event_id
+                                            WHERE EventParticipants.UserID = ? AND Events.date_end >= NOW() AND Events.date_start > NOW()
+                                            ORDER BY Events.date_created DESC";
+                    $countUpcomingEventsStmt = $conn->prepare($countUpcomingEventsSql);
+                    $countUpcomingEventsStmt->bind_param("i", $UserID);
+                    $countUpcomingEventsStmt->execute();
+                    $countUpcomingEventsResult = $countUpcomingEventsStmt->get_result();
+                    $countUpcomingEventsRow = $countUpcomingEventsResult->fetch_assoc();
+                    $totalUpcomingEvents = $countUpcomingEventsRow['totalUpcomingEvents'];
+
+
+                    // Retrieve the total number of ongoing events joined by the user
+                    $countOngoingEventsSql = "SELECT COUNT(*) AS totalOngoingEvents FROM Events
+                    INNER JOIN EventParticipants ON Events.event_id = EventParticipants.event_id
+                    WHERE EventParticipants.UserID = ? AND Events.date_end >= NOW() AND Events.date_start <= NOW()
+                    ORDER BY Events.date_created DESC";
+                    $countOngoingEventsStmt = $conn->prepare($countOngoingEventsSql);
+                    $countOngoingEventsStmt->bind_param("i", $UserID);
+                    $countOngoingEventsStmt->execute();
+                    $countOngoingEventsResult = $countOngoingEventsStmt->get_result();
+                    $countOngoingEventsRow = $countOngoingEventsResult->fetch_assoc();
+                    $totalOngoingEvents = $countOngoingEventsRow['totalOngoingEvents'];
+                    
                     // Fetch total number of cancelled events
                     $countCancelledEventsSql = "SELECT COUNT(*) AS totalCancelledEvents FROM Events WHERE event_cancel IS NOT NULL AND event_cancel <> ''";
                     $countCancelledEventsResult = mysqli_query($conn, $countCancelledEventsSql);
                     $countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
                     $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
-
 
                 } else {
                     // Redirect to login page or handle the case where UserID is not set in the session
@@ -111,7 +144,7 @@
                         <ul>
                             <a href="landingPageU.php">Join Event</a>
                             <a href="history.php">History</a>
-                            <a href="cancelEventU.php">Cancelled <span><?php echo $totalCancelledEvents; ?></span></span></span></a>
+                            <a href="cancelEventU.php">Cancelled <span><?php echo $totalCancelledEvents; ?></span></span></a>
                         </ul>
                     </div>
                 </li>
@@ -141,16 +174,57 @@
         </div>
 
 
-        
-
-
-
         <!-- ============ CONTENT ============-->
         <div class="main-content">
             <div class="containerr">
-                <h3 class="dashboard">EVENTS</h3>
+                <h3 class="dashboard">DASHBOARD</h3>
 
                 <!--======= event filter starts ======= -->
+                <section class="event-filter"> <!--dapat naka drop down ito-->
+
+                    <h1 class="heading">All Joined Events</h1>
+
+                </section>
+                <!-- ======= event filter ends ========-->
+
+            </div>
+
+
+            <div class="containerr">
+                <!--========= all event start =============-->
+                <section class="category">
+
+                    <div class="box-container">
+
+                        <a href="total_events.php" class="box">
+                            <i class='bx bx-archive'></i>
+                            <div>
+                                <!-- <h3>Total</h3> -->
+                                <h3>All</h3>
+                                <span>Events Joined</span>
+                            </div>
+                        </a>
+
+                        <a href="my_upcoming.php" class="box">
+                            <i class='bx bx-archive'></i>
+                            <div>
+                                <h3>Upcoming</h3>
+                                <span>Events</span>
+                            </div>
+                        </a>
+
+                        <a href="my_ongoing.php" class="box">
+                            <i class='bx bx-archive'></i>
+                            <div>
+                                <h3>Ongoing</h3>
+                                <span>Events</span>
+                            </div>
+                        </a>
+
+                    </div>
+                </section>
+
+                
                 <section class="event-filter"> <!--dapat naka drop down ito-->
 
                 <h1 class="heading"></h1>
@@ -166,7 +240,7 @@
                                 <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
                                 <div class="lists">
                                         
-                                    <a href="landingPage2.php"><p class="items">Grid</p></a>
+                                    <a href="total_events.php"><p class="items">Grid</p></a>
                                 </div>
                             </div>
                         </div>
@@ -176,8 +250,8 @@
                     <form action="" method="post" style="width:65%">
                         <div class="flex">
                             <div class="box">
-                            <p>Event Title <span>*</span></p>
-                            <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
+                                <p>Event Title <span>*</span></p>
+                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
                             </div>
 
                             <!-- <div class="dropdown-container">
@@ -206,22 +280,26 @@
                             <div class="dropdown">
                                 <input type="text" readonly name="eventType" placeholder="event type" maxlength="20" class="output">
                                 <div class="lists">
-                                    <a href="#" onclick='filterEvents("All")'><p class="items">All</p></a>
                                     <?php
+                                    // Fetch all distinct event types from the database
                                     $sqlEventType = "SELECT DISTINCT event_type FROM events";
                                     $resultEventType = $conn->query($sqlEventType);
 
+                                    // Check if there are rows returned
                                     if ($resultEventType->num_rows > 0) {
+                                        // Loop through each row and display event types as dropdown items
                                         while ($row = $resultEventType->fetch_assoc()) {
-                                            echo "<a href='#' onclick='filterEvents(\"" . $row['event_type'] . "\")'><p class='items'>" . $row['event_type'] . "</p></a>";
+                                            echo "<p class='items'>" . $row['event_type'] . "</p>";
                                         }
                                     } else {
                                         echo "<p class='items'>No event types found</p>";
                                     }
+
+                                   
                                     ?>
+                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
                                 </div>
                             </div>
-
 
                         
                         </div>
@@ -229,41 +307,17 @@
                     </form>
                 </div>
                 
-                </section>
-
-                
-                <!-- ======= event filter ends ========-->
-
-            </div>
-
-
-            <div class="containerr">
-                <!--========= all event start =============-->
                 
 
-                <!-- ALL EVENTS TABULAR FORM-->
-                <div class="event-table">
-                    <div class="tbl-container">
-                        <h2>Events</h2>
-                        <table class="tbl">
-                            <thead>
-                                <tr>
-                                    <th>Event Title</th>
-                                    <th>Event Type</th>
-                                    <th>Event Mode</th>
-                                    <th>Event Location</th>
-                                    <th>Event Date</th>
-                                    <th>Event Time</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                            <?php include('../function/F.getEventTblU.php'); ?>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="containerr">
+                    <!--========= all event start =============-->
+                    <section class="event-container">
+                    <h2 class="heading">Events</h2>
+                        <div class="box-container" style="display: flex; flex-wrap: wrap;">
+                            <!-- Just include the F.getEvent.php for grid display -->
+                            <?php include('../function/F.totalEventsU_grid.php'); ?>
+                        </div>
+                    </section>
                 </div>
 
                 
@@ -278,7 +332,6 @@
 
 
 
-        
         <!-- CONFIRM DELETE -->
         <script src=js/deleteEvent.js></script>
             
@@ -298,51 +351,5 @@
 
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>
-
-
-    <script>
-            function filterEvents(eventType) {
-                // Get all rows in the events table
-                const rows = document.querySelectorAll('.event-table tbody tr');
-                
-                rows.forEach(row => {
-                    // Get the text content of the event type cell (adjust the index if necessary)
-                    const eventTypeCell = row.querySelector('td:nth-child(2)').textContent;
-                    
-                    // If the event type matches or 'All' is selected, display the row, otherwise hide it
-                    if (eventType === 'All' || eventTypeCell === eventType) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            }
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const eventTitleInput = document.getElementById('eventTitleInput');
-            
-            // Add an input event listener to the Event Title input
-            eventTitleInput.addEventListener('input', function () {
-                const filterValue = eventTitleInput.value.toLowerCase(); // Get the input value and convert it to lowercase
-                
-                // Get all rows in the events table
-                const rows = document.querySelectorAll('.event-table tbody tr');
-                
-                // Iterate through each row and filter based on the Event Title column
-                rows.forEach(row => {
-                    const eventTitleCell = row.querySelector('td[data-label="Event Title"]').textContent.toLowerCase(); // Get the event title from the specific column
-                    
-                    // Check if the event title contains the filter value
-                    if (eventTitleCell.includes(filterValue)) {
-                        row.style.display = ''; // Show the row if it matches the filter
-                    } else {
-                        row.style.display = 'none'; // Hide the row if it doesn't match the filter
-                    }
-                });
-            });
-        });
-        </script>
 
 </html>

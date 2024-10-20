@@ -280,10 +280,8 @@
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, join!',
-                        cancelButtonText: 'No, cancel',
-                        width: '800px', 
-                        width: '900px', 
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No',
                         padding: '3rem', 
                         customClass: {
                         popup: 'larger-swal' 

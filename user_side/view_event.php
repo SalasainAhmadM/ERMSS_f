@@ -347,8 +347,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, join!',
                         cancelButtonText: 'No, cancel',
-                        width: '800px', 
-                        width: '800px', 
                         padding: '3rem', 
                         customClass: {
                         popup: 'larger-swal' 
