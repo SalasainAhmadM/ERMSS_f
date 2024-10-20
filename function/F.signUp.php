@@ -1,6 +1,9 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 require_once('../db.connection/connection.php');
+
+$response = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve user input
@@ -16,24 +19,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Password = $_POST["Password"];
     $ConfirmPassword = $_POST["ConfirmPassword"];
 
-    // You might want to perform additional validation and sanitation here
-
-    // Check if passwords match
     if ($Password !== $ConfirmPassword) {
-        echo "<script>alert('Error: Passwords do not match'); window.location.href = '../login.php';</script>";
+        $response = ['status' => 'error', 'message' => 'Passwords do not match!'];
+        echo json_encode($response);
         exit();
     }
 
     // Check if the email has the required domain
     if (!endsWith($Email, "@gmail.com")) {
-        echo "<script>alert('Error: Email must have the domain @gmail.com'); window.location.href = '../login.php';</script>";
+        $response = ['status' => 'error', 'message' => 'Email must have the domain @gmail.com'];
+        echo json_encode($response);
         exit();
     }
 
-    // Hash the Password before storing in the database
-    $hashedPassword = password_hash($Password, PASSWORD_BCRYPT); //for encrypting the password
+    $hashedPassword = password_hash($Password, PASSWORD_BCRYPT); 
 
-    // Your SQL query to check if the email already exists in the Student table
+
     $checkEmailQuery = "SELECT COUNT(*) as count FROM pendinguser WHERE Email = '$Email'";
     $checkResult = $conn->query($checkEmailQuery);
 
@@ -42,28 +43,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $emailCount = $row['count'];
 
         if ($emailCount > 0) {
-            echo "<script>alert('Error: Email is already registered'); window.location.href = '../login.php';</script>";
+            $response = ['status' => 'error', 'message' => 'Email is already registered!'];
         } else {
-            // Your SQL query to insert data into the PendingStudent table
             $sql = "INSERT INTO pendinguser (LastName, FirstName, MI, Gender, Email, ContactNo, Address, Affiliation, Position, Password, Role)
-                    VALUES ('$LastName', '$FirstName', '$MI', '$Gender', '$Email', '$ContactNo', '$Address', '$Affiliation', '$Position', '$hashedPassword', 'User')"; // Updated line
+                    VALUES ('$LastName', '$FirstName', '$MI', '$Gender', '$Email', '$ContactNo', '$Address', '$Affiliation', '$Position', '$hashedPassword', 'User')";
 
             if ($conn->query($sql) === TRUE) {
-                echo "<script>alert('Account successfully created. Wait for validation.'); window.location.href = '../login.php';</script>";
+                $response = ['status' => 'success', 'message' => 'Account successfully created. Wait for validation.'];
             } else {
-                echo "<script>alert('Error: " . $conn->error . "'); window.location.href = '../login.php';</script>";
+                $response = ['status' => 'error', 'message' => 'Database error: ' . $conn->error];
             }
         }
     } else {
-        echo "<script>alert('Error checking email: " . $conn->error . "'); window.location.href = '../login.php';</script>";
+        $response = ['status' => 'error', 'message' => 'Error checking email: ' . $conn->error];
     }
 
-    // Close the check result
     $checkResult->close();
     $conn->close();
+    
+    echo json_encode($response);
 }
 
-// Helper function to check if a string ends with another string
 function endsWith($haystack, $needle) {
     return substr($haystack, -strlen($needle)) === $needle;
 }

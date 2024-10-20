@@ -9,7 +9,7 @@ require 'PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$alertMessage = ''; // To hold the alert script
+$alertMessage = ''; 
 
 if (isset($_POST['submit'])) {
     $email = $_POST['Email'];

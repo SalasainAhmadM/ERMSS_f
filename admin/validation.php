@@ -15,14 +15,52 @@ include('../function/F.userValidation.php');
 
     <!-- font awesome cdn-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <link rel="stylesheet" href="css/table.css">
 </head>
 <body>
+<?php
+if (isset($_SESSION['success'])) {
+    // Display success SweetAlert
+    echo "<script>
+    Swal.fire({
+      title: 'Approved!',
+      text: 'Email Confirmation has been sent successfully!',
+      icon: 'success'
+    });
+    </script>";
+    // Unset the session variable to prevent the alert from showing again
+    unset($_SESSION['success']);
+}
 
+if (isset($_SESSION['decline'])) {
+    // Display decline SweetAlert
+    echo "<script>
+    Swal.fire({
+      title: 'Declined!',
+      text: 'The account has been declined.',
+      icon: 'info'
+    });
+    </script>";
+    unset($_SESSION['decline']);
+}
+
+if (isset($_SESSION['error'])) {
+    // Display error SweetAlert
+    echo "<script>
+    Swal.fire({
+      title: 'Error!',
+      text: '" . $_SESSION['error'] . "',
+      icon: 'error'
+    });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
 <!--=========== SIDEBAR =============-->
 <div class="sidebar">
     <div class="top">
@@ -202,28 +240,47 @@ include('../function/F.userValidation.php');
                     echo "No records found";
                 }
                 ?>
+                <?php
+// Check if status is set in the URL
+if (isset($_GET['status'])) {
+    $status = $_GET['status'];
+
+    // Generate SweetAlert based on the status
+    if ($status == 'success') {
+        echo "<script>
+            Swal.fire({
+                title: 'Success!',
+                text: 'Account has been approved and confirmation email sent.',
+                icon: 'success'
+            });
+        </script>";
+    } elseif ($status == 'declined') {
+        echo "<script>
+            Swal.fire({
+                title: 'Declined!',
+                text: 'Account request has been declined and email sent.',
+                icon: 'info'
+            });
+        </script>";
+    } elseif ($status == 'error') {
+        echo "<script>
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while sending the email. Please try again.',
+                icon: 'error'
+            });
+        </script>";
+    }
+}
+?>
             </div>
         </div>
-
-        <!-- <section class="category">
-            <div class="box-container">
-                <a href="landingPage.php" class="box">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <div>
-                        <h3>Go Back</h3>
-                        <span>Click to go back</span>
-                    </div>
-                </a>
-            </div>
-        </section> -->
-
         <script src="js/attendanceScript.js"></script>
 
     </div>
 </div>
 
-
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--sidebar functionality-->
 <script src="js/sidebar.js"></script>
 
