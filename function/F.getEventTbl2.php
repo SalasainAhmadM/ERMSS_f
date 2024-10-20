@@ -55,7 +55,6 @@
             </td>
 
             <?php
-            // Show Edit, View, and Delete buttons for Admin
             if ($userRole === 'Admin') {
                 ?>
                 <td data-label="Edit" class="pad">

@@ -152,7 +152,7 @@ if (isset($_GET['token'])) {
                 </form>
             </div>
         </div>
-
+ 
         <div class="panels-container">
             <div class="panel left-panel">
                 <img src="assets/img/wesmaarrdec-removebg-preview.png" class="image" alt="">

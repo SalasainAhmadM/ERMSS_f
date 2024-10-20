@@ -2,8 +2,8 @@
     // Include your database connection code here
     require_once('../db.connection/connection.php');
 
-    // Fetch upcoming and ongoing events from the database, excluding events with non-empty event_cancel
-    $sql = "SELECT * FROM Events WHERE NOW() < CONCAT(date_end, ' ', time_end) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
+    // Fetch upcoming and ongoing pendingevents from the database, excluding pendingevents with non-empty event_cancel
+    $sql = "SELECT * FROM pendingevents WHERE NOW() < CONCAT(date_end, ' ', time_end) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
     $result = mysqli_query($conn, $sql);
 
     // Loop through each event and generate a box
@@ -55,9 +55,9 @@
                 </div>
 
                 <div class="flex-btn">
-                    <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
-                    <a href="editEvent.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
-                    <a href="deleteEvent2.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to delete this event?');">
+                    <a href="view_event2.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
+                    <a href="approveEvents.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to approve this event?');" class="fa-solid fa-circle-check"></a>
+                    <a href="deleteEventpending2.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to delete this event?');">
                     <button class="btn_delete"><i class="fa fa-trash"></i></button>
                 </a>
                 </div>

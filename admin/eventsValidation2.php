@@ -272,7 +272,7 @@
 
                     <div class="box-container" style="display: flex;flex-wrap: wrap;">
                         <!--just include the F.getEvent.php for grid display-->
-                        <?php include('../function/F.getEvent2.php'); ?>
+                        <?php include('../function/F.getEvent3.php'); ?>
                                            
                     </div>
 

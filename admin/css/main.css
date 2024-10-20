@@ -818,7 +818,7 @@ section{
     color: var(--first-color-alt);
 }
 
-.event-container .box-container .box .fa-pen-to-square,
+.event-container .box-container .box .fa-pen-to-square, .event-container .box-container .box .fa-circle-check,
 .event-container .box-container .box .fa-trash{ /*replace this with qr code img class*/
     border-radius: .5rem;
     background-color: var(--body-color);
@@ -829,7 +829,7 @@ section{
     width: 4.5rem;
     line-height: 5rem;
 }
-.event-container .box-container .box .fa-pen-to-square:hover,
+.event-container .box-container .box .fa-pen-to-square:hover, .event-container .box-container .box .fa-circle-check:hover,
 .event-container .box-container .box .fa-trash:hover{
     /* background-color: var(--first-color-alt); */
     color: var(--first-color-alt);

@@ -32,7 +32,7 @@
                 $row = $result->fetch_assoc();
                 return $row['totalPendingUsers'];
             } else {
-                return 0; // Return 0 if there is an error or no pending users
+                return 0; 
             }
         }
         function countPendingEvents($conn)

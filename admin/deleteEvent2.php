@@ -12,7 +12,7 @@
             $stmt->bind_param("i", $eventId);
             // Execute the statement
             if (!$stmt->execute()) {
-                echo "<script>alert('Error deleting attendance records!'); window.location.href='pendingEvents.php';</script>";
+                echo "<script>alert('Error deleting attendance records!'); window.location.href='landingPage2.php';</script>";
                 exit;
             }
             $stmt->close();
@@ -25,28 +25,28 @@
             $stmt->bind_param("i", $eventId);
             // Execute the statement
             if (!$stmt->execute()) {
-                echo "<script>alert('Error deleting participants!'); window.location.href='pendingEvents.php';</script>";
+                echo "<script>alert('Error deleting participants!'); window.location.href='landingPage2.php';</script>";
                 exit;
             }
             $stmt->close();
         }
 
-        $deleteEventSql = "DELETE FROM pendingevents WHERE event_id = ?";
+        $deleteEventSql = "DELETE FROM Events WHERE event_id = ?";
         
         if ($stmt = $conn->prepare($deleteEventSql)) {
             $stmt->bind_param("i", $eventId);
             // Execute the statement
             if ($stmt->execute()) {
-                echo "<script>alert('Event, participants, and attendance records deleted successfully!'); window.location.href='pendingEvents.php';</script>";
+                echo "<script>alert('Event, participants, and attendance records deleted successfully!'); window.location.href='landingPage2.php';</script>";
             } else {
-                echo "<script>alert('Error deleting event!'); window.location.href='pendingEvents.php';</script>";
+                echo "<script>alert('Error deleting event!'); window.location.href='landingPage2.php';</script>";
             }
             $stmt->close();
         } else {
-            echo "<script>alert('Failed to prepare the SQL statement!'); window.location.href='pendingEvents.php';</script>";
+            echo "<script>alert('Failed to prepare the SQL statement!'); window.location.href='landingPage2.php';</script>";
         }
     } else {
-        echo "<script>alert('Invalid event ID!'); window.location.href='pendingEvents.php';</script>";
+        echo "<script>alert('Invalid event ID!'); window.location.href='landingPage2.php';</script>";
     }
 
     mysqli_close($conn);

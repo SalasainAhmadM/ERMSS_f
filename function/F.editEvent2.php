@@ -23,7 +23,7 @@ if (isset($_GET['event_id'])) {
     $eventId = cleanInput($_GET['event_id']);
 
     // Fetch event details from the database based on the event ID
-    $sql = "SELECT * FROM Events WHERE event_id = ?";
+    $sql = "SELECT * FROM pendingevents WHERE event_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $eventId);
 
@@ -108,7 +108,7 @@ if (isset($_GET['event_id'])) {
             }
 
             // Update the database with the new data using prepared statement
-            $updateSql = "UPDATE Events SET 
+            $updateSql = "UPDATE pendingevents SET 
                 event_title = ?,
                 event_description = ?,
                 event_type = ?,
@@ -148,7 +148,7 @@ if (isset($_GET['event_id'])) {
             );
 
             if ($updateStmt->execute()) {
-                showAlert("Event updated successfully!", "../admin/landingPage2.php");
+                showAlert("Event updated successfully!", "../admin/landingPage.php");
                 // Event updated successfully
                 // Redirect or perform other actions after successful update
             } else {

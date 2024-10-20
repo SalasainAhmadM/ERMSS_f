@@ -1,36 +1,32 @@
 <?php
 session_start();
 include('../function/F.event_retrieve2.php');
-
-// Ensure event_id is set from URL
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
 
-if ($eventId) {
-    // Fetch total participants for the specified event
-    $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants WHERE event_id = ?";
-    $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
-    $totalParticipantsStmt->bind_param("i", $eventId);  // Using event_id here
-    $totalParticipantsStmt->execute();
-    $totalParticipantsResult = $totalParticipantsStmt->get_result();
-    $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
-    $totalParticipants = $totalParticipantsRow['totalParticipants'];
+// Fetch total participants for the specified event title
+$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
+                          WHERE event_id = (SELECT event_id FROM pendingevents WHERE event_title = ?)";
+$totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
+$totalParticipantsStmt->bind_param("s", $eventTitle);
+$totalParticipantsStmt->execute();
+$totalParticipantsResult = $totalParticipantsStmt->get_result();
+$totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
+$totalParticipants = $totalParticipantsRow['totalParticipants'];
 
-    // Fetch participant limit for the event
-    $participantLimitSql = "SELECT participant_limit FROM pendingevents WHERE event_id = ?";
-    $participantLimitStmt = $conn->prepare($participantLimitSql);
-    $participantLimitStmt->bind_param("i", $eventId);  // Using event_id here
-    $participantLimitStmt->execute();
-    $participantLimitResult = $participantLimitStmt->get_result();
-    $participantLimitRow = $participantLimitResult->fetch_assoc();
-    $participantLimit = $participantLimitRow['participant_limit'];
+// Fetch participant limit for the event
+$participantLimitSql = "SELECT participant_limit FROM pendingevents WHERE event_title = ?";
+$participantLimitStmt = $conn->prepare($participantLimitSql);
+$participantLimitStmt->bind_param("s", $eventTitle);
+$participantLimitStmt->execute();
+$participantLimitResult = $participantLimitStmt->get_result();
+$participantLimitRow = $participantLimitResult->fetch_assoc();
+$participantLimit = $participantLimitRow['participant_limit'];
 
-    // Calculate the ratio of total participants to participant limit
-    $participantRatio = $totalParticipants . "/" . $participantLimit;
-} else {
-    $participantRatio = "N/A";  // Default value if event_id is not set
-}
-
+// Calculate the ratio of total participants to participant limit
+$participantRatio = $totalParticipants . "/" . $participantLimit;
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -96,7 +92,18 @@ if ($eventId) {
                         </div>
 
 
-                     
+                        <!-- <form action="applyEvent.php?event_id=<?php echo $eventId; ?>" method="post" class="flex-btn">
+                            <button type="submit" class="btn">Add Participant</button>
+                            
+                            <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>" class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>
+                        </form> -->
+
+                        <div class="flex-btn">
+                            <a href="applyEvent.php?event_id=<?php echo $eventId; ?>" class="btn">Add Participant</a>
+                            
+                            <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>" class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>
+                        </div>
+
                     </div>
 
                 </section>
