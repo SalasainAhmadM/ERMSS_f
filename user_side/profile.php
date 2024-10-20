@@ -91,7 +91,7 @@ $totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
                         </p>
 
                         <p class="tab__description">
-                            <span>Position: </span> <?php echo $Position; ?>
+                            <span>Occupation: </span> <?php echo $Position; ?>
                         </p>
 
                         <p class="tab__description">
@@ -135,7 +135,7 @@ $totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
 
                             <input type="number" name="Age" placeholder="Age" class="form__input" value="<?php echo $Age; ?>" require>
 
-                            <input type="text" name="Position" placeholder="Position" class="form__input" value="<?php echo $Position; ?>">
+                            <input type="text" name="Position" placeholder="Occupation" class="form__input" value="<?php echo $Position; ?>">
 
                             <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input" value="<?php echo $Affiliation; ?>">
 

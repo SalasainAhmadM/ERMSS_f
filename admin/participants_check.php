@@ -49,7 +49,7 @@
     $totalParticipants = $totalParticipantsRow['totalParticipants'];
 
     // Fetch and display participants for the specified event title
-    $participantsSql = "SELECT user.FirstName, user.LastName, user.Email, user.Affiliation, user.Position, user.ContactNo
+    $participantsSql = "SELECT user.FirstName, user.LastName,  user.Age,  user.Gender, user.Email, user.Affiliation, user.Position, user.ContactNo
                         FROM eventParticipants
                         INNER JOIN user ON eventParticipants.UserID = user.UserID
                         WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
@@ -262,9 +262,12 @@
                                 <tr>
                                     
                                     <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Gender</th>
                                     <th>Email</th>
+                                    <th>Occupation</th>
                                     <th>Affiliation</th>
-                                    <th>Position</th>
+                                    <th>Contact No.</th>
                                     <!-- <th>Action</th> -->
                                 </tr>
                             </thead>
@@ -275,15 +278,21 @@
                                     if ($participantsResult->num_rows > 0) {
                                         while ($row = $participantsResult->fetch_assoc()) {
                                             $fullName = htmlspecialchars($row['FirstName']) . ' ' . htmlspecialchars($row['LastName']);
+                                            $age = htmlspecialchars($row['Age']);
+                                            $gender = htmlspecialchars($row['Gender']);
                                             $email = htmlspecialchars($row['Email']);
                                             $affiliation = htmlspecialchars($row['Affiliation']);
                                             $position = htmlspecialchars($row['Position']);
+                                            $contact = htmlspecialchars($row['ContactNo']);
                                 ?>
                                             <tr>
                                                 <td><?php echo $fullName; ?></td>
+                                                <td><?php echo $age; ?></td>
+                                                <td><?php echo $gender; ?></td>
                                                 <td><?php echo $email; ?></td>
-                                                <td><?php echo $affiliation; ?></td>
                                                 <td><?php echo $position; ?></td>
+                                                <td><?php echo $affiliation; ?></td>
+                                                <td><?php echo $contact; ?></td>
                                                 <!-- <td>
                                                     <button><i class="fa-solid fa-eye"></i></button> 
                                                     

@@ -1493,11 +1493,11 @@ table.tb_eco button{
 }
 
 table.tb_eco td button:nth-child(1){
-    background-color: blue;
+    background-color: #e74c3c;
 }
 
 table.tb_eco td button:nth-child(2){
-    background-color: red;
+    background-color: #e74c3c;
 }
 
 .add_new{

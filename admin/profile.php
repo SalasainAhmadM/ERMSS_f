@@ -149,7 +149,7 @@ include('../function/F.profile_retrieve.php');
                         </p>
 
                         <p class="tab__description">
-                            <span>Position: </span> <?php echo $Position; ?>
+                            <span>Occupation: </span> <?php echo $Position; ?>
                         </p>
 
                         <p class="tab__description">
