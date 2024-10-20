@@ -404,13 +404,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <li>
                             <div class="item">
                                 <div class="name">
-                                    <span>Full Name</span>
+                                    <span>FULL NAME</span>
                                 </div>
                                 <div class="department">
-                                    <span>Affiliation</span>
+                                    <span>AFFILIATION</span>
                                 </div>
                                 <div class="department">
-                                    <span>POSITION</span>
+                                    <span>OCCUPATION</span>
                                 </div>
                                 <div class="info">
                                     <span>EMAIL</span>
