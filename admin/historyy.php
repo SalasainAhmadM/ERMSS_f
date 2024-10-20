@@ -163,63 +163,20 @@
                     <h1 class="heading">filter events</h1>
 
                     <form action="" method="post">
-                        <div class="flex">
-                            <div class="box">
-                                <p>Event Title <span>*</span></p>
-                                <input type="text" id="eventTitleInput" placeholder="filter event title" class="input">
-                            </div>
-
-                            <div class="dropdown-container">
-                                <div class="dropdown">
-                                    <p>Display <span>*</span></p>
-                                    <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
-                                    <div class="lists">
-                                        <a href="landingPage.php"><p class="items">List</p></a>
-                                        <a href="landingPage2.php"><p class="items">Grid</p></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dropdown-container">
-                            <!-- <div class="dropdown">
-                                <input type="text" readonly name="eventMode" placeholder="event mode" maxlength="20" class="output">
-                                <div class="lists">
-                                    <p class="items">Face-to-Face</p>
-                                    <p class="items">Online</p>
-                                    <p class="items">Hybrid</p>
-                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
-                                </div>
-                            </div> -->
-
-                            <div class="dropdown">
-                                <input type="text" readonly name="eventType" placeholder="event type" maxlength="20" class="output">
-                                <div class="lists">
-                                    <?php
-                                    // Fetch all distinct event types from the database
-                                    $sqlEventType = "SELECT DISTINCT event_type FROM events";
-                                    $resultEventType = $conn->query($sqlEventType);
-
-                                    // Check if there are rows returned
-                                    if ($resultEventType->num_rows > 0) {
-                                        // Loop through each row and display event types as dropdown items
-                                        while ($row = $resultEventType->fetch_assoc()) {
-                                            echo "<p class='items'>" . $row['event_type'] . "</p>";
-                                        }
-                                    } else {
-                                        echo "<p class='items'>No event types found</p>";
-                                    }
-
-                                   
-                                    ?>
-                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
-                                </div>
-                            </div>
-
                         
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                
+                                <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
+                                <div class="lists">
+                                        
+                                    <a href="history.php"><p class="items">List</p></a>
+                                </div>
+                            </div>
                         </div>
                         
                     </form>
+
 
                 </section>
                 <!-- ======= event filter ends ========-->
@@ -233,7 +190,7 @@
 
                     <h1 class="heading">all events</h1>
 
-                    <div class="box-container">
+                    <div class="box-container" style="display: flex;flex-wrap: wrap;">
                         <!--just include the F.getEvent.php for grid display-->
                         <?php include('../function/F.getEventHistory.php'); ?>
                                            

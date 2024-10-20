@@ -159,8 +159,8 @@
 
                 <!--======= event filter starts ======= -->
                 <section class="event-filter"> <!--dapat naka drop down ito-->
+                <h1 class="heading">filter events</h1>
 
-                    <h1 class="heading"></h1>
 
                     <form action="" method="post">
                         

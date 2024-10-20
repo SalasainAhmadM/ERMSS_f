@@ -17,16 +17,58 @@ if (isset($_SESSION['UserID'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Loop through each event and generate a table row
+    // Fetch the number of events the user has joined
+    $eventsJoined = mysqli_num_rows($result);
+
+    // Check if the session variable is already set, if not, set it
+    if (!isset($_SESSION['eventsJoined'])) {
+        $_SESSION['eventsJoined'] = $eventsJoined;
+    }
+
+    // Check if the number of events has changed after refresh
+    if ($_SESSION['eventsJoined'] != $eventsJoined) {
+        echo "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.10/dist/sweetalert2.all.min.js'></script>
+        <script>
+            Swal.fire({
+                title: 'Attention!',
+                text: 'The number of events you have joined has been added or is missing!',
+                icon: 'warning',
+                toast: false,
+                position: 'center',
+                showConfirmButton: true,
+                confirmButtonText: 'Okay',
+                confirmButtonColor: '#3085d6',
+                customClass: {
+                    popup: 'swal-popup-large',
+                    title: 'swal-title-large',
+                    content: 'swal-content-large'
+                },
+                didOpen: () => {
+                    const popup = Swal.getPopup();
+                    popup.style.width = '500px';  // Custom width
+                    popup.style.fontSize = '18px'; // Larger font size
+                }
+            });
+        </script>";
+    }
+
+    // Update session variable to the current number of events
+    $_SESSION['eventsJoined'] = $eventsJoined;
+
+    // Echo a message with the number of events the user has joined
+    echo "<h2>You have joined $eventsJoined event(s)</h2>";
+
+    // Fetch and display event data
     while ($row = mysqli_fetch_assoc($result)) {
-        $eventTitle = $row['event_title'];
-        $eventLocation = $row['location'];
-        $eventDateStart = date('F j, Y', strtotime($row['date_start'])); // Format date as Month day, Year
-        $eventDateEnd = date('F j, Y', strtotime($row['date_end'])); // Format date as Month day, Year
-        $eventTimeStart = date('h:ia', strtotime($row['time_start'])); // Format time as Hour:Minute AM/PM
-        $eventTimeEnd = date('h:ia', strtotime($row['time_end'])); // Format time as Hour:Minute AM/PM
-        $eventMode = $row['event_mode'];
-        $eventType = $row['event_type'];
+        $eventTitle = htmlspecialchars($row['event_title']);
+        $eventLocation = htmlspecialchars($row['location']);
+        $eventDateStart = $row['date_start'];
+        $eventDateEnd = $row['date_end'];
+        $eventTimeStart = $row['time_start'];
+        $eventTimeEnd = $row['time_end'];
+        $eventMode = htmlspecialchars($row['event_mode']);
+        $eventType = htmlspecialchars($row['event_type']);
         $eventId = $row['event_id'];
 
         // Get current date and time in the event's timezone
@@ -46,7 +88,7 @@ if (isset($_SESSION['UserID'])) {
             $eventStatus = 'ended';
         }
 
-        // Check if the event is ongoing or upcoming
+        // Only display ongoing or upcoming events
         if ($eventStatus === 'ongoing' || $eventStatus === 'upcoming') {
             echo '<tr data-start-date="' . $row['date_start'] . '" data-end-date="' . $row['date_end'] . '">';
             ?>
@@ -54,11 +96,11 @@ if (isset($_SESSION['UserID'])) {
             <td data-label="Event Type"><?php echo $eventType; ?></td>
             <td data-label="Event Mode"><?php echo $eventMode; ?></td>
             <td data-label="Event Location"><?php echo $eventLocation; ?></td>
-            <td data-label="Event Date"><?php echo "$eventDateStart - $eventDateEnd"; ?></td>
-            <td data-label="Event Time"><?php echo "$eventTimeStart - $eventTimeEnd"; ?></td>
+            <td data-label="Event Date"><?php echo date('F j, Y', strtotime($eventDateStart)) . ' - ' . date('F j, Y', strtotime($eventDateEnd)); ?></td>
+            <td data-label="Event Time"><?php echo date('h:ia', strtotime($eventTimeStart)) . ' - ' . date('h:ia', strtotime($eventTimeEnd)); ?></td>
             <td data-label="Status"><?php echo $eventStatus; ?></td>
             <td data-label="Attendance" class="pad">
-                <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i class="fa-solid fa-eye"></i></i></button></a>
+                <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i class="fa-solid fa-eye"></i></button></a>
             </td>
             <?php
             echo '</tr>';
@@ -71,7 +113,7 @@ if (isset($_SESSION['UserID'])) {
     // Close database connection
     mysqli_close($conn);
 } else {
-    // Redirect to login page or handle the case where UserID is not set in the session
+    // Redirect to login page if UserID is not set in the session
     header("Location: login.php");
     exit();
 }

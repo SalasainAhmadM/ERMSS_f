@@ -46,13 +46,15 @@
             <td data-label="Event Time"><?php echo "$eventTimeStart - $eventTimeEnd"; ?></td>
             <td data-label="Status"><?php echo $eventStatus; ?></td>
             <td data-label="View Event" class="pad">
-                <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>"><button class="btn_view"><i class="fa-solid fa-eye"></i></i></button></a>
+                <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>"><button class="btn_view"><i class="fa-solid fa-eye"></i></button></a>
             </td>
             <td data-label="Edit" class="pad">
                 <a href="editEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i class="fa fa-pencil"></i></button></a>
             </td>
             <td data-label="Delete" class="pad">
-                <button class="btn_trash" onclick="confirmDelete('<?php echo $row['event_id']; ?>')"><i class="fa fa-trash"></i></button>
+                <a href="deleteEvent.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to delete this event?');">
+                    <button class="btn_delete"><i class="fa fa-trash"></i></button>
+                </a>
             </td>
             <?php
             echo '</tr>';

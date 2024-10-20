@@ -57,7 +57,9 @@
                 <div class="flex-btn">
                     <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
                     <a href="editEvent.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
-                    <button type="submit" class="fa-solid fa-trash" onclick="confirmDelete('<?php echo $row['event_id']; ?>')" name="delete"></button>
+                    <a href="deleteEvent.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to delete this event?');">
+                    <button class="btn_delete"><i class="fa fa-trash"></i></button>
+                </a>
                 </div>
             </div>
 <?php

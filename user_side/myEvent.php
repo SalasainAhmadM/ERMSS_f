@@ -296,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                         </form> -->
                         <!-- Cancel Event Button -->
                         <?php if ($_SESSION['event_data']['eventStatus'] !== 'Ongoing') : ?>
-                            <form action="" method="post" class="flex-btn" id="cancelEventForm">
+                            <form action="" method="post" class="flex-btn" id="cancelEventBtn">
                                 <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                                 <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
                             </form>
