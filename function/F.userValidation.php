@@ -24,7 +24,20 @@ function countPendingUsers($conn)
 }
 
 $pendingUsersCount = countPendingUsers($conn);
-
+function countPendingEvents($conn)
+            {
+                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+                $result = $conn->query($sqls);
+            
+                if ($result) {
+                    $row = $result->fetch_assoc();
+                    return $row['totalPendingEvents'];
+                } else {
+                    return 0; 
+                }
+            }
+            
+            $pendingEventsCount = countPendingEvents($conn);
 function getAdminData($conn, $AdminID) {
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);

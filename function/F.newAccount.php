@@ -21,7 +21,20 @@ function countPendingUsers($conn)
         return 0;
     }
 }
-
+function countPendingEvents($conn)
+            {
+                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+                $result = $conn->query($sqls);
+            
+                if ($result) {
+                    $row = $result->fetch_assoc();
+                    return $row['totalPendingEvents'];
+                } else {
+                    return 0; 
+                }
+            }
+            
+            
 function getAdminData($conn, $AdminID)
 {
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
@@ -229,6 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $Image = isset($adminData['Image']) ? $adminData['Image'] : null;
 
             $pendingUsersCount = countPendingUsers($conn);
+            $pendingEventsCount = countPendingEvents($conn);
         } else {
             echo "No records found";
         }

@@ -205,6 +205,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return 0; // Return 0 if there is an error or no pending users
             }
         }
+        function countPendingEvents($conn)
+        {
+            $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+            $result = $conn->query($sqls);
+        
+            if ($result) {
+                $row = $result->fetch_assoc();
+                return $row['totalPendingEvents'];
+            } else {
+                return 0; 
+            }
+        }
+        
+        
 
         $FirstName = "";
         $MI = "";
@@ -243,6 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Example usage of the countPendingUsers function
             $pendingUsersCount = countPendingUsers($conn);
+            $pendingEventsCount = countPendingEvents($conn);
         }
     ?>
 
@@ -287,7 +302,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="tooltip">Events</span>
                 <div class="uno">
                     <ul>
-                        <a href="landingPage.php">Events</a>
+                         <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } ?>
+                            <a href="landingPage.php">Events</a>
                         <a href="addEvent.php">Add Event</a>
                         <a href="history.php">History</a>
                         <a href="cancelEvent.php">Cancelled</a>

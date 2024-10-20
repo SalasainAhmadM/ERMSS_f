@@ -42,7 +42,21 @@
                 }
             }
             
-            $pendingUsersCount = countPendingUsers($conn);
+            $pendingUsersCount = countPendingUsers($conn); 
+            function countPendingEvents($conn)
+            {
+                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+                $result = $conn->query($sqls);
+            
+                if ($result) {
+                    $row = $result->fetch_assoc();
+                    return $row['totalPendingEvents'];
+                } else {
+                    return 0; 
+                }
+            }
+            
+            $pendingEventsCount = countPendingEvents($conn);
             
             function getAdminData($conn, $AdminID) {
                 $sql = "SELECT * FROM admin WHERE AdminID = ?";
@@ -125,6 +139,11 @@
                     <span class="tooltip">Events</span>
                     <div class="uno">
                         <ul>
+                             <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } ?>
                             <a href="landingPage.php">Events</a>
                             <a href="addEvent.php">Add Event</a>
                             <a href="history.php">History</a>

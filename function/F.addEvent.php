@@ -16,11 +16,26 @@ function countPendingUsers($conn)
         $row = $result->fetch_assoc();
         return $row['totalPendingUsers'];
     } else {
-        return 0; // Return 0 if there is an error or no pending users
+        return 0; 
     }
 }
 
 $pendingUsersCount = countPendingUsers($conn);
+
+function countPendingEvents($conn)
+{
+    $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+    $result = $conn->query($sqls);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalPendingEvents'];
+    } else {
+        return 0; 
+    }
+}
+
+$pendingEventsCount = countPendingEvents($conn);
 
 function getAdminData($conn, $AdminID) {
     $sql = "SELECT * FROM admin WHERE AdminID = ?";

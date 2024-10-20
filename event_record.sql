@@ -185,6 +185,37 @@ INSERT INTO `eventparticipants` (`participant_id`, `event_id`, `UserID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pendingevents`
+--
+
+CREATE TABLE `pendingevents` (
+  `event_id` int(11) NOT NULL,
+  `event_title` varchar(255) NOT NULL,
+  `event_description` text DEFAULT NULL,
+  `event_type` varchar(50) NOT NULL,
+  `event_mode` varchar(50) NOT NULL,
+  `event_photo_path` varchar(255) DEFAULT NULL,
+  `location` varchar(255) NOT NULL,
+  `date_start` date NOT NULL,
+  `date_end` date NOT NULL,
+  `time_start` time NOT NULL,
+  `time_end` time NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `event_link` text DEFAULT NULL,
+  `cancelReason` text NOT NULL,
+  `event_cancel` varchar(255) NOT NULL,
+  `participant_limit` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pendingevents`
+--
+
+INSERT INTO `pendingevents` (`event_id`, `event_title`, `event_description`, `event_type`, `event_mode`, `event_photo_path`, `location`, `date_start`, `date_end`, `time_start`, `time_end`, `date_created`, `event_link`, `cancelReason`, `event_cancel`, `participant_limit`) VALUES
+(50, 'zoom link', 's', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-01', '2024-03-01', '20:18:00', '20:21:00', '2024-03-01 12:17:01', 'https://meet.google.com/xux-xsau-zbn', '', '', 0);
+
+-- --------------------------------------------------------
+--
 -- Table structure for table `events`
 --
 
@@ -480,6 +511,12 @@ ALTER TABLE `eventparticipants`
   ADD KEY `UserID` (`UserID`);
 
 --
+-- Indexes for table `pendingevents`
+--
+ALTER TABLE `pendingevents`
+  ADD PRIMARY KEY (`event_id`);
+
+--
 -- Indexes for table `events`
 --
 ALTER TABLE `events`
@@ -537,6 +574,12 @@ ALTER TABLE `director`
 --
 ALTER TABLE `eventparticipants`
   MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+
+--
+-- AUTO_INCREMENT for table `pendingevents`
+--
+ALTER TABLE `pendingevents`
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT for table `events`

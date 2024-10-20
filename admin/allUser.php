@@ -92,6 +92,11 @@
                     <span class="tooltip">Events</span>
                     <div class="uno">
                         <ul>
+                             <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                            <?php } ?>
                             <a href="landingPage.php">Events</a>
                             <a href="addEvent.php">Add Event</a>
                             <a href="history.php">History</a>
