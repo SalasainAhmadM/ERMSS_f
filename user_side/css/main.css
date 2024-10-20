@@ -515,7 +515,7 @@ section{
 .heading{
     /* text-align: center; */
     margin-bottom: 2rem;
-    font-size: 2.5rem;
+    font-size: 3rem;
     color: #000;
     text-transform: capitalize;
     padding: 1rem 0;
@@ -719,7 +719,7 @@ section{
     grid-template-columns: repeat(auto-fit, 35rem);
     gap: 1.5rem;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: left;
 }
 
 .event-container .box-container .box {
@@ -1534,18 +1534,18 @@ section{
 
 /* Style for the SweetAlert2 popup */
 .larger-swal {
-    font-size: 2em; /* Increase overall font size */
+    font-size: 1.5em; /* Increase overall font size */
     border-radius: 10px; /* Optional: Add rounded corners */
 }
 
 /* Style for the title */
 .larger-swal-title {
-    font-size: 2em; /* Increase the title font size */
+    font-size: 1.5em; /* Increase the title font size */
     font-weight: bold; /* Optional: Make the title bold */
 }
 
 /* Style for the content (text inside the popup) */
 .larger-swal-content {
-    font-size: 2em; /* Increase the content font size */
+    font-size: 1.5em; /* Increase the content font size */
 }
   

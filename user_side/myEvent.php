@@ -79,6 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <link rel="stylesheet" href="css/main.css">
 
         
@@ -292,12 +294,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                             <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                             <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
                         </form> -->
+                        <!-- Cancel Event Button -->
                         <?php if ($_SESSION['event_data']['eventStatus'] !== 'Ongoing') : ?>
-                            <form action="" method="post" class="flex-btn" id="cancelEventForm" onsubmit="return confirm('Are you sure you want to cancel the event?');">
+                            <form action="" method="post" class="flex-btn" id="cancelEventForm">
                                 <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                                 <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
                             </form>
+
+
+                            <script>
+                                document.getElementById('cancelEventBtn').addEventListener('click', function() {
+                                    Swal.fire({
+                                        title: 'Are you sure you want to cancel the event?',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Yes, cancel it!',
+                                        cancelButtonText: 'No, keep it',
+                                        padding: '3rem',
+                                        customClass: {
+                                            popup: 'larger-swal'
+                                        }
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // If confirmed, submit the form
+                                            document.getElementById('cancelEventForm').submit();
+                                        }
+                                    });
+                                });
+
+                            </script>
                         <?php endif; ?>
+
+
 
                     </div>
 

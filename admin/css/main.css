@@ -733,11 +733,11 @@ section{
 
 /* =================== EVENT  STARTS ==============*/
 .event-container .box-container{
-    display: grid;
+    /* display: grid; */
     grid-template-columns: repeat(auto-fit, 35rem);
     gap: 1.5rem;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: left;
 }
 
 .event-container .box-container .box {
@@ -802,7 +802,7 @@ section{
 .event-container .box-container .box .tags{
     display: flex;
     flex-wrap: wrap;
-    /* gap: .5rem; */
+    gap: .5rem;
     margin: 1.2rem 0;
 }
 
@@ -1727,17 +1727,22 @@ table.tb_eco tr:hover td{
 
 /* Style for the SweetAlert2 popup */
 .larger-swal {
-    font-size: 2em; /* Increase overall font size */
+    font-size: 1.5em; /* Increase overall font size */
     border-radius: 10px; /* Optional: Add rounded corners */
 }
 
 /* Style for the title */
 .larger-swal-title {
-    font-size: 2em; /* Increase the title font size */
+    font-size: 1.5em; /* Increase the title font size */
     font-weight: bold; /* Optional: Make the title bold */
 }
 
 /* Style for the content (text inside the popup) */
 .larger-swal-content {
-    font-size: 2em; /* Increase the content font size */
+    font-size: 1.5em; /* Increase the content font size */
+}
+
+.box-container > div {
+    width: calc(33.33% - 10px);
+    box-sizing: border-box;
 }

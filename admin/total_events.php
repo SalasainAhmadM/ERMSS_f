@@ -226,10 +226,92 @@
                             </div>
                         </a>
                     </div>
-                </section>
-
-                
+                </section>           
             </div>
+
+
+
+                <!--======= event filter starts ======= -->
+                <section class="event-filter"> <!--dapat naka drop down ito-->
+
+                <h1 class="heading"></h1>
+                <h1 class="heading">filter events</h1>
+
+                <div style="display: flex; gap: 10px; margin-bottom:10px"> 
+
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                        
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                
+                                <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
+                                <div class="lists">
+                                        
+                                    <a href="total_events_grid.php"><p class="items">Grid</p></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+                    <form action="" method="post" style="width:65%">
+                        <div class="flex">
+                            <div class="box">
+                                <p>Event Title <span>*</span></p>
+                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
+                            </div>
+
+                            <!-- <div class="dropdown-container">
+                                <div class="dropdown">
+                                    <p>Display <span>*</span></p>
+                                    <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
+                                    <div class="lists">
+                                        <a href="landingPageU.php"><p class="items">List</p></a>
+                                        <a href="landingPage2.php"><p class="items">Grid</p></a>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <div class="dropdown-container">
+                            <!-- <div class="dropdown">
+                                <input type="text" readonly name="eventMode" placeholder="event mode" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items">Face-to-Face</p>
+                                    <p class="items">Online</p>
+                                    <p class="items">Hybrid</p>
+                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
+                                </div>
+                            </div> -->
+
+                            <div class="dropdown">
+                                <input type="text" readonly name="eventType" placeholder="event type" maxlength="20" class="output">
+                                <div class="lists">
+                                    <a href="#" onclick='filterEvents("All")'><p class="items">All</p></a>
+                                    <?php
+                                    $sqlEventType = "SELECT DISTINCT event_type FROM events";
+                                    $resultEventType = $conn->query($sqlEventType);
+
+                                    if ($resultEventType->num_rows > 0) {
+                                        while ($row = $resultEventType->fetch_assoc()) {
+                                            echo "<a href='#' onclick='filterEvents(\"" . $row['event_type'] . "\")'><p class='items'>" . $row['event_type'] . "</p></a>";
+                                        }
+                                    } else {
+                                        echo "<p class='items'>No event types found</p>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+
+
+                        
+                        </div>
+                        
+                    </form>
+                </div>
+                
+                </section>
+            
 
             <div class="containerr">
                 <!--========= all event start =============-->
@@ -306,7 +388,50 @@
     </script>
 
 
+        <script>
+            function filterEvents(eventType) {
+                // Get all rows in the events table
+                const rows = document.querySelectorAll('.event-table tbody tr');
+                
+                rows.forEach(row => {
+                    // Get the text content of the event type cell (adjust the index if necessary)
+                    const eventTypeCell = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    // If the event type matches or 'All' is selected, display the row, otherwise hide it
+                    if (eventType === 'All' || eventTypeCell === eventType) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        </script>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const eventTitleInput = document.getElementById('eventTitleInput');
+                
+                // Add an input event listener to the Event Title input
+                eventTitleInput.addEventListener('input', function () {
+                    const filterValue = eventTitleInput.value.toLowerCase(); // Get the input value and convert it to lowercase
+                    
+                    // Get all rows in the events table
+                    const rows = document.querySelectorAll('.event-table tbody tr');
+                    
+                    // Iterate through each row and filter based on the Event Title column
+                    rows.forEach(row => {
+                        const eventTitleCell = row.querySelector('td[data-label="Event Title"]').textContent.toLowerCase(); // Get the event title from the specific column
+                        
+                        // Check if the event title contains the filter value
+                        if (eventTitleCell.includes(filterValue)) {
+                            row.style.display = ''; // Show the row if it matches the filter
+                        } else {
+                            row.style.display = 'none'; // Hide the row if it doesn't match the filter
+                        }
+                    });
+                });
+            });
+            </script>
 
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>

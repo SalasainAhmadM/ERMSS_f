@@ -231,6 +231,7 @@
                 
             </div>
 
+
             <div class="containerr">
                 <!--========= all event start =============-->
                 
@@ -306,6 +307,50 @@
     </script>
 
 
+        <script>
+            function filterEvents(eventType) {
+                // Get all rows in the events table
+                const rows = document.querySelectorAll('.event-table tbody tr');
+                
+                rows.forEach(row => {
+                    // Get the text content of the event type cell (adjust the index if necessary)
+                    const eventTypeCell = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    // If the event type matches or 'All' is selected, display the row, otherwise hide it
+                    if (eventType === 'All' || eventTypeCell === eventType) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const eventTitleInput = document.getElementById('eventTitleInput');
+                
+                // Add an input event listener to the Event Title input
+                eventTitleInput.addEventListener('input', function () {
+                    const filterValue = eventTitleInput.value.toLowerCase(); // Get the input value and convert it to lowercase
+                    
+                    // Get all rows in the events table
+                    const rows = document.querySelectorAll('.event-table tbody tr');
+                    
+                    // Iterate through each row and filter based on the Event Title column
+                    rows.forEach(row => {
+                        const eventTitleCell = row.querySelector('td[data-label="Event Title"]').textContent.toLowerCase(); // Get the event title from the specific column
+                        
+                        // Check if the event title contains the filter value
+                        if (eventTitleCell.includes(filterValue)) {
+                            row.style.display = ''; // Show the row if it matches the filter
+                        } else {
+                            row.style.display = 'none'; // Hide the row if it doesn't match the filter
+                        }
+                    });
+                });
+            });
+            </script>
 
 
     <!--real-time update-->
