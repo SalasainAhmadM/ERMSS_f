@@ -25,30 +25,37 @@ if (isset($_SESSION['UserID'])) {
         $_SESSION['eventsJoined'] = $eventsJoined;
     }
 
-    // Check if the number of events has changed after refresh
-    if ($_SESSION['eventsJoined'] != $eventsJoined) {
+    // Determine whether events have been added or cancelled
+    if ($_SESSION['eventsJoined'] < $eventsJoined) {
+        // Event was added
         echo "
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.10/dist/sweetalert2.all.min.js'></script>
         <script>
             Swal.fire({
-                title: 'Attention!',
-                text: 'The number of events you have joined has been added or is missing!',
+                title: 'Success!',
+                text: 'An event has been added!',
+                icon: 'success',
+                toast: true,
+                position: 'top-right',
+                showConfirmButton: false,
+                timer: 10000,
+                timerProgressBar: true,
+            });
+        </script>";
+    } elseif ($_SESSION['eventsJoined'] > $eventsJoined) {
+        // Event was cancelled
+        echo "
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.10/dist/sweetalert2.all.min.js'></script>
+        <script>
+            Swal.fire({
+                title: 'Warning!',
+                text: 'An event has been cancelled!',
                 icon: 'warning',
-                toast: false,
-                position: 'center',
-                showConfirmButton: true,
-                confirmButtonText: 'Okay',
-                confirmButtonColor: '#3085d6',
-                customClass: {
-                    popup: 'swal-popup-large',
-                    title: 'swal-title-large',
-                    content: 'swal-content-large'
-                },
-                didOpen: () => {
-                    const popup = Swal.getPopup();
-                    popup.style.width = '500px';  // Custom width
-                    popup.style.fontSize = '18px'; // Larger font size
-                }
+                toast: true,
+                position: 'top-right',
+                showConfirmButton: false,
+                timer: 10000,
+                timerProgressBar: true,
             });
         </script>";
     }
@@ -56,10 +63,9 @@ if (isset($_SESSION['UserID'])) {
     // Update session variable to the current number of events
     $_SESSION['eventsJoined'] = $eventsJoined;
 
-    // Echo a message with the number of events the user has joined
+    // Fetch and display event data
     echo "<h2>You have joined $eventsJoined event(s)</h2>";
 
-    // Fetch and display event data
     while ($row = mysqli_fetch_assoc($result)) {
         $eventTitle = htmlspecialchars($row['event_title']);
         $eventLocation = htmlspecialchars($row['location']);
@@ -117,4 +123,5 @@ if (isset($_SESSION['UserID'])) {
     header("Location: login.php");
     exit();
 }
+
 ?>
