@@ -1549,3 +1549,46 @@ section{
     font-size: 1.5em; /* Increase the content font size */
 }
   
+
+#cancelEventForm {
+    display: flex;
+    flex-direction: column;
+    max-width: 600px; /* Adjust form width */
+    margin: 20px auto; /* Center form */
+    padding: 15px;
+    border: 2px solid #444; /* Form border */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #f7f7f7; /* Light background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#cancelEventForm textarea {
+    width: 100%;
+    height: 200px; /* Bigger textarea */
+    padding: 10px;
+    font-size: 16px; /* Bigger font */
+    border-radius: 8px; /* Rounded corners for textarea */
+    resize: none; /* Disable resizing */
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+}
+
+#cancelEventForm textarea:focus {
+    border-color: #007bff; /* Border color on focus */
+    outline: none; /* Remove default focus outline */
+}
+
+#cancelEventForm button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #007bff; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+#cancelEventForm button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

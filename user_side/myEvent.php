@@ -294,6 +294,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                             <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                             <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
                         </form> -->
+                        
+
+                        <!-- Cancel Event Form -->
+                        <form action="" method="post" class="flex-btn" id="cancelEventForm">
+                            <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
+                            <textarea name="cancel_reason" placeholder="Enter reason for cancellation..." required></textarea>
+                        </form>
+
                         <!-- Cancel Event Button -->
                         <?php if ($_SESSION['event_data']['eventStatus'] !== 'Ongoing') : ?>
                             <form action="" method="post" class="flex-btn" id="cancelEventBtn">
@@ -326,7 +334,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
 
                             </script>
                         <?php endif; ?>
-
 
 
                     </div>

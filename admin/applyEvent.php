@@ -3,64 +3,80 @@
 
     $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
 
-    // Fetch distinct years from the Events table
-    $yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM Events ORDER BY event_year DESC";
-    $yearResult = mysqli_query($conn, $yearQuery);
-    $years = mysqli_fetch_all($yearResult, MYSQLI_ASSOC);
 
+    function showAlert($message, $redirectPath = null) {
+        echo "<script>alert('$message');";
+        if ($redirectPath) {
+            echo "window.location.href = '$redirectPath';";
+        }
+        echo "</script>";
+    }
+    
+    function getUserData($conn, $UserID) {
+        $sql = "SELECT * FROM user WHERE UserID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $UserID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            return $row;
+        } else {
+            $stmt->close();
+            return false;
+        }
+    }
 
-    // Fetch total events
-    $totalEventsQuery = "SELECT COUNT(*) AS totalEvents FROM Events";
-    $totalEventsResult = mysqli_query($conn, $totalEventsQuery);
-    $totalEvents = mysqli_fetch_assoc($totalEventsResult)['totalEvents'];
+    $eventLimitQuery = "SELECT participant_limit FROM Events WHERE event_id = ?";
+    $stmtLimit = $conn->prepare($eventLimitQuery);
+    $stmtLimit->bind_param("i", $eventId);
+    $stmtLimit->execute();
+    $eventLimitResult = $stmtLimit->get_result();
+    $eventLimit = $eventLimitResult->fetch_assoc()['participant_limit'];
+    $stmtLimit->close();
 
-    // Fetch total upcoming events (excluding cancelled events)
-    $totalUpcomingQuery = "SELECT COUNT(*) AS totalUpcoming FROM Events WHERE (NOW() < CONCAT(date_start, ' ', time_start)) AND (event_cancel IS NULL OR event_cancel = '')";
-    $totalUpcomingResult = mysqli_query($conn, $totalUpcomingQuery);
-    $totalUpcoming = mysqli_fetch_assoc($totalUpcomingResult)['totalUpcoming'];
+    $participantCountQuery = "SELECT COUNT(*) AS currentParticipants FROM EventParticipants WHERE event_id = ?";
+    $stmtCount = $conn->prepare($participantCountQuery);
+    $stmtCount->bind_param("i", $eventId);
+    $stmtCount->execute();
+    $participantCountResult = $stmtCount->get_result();
+    $currentParticipants = $participantCountResult->fetch_assoc()['currentParticipants'];
+    $stmtCount->close();
 
-    // Fetch total ongoing events (excluding cancelled events)
-    $totalOngoingQuery = "SELECT COUNT(*) AS totalOngoing FROM Events WHERE (NOW() BETWEEN CONCAT(date_start, ' ', time_start) AND CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
-    $totalOngoingResult = mysqli_query($conn, $totalOngoingQuery);
-    $totalOngoing = mysqli_fetch_assoc($totalOngoingResult)['totalOngoing'];
-
-    // Fetch total ended events (excluding cancelled events)
-    $totalEndedQuery = "SELECT COUNT(*) AS totalEnded FROM Events WHERE (NOW() > CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
-    $totalEndedResult = mysqli_query($conn, $totalEndedQuery);
-    $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
-
-
-    // Check if the form is submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once('../db.connection/connection.php');
-
-        // Check if UserID is set in the session
+    
         if (isset($_SESSION['UserID'])) {
             $UserID = $_SESSION['UserID'];
             $eventId = isset($_POST['event_id']) ? $_POST['event_id'] : null;
-
-            // Prepare and execute a query to insert data into EventParticipants table
-            $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
-            $stmtInsert = $conn->prepare($sqlInsert);
-            $stmtInsert->bind_param("ii", $eventId, $UserID);
-
-            if ($stmtInsert->execute()) {
-                // Insertion successful
-                echo "<script>alert('Successfully joined the event!'); window.location.href='';</script>";
+    
+            echo "UserID: $UserID, EventID: $eventId";  // Debugging line
+    
+            if ($currentParticipants >= $eventLimit) {
+                echo "<script>alert('Participant limit reached!'); window.location.href='';</script>";
             } else {
-                // Insertion failed
-                echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='';</script>";
+                $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
+                $stmtInsert = $conn->prepare($sqlInsert);
+                $stmtInsert->bind_param("ii", $eventId, $UserID);
+    
+                if ($stmtInsert->execute()) {
+                    echo "<script>alert('Successfully added to the event!'); window.location.href='';</script>";
+                } else {
+                    echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='';</script>";
+                }
+    
+                $stmtInsert->close();
             }
-
-            $stmtInsert->close();
         } else {
-            // Redirect to login page or handle the case where UserID is not set in the session
             header("Location: ../login.php");
             exit();
         }
     }
-
+    
 ?>
+
 
 
 <!DOCTYPE html>
@@ -183,6 +199,7 @@
                     <thead class="tb_head">
                         <tr>
                             <th>ID</th>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Affiliation</th>
@@ -192,14 +209,15 @@
                     <tbody>
                         <?php foreach ($allUsers as $user): ?>
                             <tr>
+                                <td>Event ID: <?php echo $eventId; ?></td>
                                 <td><?php echo $user['UserID']; ?></td>
                                 <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
                                 <td><?php echo $user['Email']; ?></td>
                                 <td><?php echo $user['Affiliation']; ?></td>
                                 <td>
                                     <form action="" method="post">
-                                        <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
-                                        <button type="submit" class="action-button"><i class="fa-solid fa-plus"></i></button>
+                                    <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
+                                    <button type="submit" class="action-button"><i class="fa-solid fa-plus"></i></button>
                                     </form>
                                     <!-- <button class="action-button" data-userid="<?php echo $user['UserID']; ?>" data-eventid="<?php echo $eventId; ?>"><i class="fa-solid fa-plus"></i></button> -->
                                 </td>
