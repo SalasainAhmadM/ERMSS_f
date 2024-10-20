@@ -7,6 +7,7 @@ function showProfileModal($message) {
               showModal('$message');
           </script>";
 }
+
 function countPendingUsers($conn)
 {
     $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
@@ -54,11 +55,10 @@ function getAdminData($conn, $AdminID) {
     }
 }
 
-$AdminID = $_SESSION['AdminID']; // Retrieve AdminID from the session
+$AdminID = $_SESSION['AdminID']; 
 $adminData = getAdminData($conn, $AdminID);
 
 if ($adminData) {
-    // Retrieve existing admin data
     $LastName = $adminData['LastName'];
     $FirstName = $adminData['FirstName'];
     $MI = $adminData['MI'];
@@ -70,41 +70,35 @@ if ($adminData) {
     $Position = $adminData['Position'];
     $Image = isset($adminData['Image']) ? $adminData['Image'] : null;
 } else {
-    // Redirect or handle error if admin data is not found
     showProfileModal("Admin data not found");
     exit();
 }
 
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data using $_POST
     $eventTitle = $_POST['event_title'];
     $eventDescription = $_POST['event_description'];
     $eventType = $_POST['event_type'];
     $eventMode = $_POST['event_mode'];
-    $eventLocation = $_POST['location'];
-    $eventDateStart = $_POST['date_start'];
-    $eventDateEnd = $_POST['date_end'];
-    $eventTimeStart = $_POST['time_start'];
-    $eventTimeEnd = $_POST['time_end'];
-    $participantLimit = $_POST['participant_limit']; // Retrieve participant limit from form data
-
-    // Initialize event photo path
+    $eventLocation = strtolower(trim($_POST['location'])); // Normalize location input
+    $eventDateStart = trim($_POST['date_start']); // Normalize date input
+    $eventDateEnd = trim($_POST['date_end']);
+    $eventTimeStart = trim($_POST['time_start']); // Normalize time input
+    $eventTimeEnd = trim($_POST['time_end']);
+    
+    $participantLimit = isset($_POST['participant_limit']) ? (int)$_POST['participant_limit'] : 0;
+    
     $eventPhotoPath = "";
-
-    // Initialize event link
     $eventLink = "";
 
     // Check if the event with the same location, date, and time already exists
-    $sqlCheckExisting = "SELECT * FROM Events WHERE location = ? AND date_start = ? AND time_start = ?";
+    $sqlCheckExisting = "SELECT * FROM Events WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
     $stmtCheckExisting = $conn->prepare($sqlCheckExisting);
     $stmtCheckExisting->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
     $stmtCheckExisting->execute();
     $resultCheckExisting = $stmtCheckExisting->get_result();
 
     if ($resultCheckExisting->num_rows > 0) {
-        // Event already exists with the same location, date, and time
-        echo "<script>alert('An event with the same location, date, and time already exists!'); window.location.href='landingPage.php';</script>";
+        echo "<script>alert('Location venue is already occupied on this date!'); window.location.href='landingPage.php';</script>";
         exit(); // Stop further execution
     }
 
@@ -126,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $eventDateEnd,
         $eventTimeStart,
         $eventTimeEnd,
-        $participantLimit, // Bind participant limit parameter
+        $participantLimit,  // Ensure correct parameter binding
         $eventPhotoPath,
         $eventLink
     );
