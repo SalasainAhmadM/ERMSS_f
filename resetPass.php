@@ -20,7 +20,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
 
 
-        <title>Forgot Password | Event Record Management</title>
+        <title>Reset Password | Event Record Management</title>
     </head>
 
 
@@ -33,12 +33,22 @@
                         <h2 class="title">Forget Password</h2>
 
                         <div class="input-field">
-                            <i class="fa-solid fa-user"></i>
-                            <input type="text" name="Email" placeholder="Email" required>
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="Password" placeholder="New Password" required>
                         </div>
 
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="Password" placeholder="Confirm Password" required>
+                        </div>
+
+                        <!-- <div class="input-field">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" name="Email" placeholder="Email" required>
+                        </div> -->
+
                         <!-- <input type="submit" value="Sign in" class="btn solid"> -->
-                        <input type="submit" value="Send Reset Link" name="submit" class="btn solid">
+                        <input type="submit" value="Save" name="submit" class="btn solid">
 
                         <div class="options">
                             <p class="social-text"><a href="index.php">Go Back</a></p>
