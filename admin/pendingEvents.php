@@ -187,7 +187,7 @@
                                 <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
                                 <div class="lists">
                                         
-                                    <a href="eventsValidation2.php"><p class="items">Grid</p></a>
+                                    <a href="pendingEvents2.php"><p class="items">Grid</p></a>
                                 </div>
                             </div>
                         </div>
