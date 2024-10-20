@@ -422,6 +422,18 @@ INSERT INTO `user` (`UserID`, `LastName`, `FirstName`, `MI`, `Gender`, `Age`, `E
 (25, 'Policarpio', 'Jhong', '', 'male', NULL, 'jhong@gmail.com', '$2y$10$jTSUCUObKu/JYNAOslXJQOFgbYNBGRupssintIWVHjvQKG7Yu3oO2', '123123', NULL, 'CCS', 'Project Manager', NULL, NULL, 'User'),
 (26, 'Delica', 'Faustine', '', 'Female', NULL, 'faustine@gmail.com', '$2y$10$wc6onDJlMM8w/29UEhDNU.S22XT77kxk1p8t52.Lnwekm9FmRW5p6', '09090909', 'baliwasan', 'CCS', 'secretary', '', NULL, 'User');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `expires_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -489,6 +501,13 @@ ALTER TABLE `pendinguser`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`UserID`);
+
+--
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`token`),
+  ADD UNIQUE KEY `Email` (`Email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
