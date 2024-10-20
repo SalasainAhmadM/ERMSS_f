@@ -48,10 +48,11 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`AdminID`, `LastName`, `FirstName`, `MI`, `Gender`, `Email`, `Password`, `ContactNo`, `Address`, `Affiliation`, `Position`, `Image`, `Role`) VALUES
-(5, 'Casinillo', 'Antonia', 'D.', 'Female', 'Admin2@gmail.com', '$2y$10$NwHhZ1iud/zSr52enuQm5OpKuECWGO02f9B5J7tzizL5Pb/7YdfI2', '09709185816', 'Atis drive, baliwasan,Zamboanga City', 'WMSU', 'Clerk', 'padwa.png', 'admin'),
-(6, 'Tabotabo', 'Larenz', 'B.', '', 'Admin@gmail.com', '$2y$10$AGJKlslsUWzh6jDVZSAN0u8Xa8U.EXP4QDeQc/Uw6CZ5GfB36RGO.', '09352453795', NULL, 'CCS', 'Lead Programmer', 'mark.png', 'admin'),
+(1, 'Gold', 'Roger', 'D.', 'Male', 'superadmin@gmail.com', '$2y$10$/ATMjC.VAVuAKFQjhh1jCOE.7dr24zsizLOGxiGVpX4p0O5K32XUm', '09709185816', 'Laughtale , Grandline', 'One Piece', 'Pirate King', 'roger.png', 'superadmin'),
+(5, 'Casinillo', 'Antonia', 'D.', 'Female', 'Admin2@gmail.com', '$2y$10$NwHhZ1iud/zSr52enuQm5OpKuECWGO02f9B5J7tzizL5Pb/7YdfI2', '09709185816', 'Atis drive, baliwasan,Zamboanga City', 'WMSU', 'Clerk', 'padwa.png', 'Admin'),
+(6, 'Tabotabo', 'Larenz', 'B.', '', 'Admin@gmail.com', '$2y$10$AGJKlslsUWzh6jDVZSAN0u8Xa8U.EXP4QDeQc/Uw6CZ5GfB36RGO.', '09352453795', NULL, 'CCS', 'Lead Programmer', 'mark.png', 'Admin'),
 (7, 'Tabotabo', 'Larenz', 'B.', '', 'larenz@gmail.com', 'Tabotabo', '123123123', 'Tetutan', 'CCS', 'Lead Programmer', 'mark.png', 'Admin'),
-(10, 'Dela Cruz', 'Juan', 'l', 'Male', 'director@gmail.com', '$2y$10$EpXTOqerQtUKQUab..FJLe8o5Nm6RgJxTGxuR48ImC.qyC033u5Ve', '09873526627', 'Normal Road, Baliwasan, Zamboanga City', 'Wesmaarrdec', 'Director', 'wesmaarrdec.jpg', 'SuperAdmin'),
+(10, 'Dela Cruz', 'Juan', 'l', 'Male', 'director@gmail.com', '$2y$10$EpXTOqerQtUKQUab..FJLe8o5Nm6RgJxTGxuR48ImC.qyC033u5Ve', '09873526627', 'Normal Road, Baliwasan, Zamboanga City', 'Wesmaarrdec', 'Director', 'wesmaarrdec.jpg', 'Admin'),
 (11, 'Beligolo', 'Raiza', '', 'Female', 'ziara@gmail.com', '$2y$10$XW3ZM3iJepGa6B5lX5Z1QenAAkjbLMdIfChQjzHpk7cu2aIr43Yvu', '09776702283', 'Tetutan, Zamboanga City', 'CCS', 'Project Manager', '', 'Admin'),
 (12, 'Beligolo', 'Raiza', 'S.', 'Female', 'ziara@gmail.com', '$2y$10$jW5AUsW.ahrO/i8E7ILRoOe5/2n54/D5uyhY.SMw.8CYt7kaHt19O', '09776702283', 'Tetutan, Zamboanga City', 'CCS', 'Project Manager', '', 'Admin'),
 (13, 'Beligolo', 'Raiza', 'S.', 'Female', 'ziara@gmail.com', '$2y$10$iz/yw.bG41NEliY4jH9cO.UTWfSff47odNRZ7t8t0FCrPqCttw/YK', '09776702283', 'Tetutan, Zamboanga City', 'CCS', 'Project Manager', '', 'Admin'),

@@ -15,11 +15,36 @@ include('../function/F.newAccount.php');
 
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+<?php
+    // Success Alert
+    if (isset($_SESSION['success'])) {
+        echo "<script>
+        Swal.fire({
+          title: 'Success!',
+          text: '" . $_SESSION['success'] . "',
+          icon: 'success'
+        });
+        </script>";
+        unset($_SESSION['success']); // Clear the session
+    }
 
+    // Error Alert
+    if (isset($_SESSION['error'])) {
+        echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+        </script>";
+        unset($_SESSION['error']); // Clear the session
+    }
+    ?>
 <!--=========== SIDEBAR =============-->
 <div class="sidebar">
     <div class="top">
@@ -183,10 +208,10 @@ include('../function/F.newAccount.php');
                             
                             <select name="Role" required>
                                 <option value="">Select</option>
-                                <?php if ($Role === 'SuperAdmin'): ?>
+                                <?php if ($Role === 'superadmin'): ?>
                                     <option value="Admin">Admin</option>
                                     <option value="User">User</option>
-                                    <option value="SuperAdmin">Director</option>
+                                    <!-- <option value="SuperAdmin">Director</option> -->
                                     <?php else: ?>
                                     
                                     <option value="User">User</option>
@@ -207,19 +232,6 @@ include('../function/F.newAccount.php');
 
         </div>
 
-        <!--back button-->
-        <!-- <section class="category">
-            <div class="box-container">
-              <a href="landingPage.php" class="box">
-                <i class="fa-solid fa-arrow-left"></i>
-                <div>
-                  <h3>Go Back</h3>
-                  <span>Click to go back</span>
-                </div>
-              </a>
-      
-            </div>
-          </section> -->
 
 
         
@@ -261,7 +273,7 @@ include('../function/F.newAccount.php');
         });
     </script> -->
 
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
         let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
