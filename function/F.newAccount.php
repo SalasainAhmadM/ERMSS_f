@@ -8,14 +8,6 @@ function endsWith($haystack, $needle)
 {
     return substr($haystack, -strlen($needle)) === $needle;
 }
-function showAlert($message, $redirectPath = null)
-{
-    echo "<script>alert('$message');";
-    if ($redirectPath) {
-        echo "window.location.href = '$redirectPath';";
-    }
-    echo "</script>";
-}
 
 function countPendingUsers($conn)
 {
@@ -26,11 +18,12 @@ function countPendingUsers($conn)
         $row = $result->fetch_assoc();
         return $row['totalPendingUsers'];
     } else {
-        return 0; // Return 0 if there is an error or no pending users
+        return 0;
     }
 }
 
-function getAdminData($conn, $AdminID) {
+function getAdminData($conn, $AdminID)
+{
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $AdminID);
@@ -47,7 +40,8 @@ function getAdminData($conn, $AdminID) {
     }
 }
 
-function getLoggedInUserRole($conn, $AdminID) {
+function getLoggedInUserRole($conn, $AdminID)
+{
     $sql = "SELECT Role FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $AdminID);
@@ -64,13 +58,30 @@ function getLoggedInUserRole($conn, $AdminID) {
     }
 }
 
-// Check if AdminID is set in the session
+function checkDuplicateEmail($conn, $email)
+{
+    $sql = "
+    SELECT Email FROM admin WHERE Email = ?
+    UNION
+    SELECT Email FROM user WHERE Email = ?
+";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return true; // Email already exists
+    } else {
+        return false; // No duplicate email found
+    }
+}
+
 if (isset($_SESSION['AdminID'])) {
     $AdminID = $_SESSION['AdminID']; // Retrieve AdminID from the session
     $adminData = getAdminData($conn, $AdminID);
 
     if ($adminData) {
-        // Retrieve existing admin data
         $LastName = $adminData['LastName'];
         $FirstName = $adminData['FirstName'];
         $MI = $adminData['MI'];
@@ -83,22 +94,19 @@ if (isset($_SESSION['AdminID'])) {
         $Image = isset($adminData['Image']) ? $adminData['Image'] : null;
         $Role = $adminData['Role'];
 
-        // Get the logged-in user's role
         $loggedInUserRole = getLoggedInUserRole($conn, $AdminID);
     } else {
-        // Redirect or handle error if admin data is not found
-        showProfileModal("Admin data not found");
+        $_SESSION['error'] = "Admin data not found";
+        header("Location: ../admin/newAccount.php");
         exit();
     }
 } else {
-    // Handle the case where AdminID is not set in the session
-    showProfileModal("Admin session not found");
+    $_SESSION['error'] = "Admin session not found";
+    header("Location: ../admin/newAccount.php");
     exit();
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Handle form submission
     $Email = $_POST["Email"];
     $LastName = $_POST["LastName"];
     $FirstName = $_POST["FirstName"];
@@ -113,30 +121,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Position = isset($_POST["Position"]) ? $_POST["Position"] : '';
     $Gender = $_POST["Gender"];
 
-    // Additional validation and sanitation here
-
     // Check if Passwords match
     if ($Password !== $ConfirmPassword) {
-        showAlert("Error: Passwords do not match", "../admin/newAccount.php");
+        $_SESSION['error'] = "Error: Passwords do not match";
+        header("Location: ../admin/newAccount.php");
         exit();
     }
 
     // Check if the Email has the required domain
     if (!endsWith($Email, "@gmail.com")) {
-        showAlert("Error: Email must have the domain @gmail.com", "../admin/newAccount.php");
+        $_SESSION['error'] = "Error: Email must have the domain @gmail.com";
+        header("Location: ../admin/newAccount.php");
         exit();
     }
 
-    // Hash the Password before storing in the database
+    // Check for duplicate email
+    if (checkDuplicateEmail($conn, $Email)) {
+        $_SESSION['error'] = "Error: Email already exists in the system";
+        header("Location: ../admin/newAccount.php");
+        exit();
+    }
+
     $hashedPassword = password_hash($Password, PASSWORD_BCRYPT);
 
-    // Check if an image is uploaded
     if (isset($_FILES['Image']) && $_FILES['Image']['error'] === UPLOAD_ERR_OK) {
         $fileType = pathinfo($_FILES['Image']['name'], PATHINFO_EXTENSION);
 
-        // Check if the file type is allowed
         if (!in_array($fileType, ['jpg', 'jpeg', 'png'])) {
-            showAlert("Only JPG, JPEG, or PNG files are allowed.", "../admin/newAccount.php");
+            $_SESSION['error'] = "Only JPG, JPEG, or PNG files are allowed.";
+            header("Location: ../admin/newAccount.php");
             exit();
         }
 
@@ -147,12 +160,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (move_uploaded_file($_FILES['Image']['tmp_name'], $imagePath)) {
             $Image = $fileName;
         } else {
-            showAlert("Failed to move uploaded file.", "../admin/newAccount.php");
+            $_SESSION['error'] = "Failed to move uploaded file.";
+            header("Location: ../admin/newAccount.php");
             exit();
         }
     }
 
-    // Fetch the Role of the logged-in admin
     $AdminID = $_SESSION['AdminID'];
     $sqlRole = "SELECT Role FROM admin WHERE AdminID = ?";
     $stmtRole = $conn->prepare($sqlRole);
@@ -164,24 +177,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $rowRole = $resultRole->fetch_assoc();
         $role = $rowRole['Role'];
     } else {
-        showAlert("Error: Unable to fetch admin role", "../admin/newAccount.php");
+        $_SESSION['error'] = "Error: Unable to fetch admin role";
+        header("Location: ../admin/newAccount.php");
         exit();
     }
 
     $stmtRole->close();
 
-    // Your SQL query to insert data into the appropriate table based on the role
     switch (strtolower($Role)) {
         case 'admin':
             $sql = "INSERT INTO admin (LastName, FirstName, MI, Gender, Email, Password, ContactNo, Address, Affiliation, Position, Image, Role)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             break;
-        case 'superadmin': // Change 'Director' to 'SuperAdmin'
+        case 'superadmin':
             if ($role === 'SuperAdmin') {
                 $sql = "INSERT INTO admin (LastName, FirstName, MI, Gender, Email, Password, ContactNo, Address, Affiliation, Position, Image, Role)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             } else {
-                showAlert("Error: Only SuperAdmin can create SuperAdmin accounts", "../admin/newAccount.php");
+                $_SESSION['error'] = "Error: Only SuperAdmin can create SuperAdmin accounts";
+                header("Location: ../admin/newAccount.php");
                 exit();
             }
             break;
@@ -191,22 +205,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $stmt = $conn->prepare($sql);
-
-    if (strtolower($Role) !== 'superadmin') {
-        $stmt->bind_param("ssssssssssss", $LastName, $FirstName, $MI, $Gender, $Email, $hashedPassword, $ContactNo, $Address, $Affiliation, $Position, $Image, $Role);
-    } else {
-        $stmt->bind_param("ssssssssssss", $LastName, $FirstName, $MI, $Gender, $Email, $hashedPassword, $ContactNo, $Address, $Affiliation, $Position, $Image, $Role);
-    }
+    $stmt->bind_param("ssssssssssss", $LastName, $FirstName, $MI, $Gender, $Email, $hashedPassword, $ContactNo, $Address, $Affiliation, $Position, $Image, $Role);
 
     if ($stmt->execute()) {
-        showAlert("New record created successfully", "../admin/landingPage.php");
+        $_SESSION['success'] = 'New record created successfully';
+        header("Location: ../admin/newAccount.php");
     } else {
-        showAlert("Error: " . $stmt->error, "../admin/newAccount.php");
+        $_SESSION['error'] = 'Error: ' . $stmt->error;
+        header("Location: ../admin/newAccount.php");
     }
 
     $stmt->close();
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Handle GET requests
     if (isset($_SESSION['AdminID'])) {
         $AdminID = $_SESSION['AdminID'];
         $adminData = getAdminData($conn, $AdminID);
@@ -223,7 +233,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "No records found";
         }
     } else {
-        echo "AdminID not set in the session";
+        echo "No admin session";
     }
 }
-?>

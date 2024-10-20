@@ -16,7 +16,8 @@ require_once('db.connection/connection.php');
 
         <!-- browser icon-->
         <link rel="icon" href="assets/img/wesmaarrdec.jpg" type="image/png">
-        
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- remixicons-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
 
@@ -120,7 +121,21 @@ require_once('db.connection/connection.php');
 
         </main>
 
-
+        <?php
+    if (isset($_GET['email'])) {
+        $email = htmlspecialchars($_GET['email']); 
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Registration Confirmed!',
+                    text: 'Your account with email $email has been approved.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>";
+    }
+    ?>
         <!-- FOOTER -->
         <!-- <footer class="footer">
             <div class="footer__container container grid">
@@ -178,7 +193,7 @@ require_once('db.connection/connection.php');
         <!-- SWIPER JS-->
         <script src="assets/js/swiper-bundle.min.js"></script>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- INDEX JS-->
         <script src="assets/js/index.js"></script>
     </body>

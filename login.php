@@ -15,7 +15,8 @@
         <link rel="icon" href="assets/img/wesmaarrdec.jpg" type="image/png">
 
 
-        <!-- Kaizoku -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- remixicons-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
 
@@ -50,7 +51,7 @@
                         
                     </form>
 
-                    <form action="function/F.signUp.php" class="sign-up-form" method="POST">
+                    <form id="sign-up-form" action="function/F.signUp.php" class="sign-up-form" method="POST">
                         <h2 class="title">Sign up</h2>
     
                         <h3 lass="title" style="margin-top:1rem;">Personal Information</h3>
@@ -83,26 +84,6 @@
                             <i class="fas fa-envelope"></i>
                             <input type="email" name="Email" placeholder="Email" required>
                         </div>
-
-                        <!-- <div class="input-field">
-                            <i class="fa-solid fa-phone"></i>
-                            <input type="number" name="ContactNo" placeholder="Contact Number" required>
-                        </div>
-
-                        <div class="input-field">
-                            <i class="fa-solid fa-building"></i>
-                            <input type="text" name="Address" placeholder="Street, Barangay, City" required>
-                        </div>
-
-                        <div class="input-field">
-                            <i class="fa-solid fa-building"></i>
-                            <input type="text" name="Affiliation" placeholder="Affiliation" required>
-                        </div>
-
-                        <div class="input-field">
-                            <i class="fa-solid fa-address-card"></i>
-                            <input type="text" name="Position" placeholder="Position" required>
-                        </div> -->
 
                         <div class="input-field">
                             <i class="fas fa-lock"></i>
@@ -147,18 +128,52 @@
                 </div>
             </div>
         </div>
+        <script>
+    $(document).ready(function() {
+        $('#sign-up-form').submit(function(event) {
+            event.preventDefault(); 
+
+            $.ajax({
+                url: 'function/F.signUp.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        }).then(function() {
+                            window.location.href = 'login.php'; 
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong. Please try again later.'
+                    });
+                }
+            });
+        });
+    });
+</script>
         
-
-
-
-
-
 
         <!-- SIGNIN-SIGNUP JS-->
         <script src="assets/js/signin-signup.js"></script>
 
 
         <!--font awesome kit -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <script src="https://kit.fontawesome.com/7b27fcfa62.js" crossorigin="anonymous"></script>
 
         <script>
@@ -167,22 +182,8 @@
             });
         </script>
 
-        <!-- <script>
-            function redirectToLandingPage() {
-                // Perform the redirection
-                window.location.href = 'admin/landingPage_admin.html';
-            }
-        </script> -->
-
         
     </body>
 
-    <!-- Error Modal -->
-<!-- <div id="errorModal" class="modal" style="display: <?php echo $message ? 'block' : 'none'; ?>">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p><?php echo $message; ?></p>
-    </div>
-</div> -->
 
 </html>
