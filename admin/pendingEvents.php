@@ -367,7 +367,21 @@ if (isset($_SESSION['success'])) {
 
     </body> 
 
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
 
+    if (status === 'success') {
+        Swal.fire({
+            title: "Success!",
+            text: "Event successfully updated!",
+            icon: "success"
+        }).then(() => {
+            const newUrl = window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        });
+    }
+</script>
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>
 

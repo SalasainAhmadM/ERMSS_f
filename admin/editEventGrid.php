@@ -90,7 +90,22 @@
 
         
     ?>
-
+ <?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+    Swal.fire({
+      title: 'Success!',
+      text: '" . $_SESSION['success'] . "',
+      icon: 'success'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = 'landingPage2.php';
+      }
+    });
+    </script>";
+    unset($_SESSION['success']);
+}
+?>
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
         <div class="top">
@@ -183,8 +198,10 @@
                 <div class="title">
                     Edit Event
                 </div>
+                <!-- <form method="POST" action="editEvent.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   -->
                 <form method="POST" action="editEventGrid.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   
-                    
+                <input type="hidden" name="event_cancel_reason" value="">
+                <input type="hidden" name="event_cancel" value="Cancelled">
                     <div class="input_field">
                         <label>Event Title</label>
                         <input type="text" class="input" name="event_title" value="<?php echo $eventTitle; ?>" required>
@@ -263,10 +280,6 @@
                         <input type="time" class="input" name="time_end" value="<?php echo $eventTimeEnd; ?>" required>
                     </div>
 
-                    <div class="input_field" id="cancelEventField" style="display: none;">
-                        <label>Reason for cancelling</label>
-                        <input type="text" class="input" name="event_cancel" value="">
-                    </div>
 
                     <div class="input_field">
                         <input type="submit" value="Save" class="createBtn" id="saveEventButton">
@@ -279,14 +292,81 @@
         </div>        
     </div>
 
+<!--CONFIRMATION===========-->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function confirmSaveChanges(event) {
+        event.preventDefault(); 
 
+        Swal.fire({
+            title: 'Save Changes?',
+            text: 'Are you sure you want to save the changes to this event?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, save it!',
+            cancelButtonText: 'No, cancel',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                event.target.submit();
+            }
+        });
+    }
+
+    function confirmCancelEvent(event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Cancel Event?',
+            text: 'Please provide a reason for canceling the event:',
+            icon: 'question',
+            input: 'text',
+            inputPlaceholder: 'Enter reason for cancellation',
+            inputAttributes: {
+                'aria-label': 'Reason for cancellation'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal'
+            },
+            preConfirm: (cancelReason) => {
+                if (!cancelReason) {
+                    Swal.showValidationMessage('Cancellation reason is required!');
+                }
+                return cancelReason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var cancelReason = result.value;
+                
+                document.querySelector("input[name='event_cancel_reason']").value = cancelReason;
+                document.querySelector('form').submit(); 
+            }
+        });
+    }
+
+    document.querySelector('form').addEventListener('submit', confirmSaveChanges);
+
+    document.getElementById('cancelEventButton').addEventListener('click', confirmCancelEvent);
+});
+</script>
     
 
 
     <!--JS -->
     <script src="js/eventscript.js"></script>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--sidebar functionality-->
     <script src="js/sidebar.js"></script>
 
@@ -326,93 +406,15 @@
                 toggleLocationField();
             });
 
-            // Trigger the initial state check
             toggleZoomLinkField();
             toggleLocationField();
-
-
-            // Function to handle cancel event button click
-            // document.getElementById('cancelEventButton').addEventListener('click', function () {
-            //     // Toggle visibility of the cancel event field
-            //     var cancelEventField = document.getElementById('cancelEventField');
-            //     cancelEventField.style.display = (cancelEventField.style.display === 'none') ? 'block' : 'none';
-
-            //     // Check if the field is being displayed and add/remove the required attribute accordingly
-            //     var eventCancelInput = document.querySelector("input[name='event_cancel']");
-            //     if (cancelEventField.style.display === 'block') {
-            //         eventCancelInput.required = true;
-                   
-                    
-            //     } else {
-            //         eventCancelInput.required = false;
-                    
-                    
-            //     }
-            // });
         });
     </script>
 
 
 
 
-    <!--CONFIRMATION===========-->
-    <script>
-       document.addEventListener('DOMContentLoaded', function () {
-    function confirmSaveChanges(event) {
-        event.preventDefault(); 
-
-        Swal.fire({
-            title: 'Save Changes?',
-            text: 'Are you sure you want to save the changes to this event?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, save it!',
-            cancelButtonText: 'No, cancel',
-            padding: '3rem',
-            customClass: {
-                popup: 'larger-swal' 
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.target.submit(); 
-            }
-        });
-    }
-
-    function confirmCancelEvent(event) {
-        event.preventDefault();
-
-        Swal.fire({
-            title: 'Cancel Event?',
-            text: 'Are you sure you want to cancel this event?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'No, keep it',
-            padding: '3rem',
-            customClass: {
-                popup: 'larger-swal' 
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'landingPage2.php'; 
-            }
-        });
-    }
-
-    document.querySelector('form').addEventListener('submit', confirmSaveChanges);
-
-    document.getElementById('cancelEventButton').addEventListener('click', confirmCancelEvent);
-});
-
-    </script>
-
-
-
+    
 
 
     <script>

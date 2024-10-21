@@ -391,7 +391,18 @@ if (isset($_SESSION['error'])) {
             window.history.replaceState(null, '', newUrl);
         });
     }
+    if (status === 'cancelled') {
+        Swal.fire({
+            title: "Cancelled!",
+            text: "Event successfully cancelled!",
+            icon: "error"
+        }).then(() => {
+            const newUrl = window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        });
+    }
 </script>
+
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>
 

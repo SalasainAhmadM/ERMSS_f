@@ -20,7 +20,7 @@ function cleanInput($input)
 if (isset($_GET['event_id'])) {
     $eventId = cleanInput($_GET['event_id']);
 
-    $sql = "SELECT * FROM Events WHERE event_id = ?";
+    $sql = "SELECT * FROM pendingevents WHERE event_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $eventId);
 
@@ -32,14 +32,14 @@ if (isset($_GET['event_id'])) {
         $eventDescription = $eventDetails['event_description'];
         $eventType = $eventDetails['event_type'];
         $eventMode = $eventDetails['event_mode'];
-        $eventLink = ($eventMode === 'Face-to-Face') ? '' : $eventDetails['event_link'];
-        $eventLocation = ($eventMode === 'Online') ? '' : $eventDetails['location'];
+        $eventLink = ($eventMode === 'Face-to-Face') ? '' : $eventDetails['event_link']; // Set to empty if Face-to-Face
+        $eventLocation = ($eventMode === 'Online') ? '' : $eventDetails['location']; // Set to empty if Online
         $eventDateStart = $eventDetails['date_start'];
         $eventDateEnd = $eventDetails['date_end'];
         $eventTimeStart = $eventDetails['time_start'];
         $eventTimeEnd = $eventDetails['time_end'];
         $eventPhotoPath = $eventDetails['event_photo_path'];
-        $participantLimit = $eventDetails['participant_limit'];
+        $participantLimit = $eventDetails['participant_limit']; // Retrieve participant limit
 
         $result->close();
 
@@ -53,9 +53,9 @@ if (isset($_GET['event_id'])) {
             $eventDateEnd = cleanInput($_POST['date_end']);
             $eventTimeStart = cleanInput($_POST['time_start']);
             $eventTimeEnd = cleanInput($_POST['time_end']);
-            $participantLimit = cleanInput($_POST['participant_limit']);
+            $participantLimit = cleanInput($_POST['participant_limit']); // Retrieve participant limit from form data
 
-            $eventPhotoPath = $eventDetails['event_photo_path'];
+            $eventPhotoPath = $eventDetails['event_photo_path']; // Use existing photo path as a default
 
             $uploadDir = "../admin/img/eventPhoto/";
             $uploadOk = 1;
@@ -65,6 +65,7 @@ if (isset($_GET['event_id'])) {
 
                 if ($uploadOk == 1 && move_uploaded_file($_FILES['event_photo']['tmp_name'], $newEventPhotoPath)) {
                     $eventPhotoPath = $newEventPhotoPath;
+                } else {
                 }
             }
 
@@ -78,10 +79,15 @@ if (isset($_GET['event_id'])) {
                 $eventLink = '';
             }
 
-            $cancelReason = cleanInput($_POST['event_cancel_reason']);
-            $cancelStatus = (!empty($cancelReason)) ? 'Cancelled' : '';
+            if (!empty($_POST['event_cancel'])) {
+                $cancelReason = cleanInput($_POST['event_cancel']);
+                $cancelStatus = 'Cancelled';
+            } else {
+                $cancelReason = ''; // If cancel reason is not provided
+                $cancelStatus = ''; // If event is not cancelled
+            }
 
-            $updateSql = "UPDATE Events SET 
+            $updateSql = "UPDATE pendingevents SET 
                 event_title = ?, 
                 event_description = ?, 
                 event_type = ?, 
@@ -102,35 +108,30 @@ if (isset($_GET['event_id'])) {
             $updateStmt->bind_param(
                 "sssssssssssssii", 
                 $eventTitle, 
-                $eventDescription, 
-                $eventType, 
-                $eventMode, 
-                $eventLink, 
-                $eventLocation, 
-                $eventDateStart, 
-                $eventDateEnd, 
-                $eventTimeStart, 
-                $eventTimeEnd, 
-                $eventPhotoPath, 
-                $cancelReason, 
+                $_POST['event_description'], 
+                $_POST['event_type'], 
+                $_POST['event_mode'], 
+                $_POST['zoom_link'], 
+                $_POST['location'], 
+                $_POST['date_start'], 
+                $_POST['date_end'], 
+                $_POST['time_start'], 
+                $_POST['time_end'], 
+                $_FILES['event_photo']['name'], 
+                $_POST['event_cancel'], 
                 $cancelStatus, 
-                $participantLimit, 
+                $_POST['participant_limit'], 
                 $eventId
             );
 
             if ($updateStmt->execute()) {
-                if (!empty($cancelReason)) {
-                    $_SESSION['cancelled'] = 'Event successfully cancelled!';
-                    header("Location: ../admin/landingPage.php?event_id=$eventId&status=cancelled");
-                } else {
-                    $_SESSION['success'] = 'Event successfully updated!';
-                    header("Location: ../admin/landingPage.php?event_id=$eventId&status=success");
-                }
+                $_SESSION['success'] = 'Event successfully updated!';
+                header("Location: ../admin/pendingEvents.php?event_id=$eventId&status=success");
                 exit();
             } else {
                 echo "Error updating record: " . $updateStmt->error;
             }
-
+            
             $updateStmt->close();
         }
     } else {
@@ -140,5 +141,3 @@ if (isset($_GET['event_id'])) {
     die("Event ID not provided.");
 }
 ?>
-
-
