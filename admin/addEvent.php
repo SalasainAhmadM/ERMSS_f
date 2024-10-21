@@ -26,10 +26,13 @@
     <?php
 if (isset($_SESSION['success'])) {
     echo "<script>
-    Swal.fire({
-      title: 'Success!',
-      text: '" . $_SESSION['success'] . "',
-      icon: 'success'
+        Swal.fire({
+        title: 'Success!',
+        text: '" . $_SESSION['success'] . "',
+        icon: 'success',
+        customClass: {
+        popup: 'larger-swal' 
+        }  
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = 'landingPage.php';
@@ -40,10 +43,13 @@ if (isset($_SESSION['success'])) {
 }
 if (isset($_SESSION['success2'])) {
     echo "<script>
-    Swal.fire({
-      title: 'Success!',
-      text: '" . $_SESSION['success2'] . "',
-      icon: 'success'
+        Swal.fire({
+        title: 'Success!',
+        text: '" . $_SESSION['success2'] . "',
+        icon: 'success',
+        customClass: {
+        popup: 'larger-swal' 
+        }  
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = 'pendingEvents.php';
@@ -54,10 +60,13 @@ if (isset($_SESSION['success2'])) {
 }
 if (isset($_SESSION['error'])) {
     echo "<script>
-        Swal.fire({
-          title: 'Error!',
-          text: '" . $_SESSION['error'] . "',
-          icon: 'error'
+            Swal.fire({
+            title: 'Error!',
+            text: '" . $_SESSION['error'] . "',
+            icon: 'error',
+            customClass: {
+            popup: 'larger-swal' 
+            }  
         });
     </script>";
     unset($_SESSION['error']);

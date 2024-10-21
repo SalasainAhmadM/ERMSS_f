@@ -113,38 +113,47 @@ $totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
                 <div class="tab__content" content id="update-profile">
                     <h3 class="tab__header">Update Profile</h3>
                     <div class="tab__body">
-                        <form id="profileForm" action="" method="POST" enctype="multipart/form-data" class="form grid">
-                            <label for="photoUpload">Change Photo</label>
-                            <?php if (!empty($Image)): ?>
-                                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon" id="profilePreview">
-                            <?php else: ?>
-                                <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon" id="profilePreview">
-                            <?php endif; ?>
-                            <input type="file" name="Image" id="Image" accept="image/*" class="form__input" onchange="previewImage(event)">
+                    <form id="profileForm" action="" method="POST" enctype="multipart/form-data" class="form grid">
+                        <label for="photoUpload">Change Photo</label>
+                        <?php if (!empty($Image)): ?>
+                            <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon" id="profilePreview">
+                        <?php else: ?>
+                            <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon" id="profilePreview">
+                        <?php endif; ?>
+                        <input type="file" name="Image" id="Image" accept="image/*" class="form__input" onchange="previewImage(event)">
 
-                            <input type="text" name="FirstName" style="display: none;" value="<?php echo $FirstName; ?>">
-                            <input type="text" name="LastName" style="display: none;"value="<?php echo $LastName; ?>">
-                            <input type="text" name="MI" style="display: none;"value="<?php echo $MI; ?>">
-                            <input type="text" name="Gender" style="display: none;"value="<?php echo $Gender; ?>">
-                            <input type="text" name="Email" style="display: none;"value="<?php echo $Email; ?>">
-                            <input type="password" name="Password" style="display: none;"value="<?php echo $Password; ?>">
-                
-                            <input type="text" name="ContactNo" placeholder="Phone" class="form__input" value="<?php echo $ContactNo; ?>">
+                        <input type="text" name="FirstName" style="display: none;" value="<?php echo $FirstName; ?>">
+                        <input type="text" name="LastName" style="display: none;" value="<?php echo $LastName; ?>">
+                        <input type="text" name="MI" style="display: none;" value="<?php echo $MI; ?>">
+                        <input type="text" name="Gender" style="display: none;" value="<?php echo $Gender; ?>">
+                        <input type="text" name="Email" style="display: none;" value="<?php echo $Email; ?>">
+                        <input type="password" name="Password" style="display: none;" value="<?php echo $Password; ?>">
 
-                            <input type="text" name="Address" placeholder="Address" class="form__input" value="<?php echo $Address; ?>">
+                        <input type="text" name="ContactNo" placeholder="Phone" class="form__input" value="<?php echo $ContactNo; ?>">
 
-                            <input type="number" name="Age" placeholder="Age" class="form__input" value="<?php echo $Age; ?>" require>
+                        <input type="text" name="Address" placeholder="Address" class="form__input" value="<?php echo $Address; ?>">
 
-                            <input type="text" name="Position" placeholder="Occupation" class="form__input" value="<?php echo $Position; ?>">
+                        <input type="number" name="Age" placeholder="Age" class="form__input" value="<?php echo $Age; ?>" required>
 
-                            <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input" value="<?php echo $Affiliation; ?>">
+                        <input type="text" name="Position" placeholder="Occupation" class="form__input" value="<?php echo $Position; ?>">
 
-                            <input type="text" name="EducationalAttainment"placeholder="Educational Attainment" class="form__input" value="<?php echo $EducationalAttainment; ?>">
+                        <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input" value="<?php echo $Affiliation; ?>">
 
-                            <div class="form__btn">
+                        <label for="EducationalAttainment">Educational Attainment</label>
+                        <select name="EducationalAttainment" class="form__input">
+                            <option value="" disabled selected>Select your educational attainment</option>
+                            <option value="High School" <?php echo ($EducationalAttainment == 'High School') ? 'selected' : ''; ?>>High School</option>
+                            <option value="Associate Degree" <?php echo ($EducationalAttainment == 'Associate Degree') ? 'selected' : ''; ?>>Associate Degree</option>
+                            <option value="Bachelors Degree" <?php echo ($EducationalAttainment == 'Bachelors Degree') ? 'selected' : ''; ?>>Bachelors Degree</option>
+                            <option value="Masters Degree" <?php echo ($EducationalAttainment == 'Masters Degree') ? 'selected' : ''; ?>>Masters Degree</option>
+                            <option value="Doctorate" <?php echo ($EducationalAttainment == 'Doctorate') ? 'selected' : ''; ?>>Doctorate</option>
+                        </select>
+
+                        <div class="form__btn">
                             <button class="btn btn--md" id="submitBtn" name="Submit">Save</button>
-                            </div>
-                        </form>
+                        </div>
+                    </form>
+
                     </div>
                 </div>
 

@@ -49,10 +49,11 @@ $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
 $totalParticipants = $totalParticipantsRow['totalParticipants'];
 
 // Fetch and display participants for the specified event title
-$participantsSql = "SELECT user.FirstName, user.LastName,  user.Age,  user.Gender, user.Email, user.Affiliation, user.Position, user.ContactNo
+$participantsSql = "SELECT user.FirstName, user.LastName, user.Age, user.Gender, user.Email, user.Affiliation, user.Position, user.Image, user.ContactNo, user.EducationalAttainment
                     FROM eventParticipants
                     INNER JOIN user ON eventParticipants.UserID = user.UserID
                     WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ? LIMIT 1)";
+
 $participantsStmt = $conn->prepare($participantsSql);
 $participantsStmt->bind_param("s", $eventTitle);
 $participantsStmt->execute();
@@ -73,6 +74,8 @@ $participantsResult = $participantsStmt->get_result();
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
@@ -266,17 +269,16 @@ $participantsResult = $participantsStmt->get_result();
                                     <th>Name</th>
                                     <th>Age</th>
                                     <th>Gender</th>
-                                    <th>Email</th>
+                                    <!-- <th>Email</th> -->
                                     <th>Occupation</th>
-                                    <th>Affiliation</th>
+                                    <!-- <th>Affiliation</th> -->
                                     <th>Contact No.</th>
                                     <!-- <th>Action</th> -->
                                 </tr>
                             </thead>
 
-                            <tbody>
-
-                                <?php
+                                <tbody>
+                                    <?php
                                     if ($participantsResult->num_rows > 0) {
                                         while ($row = $participantsResult->fetch_assoc()) {
                                             $fullName = htmlspecialchars($row['FirstName']) . ' ' . htmlspecialchars($row['LastName']);
@@ -285,28 +287,29 @@ $participantsResult = $participantsStmt->get_result();
                                             $email = htmlspecialchars($row['Email']);
                                             $affiliation = htmlspecialchars($row['Affiliation']);
                                             $position = htmlspecialchars($row['Position']);
+                                            $image = htmlspecialchars($row['Image']);
                                             $contact = htmlspecialchars($row['ContactNo']);
-                                ?>
-                                            <tr>
+                                            $educationalAttainment = htmlspecialchars($row['EducationalAttainment']); 
+                                            
+                                    ?>
+                                            <!-- Add the onclick event to trigger SweetAlert with participant info -->
+                                            <tr onclick="showProfile('<?php echo $fullName; ?>', '<?php echo $age; ?>', '<?php echo $gender; ?>', '<?php echo $email; ?>', '<?php echo $affiliation; ?>', '<?php echo $position; ?>', '<?php echo $image; ?>' , '<?php echo $contact; ?>', '<?php echo $educationalAttainment; ?>')">
                                                 <td><?php echo $fullName; ?></td>
                                                 <td><?php echo $age; ?></td>
                                                 <td><?php echo $gender; ?></td>
-                                                <td><?php echo $email; ?></td>
+                                                <!-- <td><?php echo $email; ?></td> -->
                                                 <td><?php echo $position; ?></td>
-                                                <td><?php echo $affiliation; ?></td>
+                                                <!-- <td><?php echo $affiliation; ?></td> -->
                                                 <td><?php echo $contact; ?></td>
-                                                <!-- <td>
-                                                    <button><i class="fa-solid fa-eye"></i></button> 
-                                                    
-                                                </td> -->
                                             </tr>
-                                <?php
+                                    <?php
                                         }
                                     } else {
-                                        echo "<tr><td colspan='4'>No participants found for this event.</td></tr>";
+                                        echo "<tr><td colspan='7'>No participants found for this event.</td></tr>";
                                     }
-                                ?>
-                            </tbody>
+                                    ?>
+                                </tbody>
+
                         </table>
                     </div>
                     
@@ -314,10 +317,47 @@ $participantsResult = $participantsStmt->get_result();
             </div>
         </div>
 
+        <script>
+            function showProfile(fullName, age, gender, email, affiliation, position, image, contact, educationalAttainment) {
+                Swal.fire({
+                    title: 'Participant Profile',
+                    html: `
+                    <div style="text-align: left; padding:2.5rem; ">
 
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                            alt="Profile Image" 
+                            style="width: 100px; height: 100px; border-radius: 50%;">
+                        </div>
 
-        
+                        <strong><h3 style="margin-bottom: 0.25rem; ; margin-top: 4rem">Personal Info:</h3></strong>
+                            <strong>Name:</strong> ${fullName}
+                            <strong style="margin-left:5rem;">Age:</strong> ${age} <br/>
+                            <strong>Gender:</strong> ${gender} <br/>
+                            <strong>Educational Attainment:</strong> ${educationalAttainment}
+                        <br/>
+                        <br/>
+       
+                        <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
+                            <strong>Email:</strong> ${email} <br/>
+                            <strong>Contact:</strong> ${contact} 
+                        <br/>
+                        <br/>
 
+                        <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
+                            <strong>Affiliation:</strong> ${affiliation} <br/>
+                            <strong>Occupation:</strong> ${position} 
+
+                    </div>
+                    `,
+                    customClass: {
+                        popup: 'larger-swal'
+                    },
+                    confirmButtonText: 'Close'
+                });
+
+            }
+        </script>
 
         <!--FILTER TABLE ROW-->
         <script>

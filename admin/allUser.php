@@ -40,6 +40,8 @@
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -152,21 +154,28 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Affiliation</th>
-                            <!-- <th>Action</th> -->
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($allUsers as $user): ?>
-                            <tr>
-                                <td><?php echo $user['UserID']; ?></td>
-                                <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
-                                <td><?php echo $user['Email']; ?></td>
-                                <td><?php echo $user['Affiliation']; ?></td>
-                                <!-- <td>
-                                    <button class="action-button" data-userid="<?php echo $user['UserID']; ?>"><i class="fa-solid fa-plus"></i></button>
-                                </td> -->
-
-                            </tr>
+                        <tr>
+                            <td><?php echo $user['UserID']; ?></td>
+                            <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
+                            <td><?php echo $user['Email']; ?></td>
+                            <td><?php echo $user['Affiliation']; ?></td>
+                            <td>
+                                <button class="action-button" data-userid="<?php echo $user['UserID']; ?>" 
+                                        data-image="<?php echo $user['Image']; ?>" 
+                                        data-gender="<?php echo $user['Gender']; ?>" 
+                                        data-age="<?php echo $user['Age']; ?>"
+                                        data-affiliation="<?php echo $user['Affiliation']; ?>"
+                                        data-educationalattainment="<?php echo $user['EducationalAttainment']; ?>"
+                                        data-contact="<?php echo $user['ContactNo']; ?>"
+                                        data-position="<?php echo $user['Position']; ?>"
+                                        onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
+                            </td>
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -176,6 +185,55 @@
                 
 </div>
         
+
+<script>
+function showUserProfile(userId) {
+    // Fetch user details dynamically
+    const fullName = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    const email = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.innerText;
+    const affiliation = document.querySelector(`button[data-userid="${userId}"]`).dataset.affiliation;
+    const gender = document.querySelector(`button[data-userid="${userId}"]`).dataset.gender; 
+    const age = document.querySelector(`button[data-userid="${userId}"]`).dataset.age; 
+    const educationalAttainment = document.querySelector(`button[data-userid="${userId}"]`).dataset.educationalattainment; 
+    const contact = document.querySelector(`button[data-userid="${userId}"]`).dataset.contact; 
+    const position = document.querySelector(`button[data-userid="${userId}"]`).dataset.position; 
+    const image = document.querySelector(`button[data-userid="${userId}"]`).dataset.image;  // User's profile image
+
+    Swal.fire({
+        title: 'User Profile',
+        html: `
+                <div style="text-align: left; padding:2.5rem;">
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                            alt="Profile Image" 
+                            style="width: 100px; height: 100px; border-radius: 50%;">
+                    </div>
+
+                    <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
+                    <strong>Name:</strong> ${fullName}
+                    <strong style="margin-left:5rem;">Age:</strong> ${age} <br/>
+                    <strong>Gender:</strong> ${gender} <br/>
+                    <strong>Educational Attainment:</strong> ${educationalAttainment}
+                    <br/><br/>
+                    
+                    <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
+                    <strong>Email:</strong> ${email} <br/>
+                    <strong>Contact:</strong> ${contact} 
+                    <br/><br/>
+                    
+                    <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
+                    <strong>Affiliation:</strong> ${affiliation} <br/>
+                    <strong>Occupation:</strong> ${position} 
+                </div>
+        `,
+        confirmButtonText: 'Close',
+        customClass: {
+            popup: 'larger-swal'
+        },
+    });
+}
+</script>
+
 
 
         <!--FILTER TABLE ROW-->

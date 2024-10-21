@@ -8,63 +8,83 @@
     $yearResult = mysqli_query($conn, $yearQuery);
     $years = mysqli_fetch_all($yearResult, MYSQLI_ASSOC);
 
-
-    // Fetch total events
     $totalEventsQuery = "SELECT COUNT(*) AS totalEvents FROM Events";
     $totalEventsResult = mysqli_query($conn, $totalEventsQuery);
     $totalEvents = mysqli_fetch_assoc($totalEventsResult)['totalEvents'];
 
-    // Fetch total upcoming events (excluding cancelled events)
     $totalUpcomingQuery = "SELECT COUNT(*) AS totalUpcoming FROM Events WHERE (NOW() < CONCAT(date_start, ' ', time_start)) AND (event_cancel IS NULL OR event_cancel = '')";
     $totalUpcomingResult = mysqli_query($conn, $totalUpcomingQuery);
     $totalUpcoming = mysqli_fetch_assoc($totalUpcomingResult)['totalUpcoming'];
 
-    // Fetch total ongoing events (excluding cancelled events)
     $totalOngoingQuery = "SELECT COUNT(*) AS totalOngoing FROM Events WHERE (NOW() BETWEEN CONCAT(date_start, ' ', time_start) AND CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
     $totalOngoingResult = mysqli_query($conn, $totalOngoingQuery);
     $totalOngoing = mysqli_fetch_assoc($totalOngoingResult)['totalOngoing'];
 
-    // Fetch total ended events (excluding cancelled events)
     $totalEndedQuery = "SELECT COUNT(*) AS totalEnded FROM Events WHERE (NOW() > CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
     $totalEndedResult = mysqli_query($conn, $totalEndedQuery);
     $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
-
-    // Check if the form is submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once('../db.connection/connection.php');
     
-        // Check if UserID is set in the session
         if (isset($_SESSION['UserID'])) {
             $UserID = $_SESSION['UserID'];
             $eventId = isset($_POST['event_id']) ? $_POST['event_id'] : null;
-            $participantId = isset($_POST['user_id']) ? $_POST['user_id'] : null; // Get the user ID from the form
+            $participantId = isset($_POST['user_id']) ? $_POST['user_id'] : null;
     
             if ($eventId && $participantId) {
-                // Prepare and execute a query to insert data into EventParticipants table
-                $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
-                $stmtInsert = $conn->prepare($sqlInsert);
-                $stmtInsert->bind_param("ii", $eventId, $participantId); // Use both eventId and participantId
+                // Check if the participant is already enrolled
+                $checkParticipantQuery = "SELECT COUNT(*) AS participant_count FROM EventParticipants WHERE event_id = ? AND UserID = ?";
+                $stmtCheckParticipant = $conn->prepare($checkParticipantQuery);
+                $stmtCheckParticipant->bind_param("ii", $eventId, $participantId);
+                $stmtCheckParticipant->execute();
+                $resultCheckParticipant = $stmtCheckParticipant->get_result();
+                $participantData = $resultCheckParticipant->fetch_assoc();
     
-                if ($stmtInsert->execute()) {
-                    // Insertion successful
-                    echo "<script>alert('Successfully joined the event!'); window.location.href='';</script>";
+                if ($participantData['participant_count'] > 0) {
+                    // Participant already enrolled
+                    echo "<script>alert('The participant is already added to the event.'); window.location.href='';</script>";
                 } else {
-                    // Insertion failed
-                    echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='';</script>";
+                    // Check the participant limit
+                    $checkLimitQuery = "SELECT participant_limit, 
+                                        (SELECT COUNT(*) FROM EventParticipants WHERE event_id = ?) AS current_participants 
+                                        FROM Events WHERE event_id = ?";
+                    $stmtLimit = $conn->prepare($checkLimitQuery);
+                    $stmtLimit->bind_param("ii", $eventId, $eventId);
+                    $stmtLimit->execute();
+                    $resultLimit = $stmtLimit->get_result();
+                    $eventData = $resultLimit->fetch_assoc();
+    
+                    if ($eventData['current_participants'] < $eventData['participant_limit']) {
+                        // If participant limit is not reached, proceed with insertion
+                        $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
+                        $stmtInsert = $conn->prepare($sqlInsert);
+                        $stmtInsert->bind_param("ii", $eventId, $participantId);
+    
+                        if ($stmtInsert->execute()) {
+                            echo "<script>alert('Successfully joined the event!'); window.location.href='';</script>";
+                        } else {
+                            echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='';</script>";
+                        }
+    
+                        $stmtInsert->close();
+                    } else {
+                        // Participant limit reached
+                        echo "<script>alert('This event has reached its participant limit.'); window.location.href='';</script>";
+                    }
+    
+                    $stmtLimit->close();
                 }
     
-                $stmtInsert->close();
+                $stmtCheckParticipant->close();
             }
         } else {
-            // Redirect to login page or handle the case where UserID is not set in the session
             header("Location: ../login.php");
             exit();
         }
     }
-    
-
 ?>
+
 
 
 <!DOCTYPE html>
