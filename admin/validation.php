@@ -25,7 +25,6 @@ include('../function/F.userValidation.php');
 <body>
 <?php
 if (isset($_SESSION['success'])) {
-    // Display success SweetAlert
     echo "<script>
     Swal.fire({
       title: 'Approved!',
@@ -33,12 +32,10 @@ if (isset($_SESSION['success'])) {
       icon: 'success'
     });
     </script>";
-    // Unset the session variable to prevent the alert from showing again
     unset($_SESSION['success']);
 }
 
 if (isset($_SESSION['decline'])) {
-    // Display decline SweetAlert
     echo "<script>
     Swal.fire({
       title: 'Declined!',
@@ -50,7 +47,6 @@ if (isset($_SESSION['decline'])) {
 }
 
 if (isset($_SESSION['error'])) {
-    // Display error SweetAlert
     echo "<script>
     Swal.fire({
       title: 'Error!',

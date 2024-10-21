@@ -38,25 +38,27 @@
     // Close statement and result set
     $eventDatesStmt->close();
 
-    // Fetch total participants for the specified event title
-    $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
-                            WHERE event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
-    $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
-    $totalParticipantsStmt->bind_param("s", $eventTitle);
-    $totalParticipantsStmt->execute();
-    $totalParticipantsResult = $totalParticipantsStmt->get_result();
-    $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
-    $totalParticipants = $totalParticipantsRow['totalParticipants'];
+// Fetch total participants for the specified event title
+$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
+                         WHERE event_id = (SELECT event_id FROM Events WHERE event_title = ? LIMIT 1)";
+$totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
+$totalParticipantsStmt->bind_param("s", $eventTitle);
+$totalParticipantsStmt->execute();
+$totalParticipantsResult = $totalParticipantsStmt->get_result();
+$totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
+$totalParticipants = $totalParticipantsRow['totalParticipants'];
 
-    // Fetch and display participants for the specified event title
-    $participantsSql = "SELECT user.FirstName, user.LastName,  user.Age,  user.Gender, user.Email, user.Affiliation, user.Position, user.ContactNo
-                        FROM eventParticipants
-                        INNER JOIN user ON eventParticipants.UserID = user.UserID
-                        WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
-    $participantsStmt = $conn->prepare($participantsSql);
-    $participantsStmt->bind_param("s", $eventTitle);
-    $participantsStmt->execute();
-    $participantsResult = $participantsStmt->get_result();
+// Fetch and display participants for the specified event title
+$participantsSql = "SELECT user.FirstName, user.LastName,  user.Age,  user.Gender, user.Email, user.Affiliation, user.Position, user.ContactNo
+                    FROM eventParticipants
+                    INNER JOIN user ON eventParticipants.UserID = user.UserID
+                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ? LIMIT 1)";
+$participantsStmt = $conn->prepare($participantsSql);
+$participantsStmt->bind_param("s", $eventTitle);
+$participantsStmt->execute();
+$participantsResult = $participantsStmt->get_result();
+
+
 ?>
 
 

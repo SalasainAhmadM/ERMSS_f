@@ -12,7 +12,8 @@
 
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -269,9 +270,10 @@
                     </div>
 
                     <div class="input_field">
-                        <input type="submit" value="Save" class="createBtn">
-                        <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
-                    </div>
+    <input type="submit" value="Save" class="createBtn" id="saveEventButton">
+    <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
+</div>
+
 
                 </form>
             </div>
@@ -331,23 +333,23 @@
 
 
             // Function to handle cancel event button click
-            document.getElementById('cancelEventButton').addEventListener('click', function () {
-                // Toggle visibility of the cancel event field
-                var cancelEventField = document.getElementById('cancelEventField');
-                cancelEventField.style.display = (cancelEventField.style.display === 'none') ? 'block' : 'none';
+            // document.getElementById('cancelEventButton').addEventListener('click', function () {
+            //     // Toggle visibility of the cancel event field
+            //     var cancelEventField = document.getElementById('cancelEventField');
+            //     cancelEventField.style.display = (cancelEventField.style.display === 'none') ? 'block' : 'none';
 
-                // Check if the field is being displayed and add/remove the required attribute accordingly
-                var eventCancelInput = document.querySelector("input[name='event_cancel']");
-                if (cancelEventField.style.display === 'block') {
-                    eventCancelInput.required = true;
+            //     // Check if the field is being displayed and add/remove the required attribute accordingly
+            //     var eventCancelInput = document.querySelector("input[name='event_cancel']");
+            //     if (cancelEventField.style.display === 'block') {
+            //         eventCancelInput.required = true;
                    
                     
-                } else {
-                    eventCancelInput.required = false;
+            //     } else {
+            //         eventCancelInput.required = false;
                     
                     
-                }
-            });
+            //     }
+            // });
         });
     </script>
 
@@ -356,26 +358,58 @@
 
     <!--CONFIRMATION===========-->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Function to display confirmation dialog when saving changes
-            function confirmSaveChanges(event) {
-                // Prevent the default form submission behavior
-                event.preventDefault();
+       document.addEventListener('DOMContentLoaded', function () {
+    function confirmSaveChanges(event) {
+        event.preventDefault(); 
 
-                // Display confirmation dialog
-                var confirmation = confirm("Save changes?");
-                if (confirmation) {
-                    // If user confirms, submit the form
-                    event.target.submit();
-                } else {
-                    // If user cancels, do nothing
-                    return false;
-                }
+        Swal.fire({
+            title: 'Save Changes?',
+            text: 'Are you sure you want to save the changes to this event?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, save it!',
+            cancelButtonText: 'No, cancel',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal' 
             }
-
-            // Attach the confirmation function to the form submit event
-            document.querySelector('form').addEventListener('submit', confirmSaveChanges);
+        }).then((result) => {
+            if (result.isConfirmed) {
+                event.target.submit(); 
+            }
         });
+    }
+
+    function confirmCancelEvent(event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Cancel Event?',
+            text: 'Are you sure you want to cancel this event?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal' 
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'landingPage.php'; 
+            }
+        });
+    }
+
+    document.querySelector('form').addEventListener('submit', confirmSaveChanges);
+
+    document.getElementById('cancelEventButton').addEventListener('click', confirmCancelEvent);
+});
+
     </script>
 
 

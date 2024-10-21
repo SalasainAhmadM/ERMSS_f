@@ -38,7 +38,20 @@ if (isset($_SESSION['success'])) {
     </script>";
     unset($_SESSION['success']);
 }
-
+if (isset($_SESSION['success2'])) {
+    echo "<script>
+    Swal.fire({
+      title: 'Success!',
+      text: '" . $_SESSION['success2'] . "',
+      icon: 'success'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = 'pendingEvents.php';
+      }
+    });
+    </script>";
+    unset($_SESSION['success2']);
+}
 if (isset($_SESSION['error'])) {
     echo "<script>
         Swal.fire({
@@ -215,6 +228,9 @@ if (isset($_SESSION['error'])) {
                         <script>
                         const dateStart = document.getElementById('date_start');
                         const dateEnd = document.getElementById('date_end');
+                        const today = new Date().toISOString().split('T')[0];
+                        dateStart.min = today;
+                        dateEnd.min = today;
                         dateStart.addEventListener('change', function() {
                             const startDate = this.value;
                             dateEnd.min = startDate;

@@ -9,7 +9,8 @@
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -72,8 +73,7 @@
                             $Position = $row['Position']; // Corrected the column name
                             $Affiliation = $row['Affiliation'];
                             $Image = $row['Image'];
-
-                            // Now, you have the specific admin's data
+                            $Role = $row['Role']; 
                         }
                     } else {
                         echo "No records found";
@@ -87,7 +87,28 @@
                 }
             }
         ?>
-
+<?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success'
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
         <!-- ====SIDEBAR==== -->
         <div class="sidebar">
             <div class="top">
@@ -269,7 +290,7 @@
                 <section class="event-container">
 
                     <h1 class="heading">events</h1>
-
+ 
                     <div class="box-container" style="display: flex;flex-wrap: wrap;">
                         <!--just include the F.getEvent.php for grid display-->
                         <?php include('../function/F.getEvent3.php'); ?>

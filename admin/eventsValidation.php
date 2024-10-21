@@ -5,14 +5,15 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE-edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Event Management System</title>
+        <title>Event Management System</title> 
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link rel="stylesheet" href="css/main.css">
 
         
@@ -45,7 +46,7 @@
                     $row = $result->fetch_assoc();
                     return $row['totalPendingEvents'];
                 } else {
-                    return 0; 
+                    return 0;  
                 }
             }
             
@@ -71,7 +72,7 @@
                             $Position = $row['Position']; 
                             $Affiliation = $row['Affiliation'];
                             $Image = $row['Image'];
-
+                            $Role = $row['Role']; 
                         }
                     } else {
                         echo "No records found";
@@ -84,7 +85,28 @@
                 }
             }
         ?>
-
+<?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success'
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
         <!-- ====SIDEBAR==== -->
         <div class="sidebar">
             <div class="top">
@@ -265,7 +287,7 @@
                     <div class="tbl-container">
                         <h2>Events</h2>
                         <table class="tbl">
-                            <thead>
+                            <thead> 
                                 <tr>
                                     <th>Event Title</th>
                                     <th>Event Type</th>
@@ -292,7 +314,7 @@
     
 
         <!-- CONFIRM DELETE -->
-        <script src=js/deleteEvent.js></script>
+        <!-- <script src=js/deleteEvent.js></script> -->
             
 
         <!--JS -->
@@ -301,7 +323,7 @@
 
         <!--sidebar functionality-->
         <script src="js/sidebar.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--filter event-->
         <script src="js/event_filter.js"></script>
 

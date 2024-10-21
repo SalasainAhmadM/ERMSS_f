@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($Role == 'superadmin') {
             $_SESSION['success'] = 'Event successfully created!';
         } elseif ($Role == 'Admin') {
-            $_SESSION['success'] = 'Event successfully created and is now pending approval!';
+            $_SESSION['success2'] = 'Event successfully created and is now pending approval!';
         }
         header("Location: addEvent.php");
         exit();

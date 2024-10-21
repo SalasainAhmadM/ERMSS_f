@@ -18,31 +18,7 @@
 
         
     </head>
-    <?php
-if (isset($_SESSION['success'])) {
-    echo "<script>
-        Swal.fire({
-          title: 'Success!',
-          text: '" . $_SESSION['success'] . "',
-          icon: 'success'
-        });
-    </script>";
-    unset($_SESSION['success']);
-}
-
-if (isset($_SESSION['error'])) {
-    echo "<script>
-        Swal.fire({
-          title: 'Error!',
-          text: '" . $_SESSION['error'] . "',
-          icon: 'error'
-        });
-    </script>";
-    unset($_SESSION['error']);
-}
-
-
-?>
+ 
 
     <body>
 
@@ -99,7 +75,7 @@ if (isset($_SESSION['error'])) {
                             $Image = $row['Image'];
 
                         }
-                    } else {
+                    } else { 
                         echo "No records found";
                     }
 
@@ -110,7 +86,28 @@ if (isset($_SESSION['error'])) {
                 }
             }
         ?>
-
+   <?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success'
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
         <!-- ====SIDEBAR==== -->
         <div class="sidebar">
             <div class="top">
@@ -285,7 +282,7 @@ if (isset($_SESSION['error'])) {
             <div class="containerr">
                 <!--========= all event start =============-->
                 
-
+ 
                 <!-- ALL EVENTS TABULAR FORM-->
                 <div class="event-table">
                     <div class="tbl-container">
@@ -327,7 +324,7 @@ if (isset($_SESSION['error'])) {
 
         <!--sidebar functionality-->
         <script src="js/sidebar.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--filter event-->
         <script src="js/event_filter.js"></script>
 

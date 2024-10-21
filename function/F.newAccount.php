@@ -1,7 +1,12 @@
 <?php
 session_start();
 require_once('../db.connection/connection.php');
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
+require '../PHPMailer/src/Exception.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 $message = '';
 
 function endsWith($haystack, $needle)
@@ -78,20 +83,20 @@ function checkDuplicateEmail($conn, $email)
     UNION
     SELECT Email FROM user WHERE Email = ?
 ";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare($sql); 
     $stmt->bind_param("ss", $email, $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        return true; // Email already exists
+        return true;
     } else {
-        return false; // No duplicate email found
+        return false; 
     }
 }
 
 if (isset($_SESSION['AdminID'])) {
-    $AdminID = $_SESSION['AdminID']; // Retrieve AdminID from the session
+    $AdminID = $_SESSION['AdminID']; 
     $adminData = getAdminData($conn, $AdminID);
 
     if ($adminData) {
@@ -221,8 +226,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssssssssss", $LastName, $FirstName, $MI, $Gender, $Email, $hashedPassword, $ContactNo, $Address, $Affiliation, $Position, $Image, $Role);
 
     if ($stmt->execute()) {
-        $_SESSION['success'] = 'New record created successfully';
+
+        $mail = new PHPMailer(true);
+    
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'eventmanagement917@gmail.com';  // Your email
+            $mail->Password = 'meapvvmlkmiccnjx';  // Your app password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+    
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+    
+            $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
+            $mail->addAddress($Email);  // Send email to the user's email
+    
+            $mail->isHTML(true);
+            $mail->Subject = 'Confirmation Link for Your Account';
+            $mail->Body    = 'Your account has been created: <a href="http://localhost/ERMSS_f/index.php?email=' . urlencode($Email) . '">Confirm Registration</a>';
+            $mail->AltBody = 'Click on the following link to confirm your registration: http://localhost/ERMSS_f/index.php?email=' . urlencode($Email);
+    
+            $mail->send();
+            $_SESSION['success'] = 'New record created successfully. A confirmation email has been sent to the user.';
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+    
         header("Location: ../admin/newAccount.php");
+        exit();
     } else {
         $_SESSION['error'] = 'Error: ' . $stmt->error;
         header("Location: ../admin/newAccount.php");

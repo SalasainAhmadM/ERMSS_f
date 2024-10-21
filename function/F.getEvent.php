@@ -57,8 +57,9 @@
                 <div class="flex-btn">
                     <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
                     <a href="editEvent.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
-                    <a href="deleteEvent2.php?event_id=<?php echo $eventId; ?>" onclick="return confirm('Are you sure you want to delete this event?');">
-                    <button class="btn_delete"><i class="fa fa-trash"></i></button>
+                    <a href="javascript:void(0);" onclick="confirmDeleteEvent(<?php echo $eventId; ?>);">
+                        <button class="btn_delete"><i class="fa fa-trash"></i></button>
+                    </a>
                 </a>
                 </div>
             </div>
@@ -71,3 +72,26 @@
     // Close database connection
     mysqli_close($conn);
 ?>
+ <script>
+    function confirmDeleteEvent(eventId) {
+        Swal.fire({
+            title: 'Delete Event?',
+            text: 'Are you sure you want to delete this event?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            padding: '3rem', 
+            customClass: {
+                popup: 'larger-swal'
+            }          
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `deleteEvent2.php?event_id=${eventId}`;
+            }
+        });
+    }
+
+</script>

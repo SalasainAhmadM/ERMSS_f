@@ -137,7 +137,7 @@ include('../function/F.newAccount.php');
                 <form action="../function/F.newAccount.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="AdminID" value="<?php echo $AdminID; ?>">
                 
-
+ 
 
                     <div class="input_field">
                         <label>Email</label>

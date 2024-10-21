@@ -3,15 +3,15 @@ session_start();
 include('../function/F.event_retrieve2.php');
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
 
-// Fetch total participants for the specified event title
 $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
-                          WHERE event_id = (SELECT event_id FROM pendingevents WHERE event_title = ?)";
+                          WHERE event_id IN (SELECT event_id FROM pendingevents WHERE event_title = ?)";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
 $totalParticipantsStmt->bind_param("s", $eventTitle);
 $totalParticipantsStmt->execute();
 $totalParticipantsResult = $totalParticipantsStmt->get_result();
 $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
 $totalParticipants = $totalParticipantsRow['totalParticipants'];
+
 
 // Fetch participant limit for the event
 $participantLimitSql = "SELECT participant_limit FROM pendingevents WHERE event_title = ?";

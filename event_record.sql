@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2024 at 03:43 AM
+-- Generation Time: Oct 21, 2024 at 08:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -93,7 +93,9 @@ CREATE TABLE `attendance` (
 
 INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`) VALUES
 (82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23'),
-(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51');
+(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51'),
+(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04'),
+(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19');
 
 -- --------------------------------------------------------
 
@@ -179,42 +181,16 @@ INSERT INTO `eventparticipants` (`participant_id`, `event_id`, `UserID`) VALUES
 (65, 203, 10),
 (66, 203, 17),
 (67, 206, 10),
-(98, 213, 25),
-(103, 226, 26);
+(104, 50, 26),
+(105, 50, 26),
+(106, 50, 26),
+(107, 50, 26),
+(108, 50, 26),
+(109, 50, 26),
+(110, 50, 26);
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `pendingevents`
---
-
-CREATE TABLE `pendingevents` (
-  `event_id` int(11) NOT NULL,
-  `event_title` varchar(255) NOT NULL,
-  `event_description` text DEFAULT NULL,
-  `event_type` varchar(50) NOT NULL,
-  `event_mode` varchar(50) NOT NULL,
-  `event_photo_path` varchar(255) DEFAULT NULL,
-  `location` varchar(255) NOT NULL,
-  `date_start` date NOT NULL,
-  `date_end` date NOT NULL,
-  `time_start` time NOT NULL,
-  `time_end` time NOT NULL,
-  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
-  `event_link` text DEFAULT NULL,
-  `cancelReason` text NOT NULL,
-  `event_cancel` varchar(255) NOT NULL,
-  `participant_limit` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `pendingevents`
---
-
-INSERT INTO `pendingevents` (`event_id`, `event_title`, `event_description`, `event_type`, `event_mode`, `event_photo_path`, `location`, `date_start`, `date_end`, `time_start`, `time_end`, `date_created`, `event_link`, `cancelReason`, `event_cancel`, `participant_limit`) VALUES
-(50, 'zoom link', 's', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-01', '2024-03-01', '20:18:00', '20:21:00', '2024-03-01 12:17:01', 'https://meet.google.com/xux-xsau-zbn', '', '', 0);
-
--- --------------------------------------------------------
 --
 -- Table structure for table `events`
 --
@@ -324,31 +300,29 @@ INSERT INTO `events` (`event_id`, `event_title`, `event_description`, `event_typ
 (147, 'dfsadf', 'dsafsdfwwe', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-10-01', '2023-10-02', '14:00:00', '15:00:00', '2024-03-12 00:25:57', '', '', '', 0),
 (148, 'hdfsdafasdfasd', 'sdfadsfdas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-01-03', '2024-01-07', '13:00:00', '14:00:00', '2024-03-12 00:27:02', '', '', '', 0),
 (149, 'sfasasdfsdf', 'dsfafs', 'Specialized Seminars', 'Online', '', '', '2024-01-06', '2024-01-03', '15:00:00', '16:00:00', '2024-03-12 00:27:37', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(150, 'asdfaswefwe', 'asdfasdf', 'Training Sessions', 'Online', '', '', '2024-02-03', '2024-02-05', '13:00:00', '14:00:00', '2024-03-12 00:28:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(151, 'Art and Craft Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla turpis in mi feugiat eleifend.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '22:24:00', '22:27:00', '2024-03-12 00:31:33', '', '', '', 0),
-(155, 'ongoing testing', 'asdfsadfa asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '22:28:00', '22:30:00', '2024-03-12 14:27:00', '', '', '', 0),
-(156, 'upcoming testing', 'asdfasf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '22:31:00', '22:33:00', '2024-03-12 14:29:26', '', '', '', 0),
-(157, 'sdfas asdfa', 'sadfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '22:53:00', '22:54:00', '2024-03-12 14:51:17', '', '', '', 0),
-(163, 'hehe', 'dafasdf asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '23:57:00', '23:59:00', '2024-03-12 15:54:31', '', '', '', 0),
-(166, 'ongoing', 'asdfasd asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '01:34:00', '01:37:00', '2024-03-12 17:33:00', '', '', '', 0),
-(168, 'oongoing', 'asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '02:04:00', '02:09:00', '2024-03-12 18:02:12', '', '', '', 0),
-(169, 'upcoming', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '02:17:00', '02:21:00', '2024-03-12 18:08:53', '', '', '', 0),
-(172, 'haaaa', 'asdfasfd', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-22', '08:38:00', '10:38:00', '2024-03-12 18:38:25', '', '', '', 0),
-(173, 'hiiiii', 'asdfasdf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '02:45:00', '02:48:00', '2024-03-12 18:43:27', '', '', '', 0),
-(176, 'real time', 'asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '09:57:00', '09:58:00', '2024-03-13 01:55:44', '', '', '', 0),
-(178, 'will ongoing', 'asdfasdf sdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '10:30:00', '10:31:00', '2024-03-13 02:22:49', '', '', '', 0),
-(179, 'create event sample', 'asdfsdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-13', '2024-03-13', '13:26:00', '13:31:00', '2024-03-13 05:24:29', '', '', '', 0),
-(180, 'event join', 'sdafsadf sdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-15', '2024-03-18', '13:28:00', '15:28:00', '2024-03-13 05:28:43', '', '', '', 0),
-(181, 'hehehe', 'asdfasdfasd', 'Specialized Seminars', 'Online', '', '', '2024-03-13', '2024-03-13', '13:37:00', '13:39:00', '2024-03-13 05:36:02', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(182, 'SE Defense', 'asdfasdf asdfsad', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-14', '2024-03-15', '15:00:00', '16:00:00', '2024-03-13 08:01:32', '', '', '', 0),
-(187, 'letsss gggg', 'adsfasdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-04-23', '2024-04-23', '07:06:00', '07:15:00', '2024-04-22 23:04:42', '', '', '', 0),
-(203, 'Date and time try', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tubungan, Zamboanga City', '2024-04-29', '2024-05-02', '03:20:00', '18:36:00', '2024-04-28 05:36:30', '', '', '', 2),
-(206, 'Attendance table save', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2024-04-29', '2024-04-29', '14:58:00', '18:56:00', '2024-04-29 06:57:00', '', '', '', 2),
-(207, 'try create event', 'sdfasd', 'Specialized Seminars', 'Online', '', '', '2024-05-01', '2024-05-03', '09:43:00', '10:43:00', '2024-04-30 06:44:05', '', '', '', 1),
-(208, 'data analytics for the future', 'chu chuc chu', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2024-05-06', '2024-05-10', '08:00:00', '17:00:00', '2024-04-30 07:25:11', '', 'Try cancel', 'Cancelled', 3),
-(209, 'workshop', 'asdfasdf asdfasdf asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2024-05-01', '2024-05-01', '08:44:00', '17:44:00', '2024-04-30 23:45:04', '', '', '', 1),
-(213, 'Add participants', 'asdfa', 'General Assembly', 'Face-to-Face', '', 'wmsu social hall', '2024-05-03', '2024-05-05', '08:00:00', '17:00:00', '2024-05-01 09:33:01', '', '', '', 2),
-(226, 'General Assembly 2024', 'sadfasdf asdfasdf sdafas', 'Training Sessions', 'Face-to-Face', '', 'Tubungan, Zamboanga City', '2024-10-20', '2024-10-24', '08:00:00', '17:00:00', '2024-10-19 01:27:18', '', '', '', 2);
+(150, 'asdfaswefwe', 'asdfasdf', 'Training Sessions', 'Online', '', '', '2025-06-04', '2025-06-06', '13:00:00', '14:00:00', '2024-03-12 00:28:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
+(151, 'Art and Craft Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla turpis in mi feugiat eleifend.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-11', '2026-03-14', '22:24:00', '22:27:00', '2024-03-12 00:31:33', '', '', '', 0),
+(155, 'ongoing testing', 'asdfsadfa asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-09-25', '2025-09-29', '22:28:00', '22:30:00', '2024-03-12 14:27:00', '', '', '', 0),
+(156, 'upcoming testing', 'asdfasf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-08-24', '2026-08-28', '22:31:00', '22:33:00', '2024-03-12 14:29:26', '', '', '', 0),
+(157, 'sdfas asdfa', 'sadfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-01-27', '2026-01-28', '22:53:00', '22:54:00', '2024-03-12 14:51:17', '', '', '', 0),
+(163, 'hehe', 'dafasdf asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-05-01', '2025-05-06', '23:57:00', '23:59:00', '2024-03-12 15:54:31', '', '', '', 0),
+(166, 'ongoing', 'asdfasd asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-08-17', '2025-08-22', '01:34:00', '01:37:00', '2024-03-12 17:33:00', '', '', '', 0),
+(168, 'oongoing', 'asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-12-31', '2025-01-04', '02:04:00', '02:09:00', '2024-03-12 18:02:12', '', '', '', 0),
+(169, 'upcoming', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-11', '02:17:00', '02:21:00', '2024-03-12 18:08:53', '', '', '', 0),
+(172, 'haaaa', 'asdfasfd', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-01-13', '2025-01-14', '08:38:00', '10:38:00', '2024-03-12 18:38:25', '', '', '', 0),
+(173, 'hiiiii', 'asdfasdf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '02:45:00', '02:48:00', '2024-03-12 18:43:27', '', '', '', 0),
+(176, 'real time', 'asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-08', '09:57:00', '09:58:00', '2024-03-13 01:55:44', '', '', '', 0),
+(178, 'will ongoing', 'asdfasdf sdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-07-09', '2025-07-10', '10:30:00', '10:31:00', '2024-03-13 02:22:49', '', '', '', 0),
+(179, 'create event sample', 'asdfsdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '13:26:00', '13:31:00', '2024-03-13 05:24:29', '', '', '', 0),
+(180, 'event join', 'sdafsadf sdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-05-01', '2026-05-06', '13:28:00', '15:28:00', '2024-03-13 05:28:43', '', '', '', 0),
+(181, 'hehehe', 'asdfasdfasd', 'Specialized Seminars', 'Online', '', '', '2025-05-09', '2025-05-11', '13:37:00', '13:39:00', '2024-03-13 05:36:02', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
+(182, 'SE Defense', 'asdfasdf asdfsad', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-06-29', '2025-07-01', '15:00:00', '16:00:00', '2024-03-13 08:01:32', '', '', '', 0),
+(187, 'letsss gggg', 'adsfasdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-12-15', '2025-12-20', '07:06:00', '07:15:00', '2024-04-22 23:04:42', '', '', '', 0),
+(203, 'Date and time try', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tubungan, Zamboanga City', '2026-02-26', '2026-03-02', '03:20:00', '18:36:00', '2024-04-28 05:36:30', '', '', '', 2),
+(206, 'Attendance table save', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2025-10-06', '2025-10-07', '14:58:00', '18:56:00', '2024-04-29 06:57:00', '', '', '', 2),
+(207, 'try create event', 'sdfasd', 'Specialized Seminars', 'Online', '', '', '2025-09-23', '2025-09-27', '09:43:00', '10:43:00', '2024-04-30 06:44:05', '', '', '', 1),
+(208, 'data analytics for the future', 'chu chuc chu', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2026-09-26', '2026-10-01', '08:00:00', '17:00:00', '2024-04-30 07:25:11', '', 'Try cancel', 'Cancelled', 3),
+(209, 'workshop', 'asdfasdf asdfasdf asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2025-12-25', '2025-12-26', '08:44:00', '17:44:00', '2024-04-30 23:45:04', '', '', '', 1);
 
 -- --------------------------------------------------------
 
@@ -386,6 +360,43 @@ CREATE TABLE `facilitator` (
   `facilitatorMname` varchar(100) NOT NULL,
   `facilitatorLname` varchar(100) NOT NULL,
   `Agency` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `expires_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pendingevents`
+--
+
+CREATE TABLE `pendingevents` (
+  `event_id` int(11) NOT NULL,
+  `event_title` varchar(255) NOT NULL,
+  `event_description` text DEFAULT NULL,
+  `event_type` varchar(50) NOT NULL,
+  `event_mode` varchar(50) NOT NULL,
+  `event_photo_path` varchar(255) DEFAULT NULL,
+  `location` varchar(255) NOT NULL,
+  `date_start` date NOT NULL,
+  `date_end` date NOT NULL,
+  `time_start` time NOT NULL,
+  `time_end` time NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `event_link` text DEFAULT NULL,
+  `cancelReason` text NOT NULL,
+  `event_cancel` varchar(255) NOT NULL,
+  `participant_limit` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -452,19 +463,8 @@ INSERT INTO `user` (`UserID`, `LastName`, `FirstName`, `MI`, `Gender`, `Age`, `E
 (21, 'Abule', 'ZIld', 'J.', '', NULL, 'zild@gmail.com', '$2y$10$27kBwrDT1MM97LIrQZ16l.TJS8eQipj.rnp6SzP.EN5vs.2SmN2aq', '1231231231', NULL, 'CCS', 'tester', NULL, NULL, 'User'),
 (23, 'Villares', 'Arp', '', 'Female', NULL, 'arp@gmail.com', '$2y$10$9m6lUl9FXI/Okntab8l8yeRSkyyRGY3vJGD/.YPh.qizNOk.UbY/e', '090909', 'Tetutan, Zamboanga City', 'CCS', 'tester', '', NULL, 'User'),
 (25, 'Policarpio', 'Jhong', '', 'male', NULL, 'jhong@gmail.com', '$2y$10$jTSUCUObKu/JYNAOslXJQOFgbYNBGRupssintIWVHjvQKG7Yu3oO2', '123123', NULL, 'CCS', 'Project Manager', NULL, NULL, 'User'),
-(26, 'Delica', 'Faustine', '', 'Female', NULL, 'faustine@gmail.com', '$2y$10$wc6onDJlMM8w/29UEhDNU.S22XT77kxk1p8t52.Lnwekm9FmRW5p6', '09090909', 'baliwasan', 'CCS', 'secretary', '', NULL, 'User');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `password_reset_tokens`
---
-
-CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) NOT NULL,
-  `token` varchar(64) NOT NULL,
-  `expires_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+(26, 'Delica', 'Faustine', '', 'Female', NULL, 'faustine@gmail.com', '$2y$10$wc6onDJlMM8w/29UEhDNU.S22XT77kxk1p8t52.Lnwekm9FmRW5p6', '09090909', 'baliwasan', 'CCS', 'secretary', '', NULL, 'User'),
+(27, 'Luffy', 'Monkey', 'D', 'Male', NULL, 'binimaloi352@gmail.com', '$2y$10$gVU0jo8xVCKwWqqWOoYbLexyoYqjUyDQ9.6d.RXbrpfGdDFO9Ma4.', '12131', 'Street', '123', 'CEO', '', NULL, 'User');
 
 --
 -- Indexes for dumped tables
@@ -511,12 +511,6 @@ ALTER TABLE `eventparticipants`
   ADD KEY `UserID` (`UserID`);
 
 --
--- Indexes for table `pendingevents`
---
-ALTER TABLE `pendingevents`
-  ADD PRIMARY KEY (`event_id`);
-
---
 -- Indexes for table `events`
 --
 ALTER TABLE `events`
@@ -529,6 +523,19 @@ ALTER TABLE `facilitator`
   ADD PRIMARY KEY (`facilitatorID`);
 
 --
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`token`),
+  ADD UNIQUE KEY `Email` (`email`);
+
+--
+-- Indexes for table `pendingevents`
+--
+ALTER TABLE `pendingevents`
+  ADD PRIMARY KEY (`event_id`);
+
+--
 -- Indexes for table `pendinguser`
 --
 ALTER TABLE `pendinguser`
@@ -539,13 +546,6 @@ ALTER TABLE `pendinguser`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`UserID`);
-
---
--- Indexes for table `password_reset_tokens`
---
-ALTER TABLE `password_reset_tokens`
-  ADD PRIMARY KEY (`token`),
-  ADD UNIQUE KEY `Email` (`Email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -561,7 +561,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT for table `director`
@@ -573,19 +573,13 @@ ALTER TABLE `director`
 -- AUTO_INCREMENT for table `eventparticipants`
 --
 ALTER TABLE `eventparticipants`
-  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
-
---
--- AUTO_INCREMENT for table `pendingevents`
---
-ALTER TABLE `pendingevents`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
+  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
 
 --
 -- AUTO_INCREMENT for table `facilitator`
@@ -594,16 +588,22 @@ ALTER TABLE `facilitator`
   MODIFY `facilitatorID` int(15) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `pendingevents`
+--
+ALTER TABLE `pendingevents`
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=259;
+
+--
 -- AUTO_INCREMENT for table `pendinguser`
 --
 ALTER TABLE `pendinguser`
-  MODIFY `PendingUserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `PendingUserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `UserID` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `UserID` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables

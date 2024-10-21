@@ -9,7 +9,8 @@
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -48,7 +49,7 @@
                     return 0; 
                 }
             }
-            
+             
             
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 // Check if AdminID is set in the session
@@ -87,7 +88,28 @@
                 }
             }
         ?>
-
+<?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success'
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
         <!-- ====SIDEBAR==== -->
         <div class="sidebar">
             <div class="top">
