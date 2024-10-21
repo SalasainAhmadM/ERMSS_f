@@ -1,6 +1,7 @@
 let btnn = document.querySelector('#btnn');
 let sidebar = document.querySelector('.sidebar');
-let sidebarToggleIcons = document.querySelectorAll('.events-side .a-events'); 
+let sidebarToggleIcons = document.querySelectorAll('.events-side .a-events, .events-side2 .a-events');
+
 // let logoutIcon = document.querySelector('.sidebar ul li:last-child a');
            
 btnn.onclick = function () {

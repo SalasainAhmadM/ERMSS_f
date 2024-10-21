@@ -113,7 +113,7 @@ if (isset($_SESSION['error'])) {
                     </div>
                 </li>
 
-        <li class="events-side nav-sidebar">
+        <li class="events-side2 nav-sidebar">
             <a href="#" class="a-events">
                 <i class='bx bx-user'></i>
                 <span class="nav-item">Account</span>

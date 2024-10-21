@@ -293,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="tooltip">Dashboard</span>
             </li>
                     
-            <li class="events-side nav-sidebar">
+            <li class="events-side2 nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-archive'></i>
                     <span class="nav-item">Events</span>
