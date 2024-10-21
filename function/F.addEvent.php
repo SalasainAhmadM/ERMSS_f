@@ -128,7 +128,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultCheckExisting = $stmtCheckExisting->get_result();
 
     if ($resultCheckExisting->num_rows > 0) {
-        echo "<script>alert('Location venue is already occupied on this date in the active events!'); window.location.href='landingPage.php';</script>";
+        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events! ' . $stmt->error;
+        header("Location: addEvent.php");
         exit();
     }
 
@@ -139,7 +140,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultCheckPending = $stmtCheckPending->get_result();
 
     if ($resultCheckPending->num_rows > 0) {
-        echo "<script>alert('Location venue is already occupied on this date in the pending events!'); window.location.href='pendingEvents.php';</script>";
+        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events! ' . $stmt->error;
+        header("Location: addEvent.php");
         exit(); 
     }
 
@@ -176,13 +178,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         if ($Role == 'superadmin') {
-            echo "<script>alert('Event successfully created!'); window.location.href='landingPage.php';</script>";
+            $_SESSION['success'] = 'Event successfully created!';
         } elseif ($Role == 'Admin') {
-            echo "<script>alert('Event successfully created!'); window.location.href='pendingEvents.php';</script>";
+            $_SESSION['success'] = 'Event successfully created and is now pending approval!';
         }
+        header("Location: addEvent.php");
         exit();
     } else {
-        echo "Error: " . $stmt->error;
+        $_SESSION['error'] = 'Error creating event: ' . $stmt->error;
+        header("Location: addEvent.php");
     }
 
     $stmt->close();

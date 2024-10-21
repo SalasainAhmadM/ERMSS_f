@@ -43,7 +43,7 @@ if (isset($_SESSION['decline'])) {
     Swal.fire({
       title: 'Declined!',
       text: 'The account has been declined.',
-      icon: 'info'
+      icon: 'info' 
     });
     </script>";
     unset($_SESSION['decline']);

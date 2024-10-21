@@ -12,7 +12,8 @@
 
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -22,12 +23,39 @@
     </head>
 
     <body>
+    <?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+    Swal.fire({
+      title: 'Success!',
+      text: '" . $_SESSION['success'] . "',
+      icon: 'success'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = 'landingPage.php';
+      }
+    });
+    </script>";
+    unset($_SESSION['success']);
+}
 
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error'
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+
+?>
 
 
         <!--=========== SIDEBAR =============-->
         <div class="sidebar">
-            <div class="top">
+            <div class="top"> 
                 <div class="logo">
                     <img src="img/wesmaarrdec-removebg-preview.png" alt="">
                     <span>WESMAARRDEC</span>
@@ -179,13 +207,23 @@
 
                         <div class="input_field">
                             <label>Date Start</label>
-                            <input type="date" class="input" name="date_start" required>
+                            <input type="date" class="input" name="date_start" id="date_start" required>
+                        </div><div class="input_field">
+                            <label>Date End</label> 
+                            <input type="date" class="input" name="date_end" id="date_end" required>
                         </div>
+                        <script>
+                        const dateStart = document.getElementById('date_start');
+                        const dateEnd = document.getElementById('date_end');
+                        dateStart.addEventListener('change', function() {
+                            const startDate = this.value;
+                            dateEnd.min = startDate;
+                            if (dateEnd.value < startDate) {
+                                dateEnd.value = '';
+                            }
+                        });
+                        </script>
 
-                        <div class="input_field">
-                            <label>Date End</label>
-                            <input type="date" class="input" name="date_end" required>
-                        </div>
 
                         <div class="input_field">
                             <label>Time Start</label>
@@ -276,6 +314,7 @@
 
 
         <script>
+            
             document.addEventListener('DOMContentLoaded', function () {
                 function confirmSaveChanges(event) {
                     event.preventDefault();
