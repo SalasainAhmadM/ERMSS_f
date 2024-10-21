@@ -87,13 +87,16 @@
                 }
             }
         ?>
-<?php
+  <?php
 if (isset($_SESSION['success'])) {
     echo "<script>
         Swal.fire({
             title: 'Success!',
             text: '" . $_SESSION['success'] . "',
-            icon: 'success'
+            icon: 'success',
+            customClass: {
+            popup: 'larger-swal' 
+        }  
         });
     </script>";
     unset($_SESSION['success']);
@@ -103,7 +106,10 @@ if (isset($_SESSION['error'])) {
         Swal.fire({
           title: 'Error!',
           text: '" . $_SESSION['error'] . "',
-          icon: 'error'
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
         });
     </script>";
     unset($_SESSION['error']);
