@@ -1,5 +1,5 @@
 <?php
-    include('../function/F.editEvent.php');
+    include('../function/F.editEventGrid.php');
 ?>
 
 <!DOCTYPE html>
@@ -90,22 +90,7 @@
 
         
     ?>
- <?php
-if (isset($_SESSION['success'])) {
-    echo "<script>
-    Swal.fire({
-      title: 'Success!',
-      text: '" . $_SESSION['success'] . "',
-      icon: 'success'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = 'landingPage.php';
-      }
-    });
-    </script>";
-    unset($_SESSION['success']);
-}
-?>
+
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
         <div class="top">
@@ -198,8 +183,7 @@ if (isset($_SESSION['success'])) {
                 <div class="title">
                     Edit Event
                 </div>
-                <!-- <form method="POST" action="editEvent.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   -->
-                <form method="POST" action="" enctype="multipart/form-data">   
+                <form method="POST" action="editEventGrid.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   
                     
                     <div class="input_field">
                         <label>Event Title</label>
@@ -302,7 +286,7 @@ if (isset($_SESSION['success'])) {
     <!--JS -->
     <script src="js/eventscript.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!--sidebar functionality-->
     <script src="js/sidebar.js"></script>
 
@@ -342,8 +326,29 @@ if (isset($_SESSION['success'])) {
                 toggleLocationField();
             });
 
+            // Trigger the initial state check
             toggleZoomLinkField();
             toggleLocationField();
+
+
+            // Function to handle cancel event button click
+            // document.getElementById('cancelEventButton').addEventListener('click', function () {
+            //     // Toggle visibility of the cancel event field
+            //     var cancelEventField = document.getElementById('cancelEventField');
+            //     cancelEventField.style.display = (cancelEventField.style.display === 'none') ? 'block' : 'none';
+
+            //     // Check if the field is being displayed and add/remove the required attribute accordingly
+            //     var eventCancelInput = document.querySelector("input[name='event_cancel']");
+            //     if (cancelEventField.style.display === 'block') {
+            //         eventCancelInput.required = true;
+                   
+                    
+            //     } else {
+            //         eventCancelInput.required = false;
+                    
+                    
+            //     }
+            // });
         });
     </script>
 
@@ -394,7 +399,7 @@ if (isset($_SESSION['success'])) {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = 'landingPage.php'; 
+                window.location.href = 'landingPage2.php'; 
             }
         });
     }
@@ -405,6 +410,9 @@ if (isset($_SESSION['success'])) {
 });
 
     </script>
+
+
+
 
 
     <script>

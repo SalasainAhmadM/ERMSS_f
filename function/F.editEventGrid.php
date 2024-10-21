@@ -126,7 +126,7 @@ if (isset($_GET['event_id'])) {
 
             if ($updateStmt->execute()) {
                 $_SESSION['success'] = 'Event successfully updated!';
-                header("Location: ../admin/landingPage.php?event_id=$eventId&status=success");
+                header("Location: ../admin/landingPage2.php?event_id=$eventId&status=success");
                 exit();
             } else {
                 echo "Error updating record: " . $updateStmt->error;

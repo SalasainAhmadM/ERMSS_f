@@ -294,7 +294,7 @@ if (isset($_SESSION['error'])) {
 
                     <div class="box-container" style="display: flex;flex-wrap: wrap;">
                         <!--just include the F.getEvent.php for grid display-->
-                        <?php include('../function/F.getEvent.php'); ?>
+                        <?php include('../function/F.getEventGrid.php'); ?>
                                            
                     </div>
 
@@ -326,7 +326,21 @@ if (isset($_SESSION['error'])) {
 
     </body> 
 
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
 
+    if (status === 'success') {
+        Swal.fire({
+            title: "Success!",
+            text: "Event successfully updated!",
+            icon: "success"
+        }).then(() => {
+            const newUrl = window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        });
+    }
+</script>
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>
 
