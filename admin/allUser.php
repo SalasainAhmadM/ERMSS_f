@@ -188,7 +188,6 @@
 
 <script>
 function showUserProfile(userId) {
-    // Fetch user details dynamically
     const fullName = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
     const email = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.innerText;
     const affiliation = document.querySelector(`button[data-userid="${userId}"]`).dataset.affiliation;
@@ -202,37 +201,128 @@ function showUserProfile(userId) {
     Swal.fire({
         title: 'User Profile',
         html: `
-                <div style="text-align: left; padding:2.5rem;">
-                    <div style="text-align: center; margin-bottom: 1rem;">
-                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
-                            alt="Profile Image" 
-                            style="width: 100px; height: 100px; border-radius: 50%;">
-                    </div>
-
-                    <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
-                    <strong>Name:</strong> ${fullName}
-                    <strong style="margin-left:5rem;">Age:</strong> ${age} <br/>
-                    <strong>Gender:</strong> ${gender} <br/>
-                    <strong>Educational Attainment:</strong> ${educationalAttainment}
-                    <br/><br/>
-                    
-                    <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
-                    <strong>Email:</strong> ${email} <br/>
-                    <strong>Contact:</strong> ${contact} 
-                    <br/><br/>
-                    
-                    <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
-                    <strong>Affiliation:</strong> ${affiliation} <br/>
-                    <strong>Occupation:</strong> ${position} 
+            <div style="text-align: left; padding:2rem;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                         alt="Profile Image" 
+                         style="width: 100px; height: 100px; border-radius: 50%;">
                 </div>
+
+                <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
+                <strong>Name:</strong> ${fullName} <br/>
+                <strong>Age:</strong> ${age} <br/>
+                <strong>Gender:</strong> ${gender} <br/>
+                <strong>Educational Attainment:</strong> ${educationalAttainment} <br/><br/>
+                
+                <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
+                <strong>Email:</strong> ${email} <br/>
+                <strong>Contact:</strong> ${contact} <br/><br/>
+                
+                <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
+                <strong>Affiliation:</strong> ${affiliation} <br/>
+                <strong>Occupation:</strong> ${position} <br/><br/>
+
+                <button id="editProfileButton" style="background-color: #28a745; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">Edit Profile</button>
+            </div>
         `,
-        confirmButtonText: 'Close',
+        showCancelButton: true,
+        cancelButtonText: 'Close',
         customClass: {
             popup: 'larger-swal'
         },
     });
+
+    document.getElementById('editProfileButton').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Edit User Profile',
+            html: `
+                <div style="text-align: left; padding: 2.5rem; font-size:2rem; ">
+                    <label>Name:</label>
+                    <input type="text" id="editName" value="${fullName}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Email:</label>
+                    <input type="email" id="editEmail" value="${email}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Affiliation:</label>
+                    <input type="text" id="editAffiliation" value="${affiliation}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Gender:</label>
+                    <select id="editGender" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                        <option value="Male" ${gender === 'Male' ? 'selected' : ''}>Male</option>
+                        <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
+                        <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
+                    </select>
+                    <label>Age:</label>
+                    <input type="number" id="editAge" value="${age}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Contact:</label>
+                    <input type="text" id="editContact" value="${contact}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Position:</label>
+                    <input type="text" id="editPosition" value="${position}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Profile Photo:</label>
+                    <input type="file" id="editProfilePhoto" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'larger-swal'
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const updatedUser = {
+                    userId: userId,
+                    name: document.getElementById('editName').value,
+                    email: document.getElementById('editEmail').value,
+                    affiliation: document.getElementById('editAffiliation').value,
+                    gender: document.getElementById('editGender').value,
+                    age: document.getElementById('editAge').value,
+                    contact: document.getElementById('editContact').value,
+                    position: document.getElementById('editPosition').value,
+                    image: document.getElementById('editProfilePhoto').files[0] 
+                };
+
+                const formData = new FormData();
+                for (const key in updatedUser) {
+                    formData.append(key, updatedUser[key]);
+                }
+
+                fetch('updateUser.php', {
+                    method: 'POST',
+                    body: formData // Send FormData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'User profile updated.',
+                            icon: 'success',
+                            customClass: {
+                                popup: 'larger-swal'
+                            },
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while updating the profile.',
+                            icon: 'error',
+                            customClass: {
+                                popup: 'larger-swal'
+                            },
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating user:', error);
+                    Swal.fire('Error!', 'An error occurred while updating the profile.', 'error');
+                });
+            }
+        });
+
+    });
 }
 </script>
+
 
 
 
