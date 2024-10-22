@@ -110,24 +110,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $attendance_date = date('Y-m-d', strtotime($dateStart . ' +' . ($selectedDay - 1) . ' days')); // Calculate attendance date
         $status = $_POST['status']; // 'present' or 'absent'
 
-        // Check if a record already exists for the participant_id, event_id, and attendance_date
-        $existingRecordSql = "SELECT * FROM attendance WHERE participant_id = ? AND event_id = ? AND attendance_date = ?";
+        // Check if a record already exists for the participant_id, event_id, and day
+        $existingRecordSql = "SELECT * FROM attendance WHERE participant_id = ? AND event_id = ? AND day = ?";
         $existingRecordStmt = $conn->prepare($existingRecordSql);
-        $existingRecordStmt->bind_param("iis", $participant_id, $event_id, $attendance_date);
+        $existingRecordStmt->bind_param("iii", $participant_id, $event_id, $selectedDay);
         $existingRecordStmt->execute();
         $existingRecordResult = $existingRecordStmt->get_result();
 
         if ($existingRecordResult->num_rows > 0) {
-            // A record already exists
+            // A record already exists for the selected day
             $existingRecordRow = $existingRecordResult->fetch_assoc();
             if ($existingRecordRow['status'] == $status) {
                 // The status is the same, so display a message
                 echo "<script>alert('Attendance already recorded.');</script>";
             } else {
-                // The status is different, so update the existing record
-                $updateSql = "UPDATE attendance SET status = ?, day = ? WHERE participant_id = ? AND event_id = ?";
+                // The status is different, so update the existing record for that specific day
+                $updateSql = "UPDATE attendance SET status = ? WHERE participant_id = ? AND event_id = ? AND day = ?";
                 $updateStmt = $conn->prepare($updateSql);
-                $updateStmt->bind_param("siii", $status, $selectedDay, $participant_id, $event_id);
+                $updateStmt->bind_param("siii", $status, $participant_id, $event_id, $selectedDay);
 
                 if ($updateStmt->execute()) {
                     echo "<script>alert('Attendance updated successfully.'); window.location.reload();</script>";
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updateStmt->close();
             }
         } else {
-            // No record exists, so insert a new record
+            // No record exists for that day, so insert a new record
             $insertSql = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, day) VALUES (?, ?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertSql);
             $insertStmt->bind_param("iissi", $participant_id, $event_id, $attendance_date, $status, $selectedDay);
@@ -156,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existingRecordResult->close();
     }
 }
+
 
 
 ?>
@@ -555,7 +556,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     FROM eventParticipants 
                     INNER JOIN user ON eventParticipants.UserID = user.UserID
                     LEFT JOIN attendance ON attendance.participant_id = eventParticipants.participant_id 
-                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
+                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)
+                    ORDER BY user.FirstName, user.LastName, attendance.day";
      
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $eventTitle);
