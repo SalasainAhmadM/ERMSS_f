@@ -421,12 +421,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="phone">
                                     <span>PHONE#</span>
                                 </div>
-
-                                <div class="phone" id="action_tab">
-                                    <span>STATUS</span>
-                                </div>
                                 
-                                <div class="phone" id="action_tab">
+                                <div class="phone">
                                     <span>DAY</span>
                                 </div>
                                 
@@ -449,11 +445,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="table_body">
                     <?php
                     // Fetch and display participants for the specified event title
-                    $sql = "SELECT *, attendance.status FROM eventParticipants
+                    $sql = "SELECT user.FirstName, user.LastName, user.Affiliation, user.Position, user.Email, user.ContactNo, 
+                    attendance.day, eventParticipants.participant_id, eventParticipants.event_id
+                    FROM eventParticipants 
                     INNER JOIN user ON eventParticipants.UserID = user.UserID
-                    LEFT JOIN attendance ON eventParticipants.participant_id = attendance.participant_id
+                    LEFT JOIN attendance ON attendance.participant_id = eventParticipants.participant_id 
                     WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
-            
      
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $eventTitle);
@@ -470,7 +467,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
                             $attendanceDay = htmlspecialchars($row['day']); 
-                            $status = htmlspecialchars($row['status']);
                     ?>
                             
                             <form action='' method='POST' onsubmit="return confirmAttendance(this);">
@@ -498,17 +494,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
 
                                             <div class="phone">
-                                                <span><?php echo ($row['status'] == 'present' ? 'Present' : 'Absent'); ?></span>
-                                            </div>
-
-                                            <div class="phone">
                                             <?php if (!empty($attendanceDay)) : ?>
                                                     <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
                                                     <span>(Day: <?php echo $attendanceDay; ?>)</span>
                                                 <?php endif; ?>
                                             </div>
-
-                                            
 
                                             <div class="action" id="action">
                                             <div class="days">
@@ -559,10 +549,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (participantDay && participantDay.value) {
                             if (selectedDay === "" || participantDay.value == selectedDay) { // Show if "All Days" is selected or day matches
                                 participant.style.display = 'block'; // Show the participant
-                                var actionDivs = document.querySelectorAll('.action');
-                                actionDivs.forEach(function(actionDiv) {
-                                    actionDiv.style.display = 'block'; // Show each action div
-                                });
                             } else {
                                 participant.style.display = 'none'; // Hide if it doesn't match
                             }
@@ -617,10 +603,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (participantInput && participantInput.value == participantId) {
                                 participantElement.style.display = "block";
                             }
-                            
                         });
                     });
 
+                                        // Show all action divs when Absent is active
+                                        var actionDivs = document.querySelectorAll('.action');
+                    actionDivs.forEach(function(actionDiv) {
+                        actionDiv.style.display = 'block'; // Show each action div
+                    });
+
+                    document.getElementById('action_tab').style.display = 'block'; 
                 }
             </script>
 
@@ -719,55 +711,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- DISPLAY ABSENT -->
             <script>
-                function handleAbsentBoxClick(event) {
-                    event.preventDefault();
+            function handleAbsentBoxClick(event) {
+                event.preventDefault();
 
-                    // Get the clicked box element
-                    var clickedBox = event.currentTarget;
+                // Get the clicked box element
+                var clickedBox = event.currentTarget;
 
-                    // Remove 'active' class from all boxes
-                    var boxes = document.querySelectorAll('.box');
-                    boxes.forEach(function(box) {
-                        box.classList.remove('active');
-                    });
+                // Remove 'active' class from all boxes
+                var boxes = document.querySelectorAll('.box');
+                boxes.forEach(function(box) {
+                    box.classList.remove('active');
+                });
 
-                    // Add 'active' class to the clicked box
-                    clickedBox.classList.add('active');
+                // Add 'active' class to the clicked box
+                clickedBox.classList.add('active');
 
-                    // Get the selected day from the dropdown
-                    var selectedDay = document.getElementById("event_day-filter").value;
+                // Get the selected day from the dropdown
+                var selectedDay = document.getElementById("event_day-filter").value;
 
-                    // Get all participant elements
-                    var participants = document.querySelectorAll('.table_body ul li');
+                // Get all participant elements
+                var participants = document.querySelectorAll('.table_body ul li');
 
-                    // Hide all participants initially
-                    participants.forEach(function(participant) {
-                        participant.style.display = 'none';
-                    });
+                // Hide all participants initially
+                participants.forEach(function(participant) {
+                    participant.style.display = 'none';
+                });
 
-                    // Show only participants fetched from the attendance table with status 'Absent'
-                    participants.forEach(function(participant) {
-                        var participantId = participant.querySelector("input[name='participant_id']").value;
-                        var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
-                        
-                        // Check if participant is absent and matches selected day
-                        if (participantId && !presentParticipantIds.includes(parseInt(participantId)) &&
-                            (selectedDay === "" || attendanceDay == selectedDay)) {
-                            participant.style.display = 'block'; // Show the participant
-                        }
-                    });
+                // Show only participants fetched from the attendance table with status 'Absent'
+                participants.forEach(function(participant) {
+                    var participantId = participant.querySelector("input[name='participant_id']").value;
+                    var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
+                    
+                    // Check if participant is absent and matches selected day
+                    if (participantId && !presentParticipantIds.includes(parseInt(participantId)) &&
+                        (selectedDay === "" || attendanceDay == selectedDay)) {
+                        participant.style.display = 'block'; // Show the participant
+                    }
+                });
 
-                    // Show all action divs when Absent is active
-                    var actionDivs = document.querySelectorAll('.action');
-                    actionDivs.forEach(function(actionDiv) {
-                        actionDiv.style.display = 'none'; // Hide each action div
-                    });
+                // Show all action divs when Absent is active
+                var actionDivs = document.querySelectorAll('.action');
+                actionDivs.forEach(function(actionDiv) {
+                    actionDiv.style.display = 'none'; // Hide each action div
+                });
 
-                    document.getElementById('action_tab').style.display = 'none'; 
-                }
+                document.getElementById('action_tab').style.display = 'none'; 
             </script>
 
-
+            }
             
 
         </div>
