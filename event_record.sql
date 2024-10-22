@@ -377,6 +377,28 @@ CREATE TABLE `password_reset_tokens` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `event_type`
+--
+
+CREATE TABLE `event_type` (
+  `event_type_id` int(11) NOT NULL,
+  `event_type_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_mode`
+--
+
+CREATE TABLE `event_mode` (
+  `event_mode_id` int(11) NOT NULL,
+  `event_mode_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pendingevents`
 --
 
@@ -523,6 +545,18 @@ ALTER TABLE `facilitator`
   ADD PRIMARY KEY (`facilitatorID`);
 
 --
+-- Indexes for table `event_type`
+--
+ALTER TABLE `event_type`
+  ADD PRIMARY KEY (`event_type_id`);
+
+--
+-- Indexes for table `event_mode`
+--
+ALTER TABLE `event_mode`
+  ADD PRIMARY KEY (`event_mode_id`);
+
+--
 -- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
@@ -586,6 +620,18 @@ ALTER TABLE `events`
 --
 ALTER TABLE `facilitator`
   MODIFY `facilitatorID` int(15) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `event_type`
+--
+ALTER TABLE `event_type`
+  MODIFY `event_type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `event_mode`
+--
+ALTER TABLE `event_mode`
+  MODIFY `event_mode_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pendingevents`

@@ -18,13 +18,87 @@
 
         
     </head>
+<style>
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+.event-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.event-table {
+    width: 48%; 
+    margin-bottom: 20px;
+}
+
+.tbl-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tbl th, .tbl td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.tbl th {
+    background-color: #f2f2f2;
+}
+
+@media (max-width: 768px) {
+    .event-wrapper {
+        flex-direction: column;
+    }
+
+    .event-table {
+        width: 100%;
+    }
+    
+    .tbl th, .tbl td {
+        padding: 12px; 
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tbl th, .tbl td {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .tbl-container {
+        padding: 15px;
+    }.event-filter form {
+    width: 60%;
+    padding: 15px;
+}
+}
+</style>
 
     <body>
 
         <?php
             session_start();
             require_once('../db.connection/connection.php');
-
+            $sql_event_type = "SELECT event_type_name ,event_type_id as id FROM event_type";
+            $result_event_type = $conn->query($sql_event_type);
+            
+            $sql_event_mode = "SELECT event_mode_name ,event_mode_id as id FROM event_mode";
+            $result_event_mode = $conn->query($sql_event_mode);
             function countPendingUsers($conn)
             {
                 $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
@@ -34,7 +108,7 @@
                     $row = $result->fetch_assoc();
                     return $row['totalPendingUsers'];
                 } else {
-                    return 0; // Return 0 if there is an error or no pending users
+                    return 0; 
                 }
             }
             function countPendingEvents($conn)
@@ -49,17 +123,16 @@
                     return 0; 
                 }
             }
-             
+            
             
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 // Check if AdminID is set in the session
                 if (isset($_SESSION['AdminID'])) {
                     $AdminID = $_SESSION['AdminID'];
 
-                    // Prepare and execute a query to fetch the specific admin's data
                     $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
                     $stmtAdmin = $conn->prepare($sqlAdmin);
-                    $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
+                    $stmtAdmin->bind_param("i", $AdminID); 
                     $stmtAdmin->execute();
                     $resultAdmin = $stmtAdmin->get_result();
 
@@ -70,25 +143,23 @@
                             $MI = $row['MI'];
                             $Email = $row['Email'];
                             $ContactNo = $row['ContactNo'];
-                            $Position = $row['Position']; // Corrected the column name
+                            $Position = $row['Position']; 
                             $Affiliation = $row['Affiliation'];
                             $Image = $row['Image'];
 
-                            // Now, you have the specific admin's data
                         }
-                    } else {
+                    } else { 
                         echo "No records found";
                     }
 
                     $stmtAdmin->close();
 
-                    // Example usage of the countPendingUsers function
                     $pendingUsersCount = countPendingUsers($conn);
                     $pendingEventsCount = countPendingEvents($conn);
                 }
             }
         ?>
-  <?php
+   <?php
 if (isset($_SESSION['success'])) {
     echo "<script>
         Swal.fire({
@@ -184,7 +255,6 @@ if (isset($_SESSION['error'])) {
                             <a href="validation.php">User Validation <span><?php echo $pendingUsersCount;  ?></span></a>
                             <a href="newAccount.php">Create Account</a>
                             <a href="allUser.php">All Users</a>
-                            <!-- <a href="accountSettings.php">Account Settings</a> -->
                         </ul>
                     </div>
                 </li>
@@ -202,124 +272,104 @@ if (isset($_SESSION['error'])) {
         <!-- ============ CONTENT ============-->
         <div class="main-content">
             <div class="containerr">
-                <h3 class="dashboard">EVENTS</h3>
-
+                <h3 class="dashboard">EVENTS TYPES AND MODES</h3>
                 <!--======= event filter starts ======= -->
-                <section class="event-filter"> <!--dapat naka drop down ito-->
-
-                <h1 class="heading"></h1>
-                <h1 class="heading">filter events</h1>
-
-                <div style="display: flex; gap: 10px; margin-bottom:10px"> 
-
-                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
-                        
-                        <div class="dropdown-container">
-                            <div class="dropdown">
-                                
-                                <input type="text" readonly name="eventDisplay" placeholder="Filter" maxlength="20" class="output">
-                                <div class="lists">
-                                        
-                                    <a href="landingPage.php"><p class="items">List</p></a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </form>
-
-                    <form action="" method="post" style="width:65%">
-                        <div class="flex">
-                            <div class="box">
-                                <p>Event Title <span>*</span></p>
-                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
-                            </div>
-
-                            <!-- <div class="dropdown-container">
+                <section class="event-filter">
+                    <!-- Dropdown menu for selecting between adding event type or mode -->
+                     <div style="display: flex; gap: 10px; margin-bottom:10px">
+                        <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                            <div class="dropdown-container">
                                 <div class="dropdown">
-                                    <p>Display <span>*</span></p>
-                                    <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
+                                    <input type="text" readonly name="eventDisplay" placeholder="Add" maxlength="20" class="output">
                                     <div class="lists">
-                                        <a href="landingPageU.php"><p class="items">List</p></a>
-                                        <a href="landingPage2.php"><p class="items">Grid</p></a>
+                                        <p class="items" onclick="openEventTypeModal()">Event Type</p>
+                                        <p class="items" onclick="openEventModeModal()">Event Mode</p>
                                     </div>
                                 </div>
-                            </div> -->
-                        </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
 
-                        <div class="dropdown-container">
-                            <!-- <div class="dropdown">
-                                <input type="text" readonly name="eventMode" placeholder="event mode" maxlength="20" class="output">
-                                <div class="lists">
-                                    <p class="items">Face-to-Face</p>
-                                    <p class="items">Online</p>
-                                    <p class="items">Hybrid</p>
-                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
-                                </div>
-                            </div> -->
 
-                            <div class="dropdown">
-                                <input type="text" readonly name="eventType" placeholder="event type" maxlength="20" class="output">
-                                <div class="lists">
+            </div>
+            
+            <div class="container">
+                <!--========= all event start =============-->
+                <div class="event-wrapper">
+                    <div class="event-table">
+                        <div class="tbl-container">
+                            <h2>Events Type</h2>
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Event Title</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     <?php
-                                    // Fetch all distinct event types from the database
-                                    $sqlEventType = "SELECT DISTINCT event_type FROM events";
-                                    $resultEventType = $conn->query($sqlEventType);
 
-                                    // Check if there are rows returned
-                                    if ($resultEventType->num_rows > 0) {
-                                        // Loop through each row and display event types as dropdown items
-                                        while ($row = $resultEventType->fetch_assoc()) {
-                                            echo "<p class='items'>" . $row['event_type'] . "</p>";
+                                    if ($result_event_type->num_rows > 0) {
+                                        while($row = $result_event_type->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td data-label='Event Title'>" . $row['event_type_name'] . "</td>";
+                                            echo "<td data-label='Action'>
+                                            <button class='btn_edit' onclick=\"editEventType('" . $row['id'] . "', '" . $row['event_type_name'] . "')\"><i class='fa fa-pencil'></i></button>
+                                            <button class='btn_delete' onclick=\"confirmDeleteEventType('" . $row['id'] . "')\"><i class='fa fa-trash'></i></button>
+                                            </td>";
+                                            echo "</tr>";
                                         }
                                     } else {
-                                        echo "<p class='items'>No event types found</p>";
+                                        echo "<tr><td colspan='2'>No event types available</td></tr>";
                                     }
-
-                                   
                                     ?>
-                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
-                                </div>
+                                    </tbody>
+                                </table>
                             </div>
-
-                        
                         </div>
-                        
-                    </form>
-                </div>
-                
-                </section>
-                <!-- ======= event filter ends ========-->
 
-            </div>
-
-
-            <div class="containerr">
-                <!--========= all event start =============-->
-                <section class="event-container">
-
-                    <h1 class="heading">events</h1>
-
-                    <div class="box-container" style="display: flex;flex-wrap: wrap;">
-                        <!--just include the F.getEvent.php for grid display-->
-                        <?php include('../function/F.getEventGrid.php'); ?>
-                                           
+                        <div class="event-table">
+                            <div class="tbl-container">
+                                <h2>Events Mode</h2>
+                                <table class="tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Event Title</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        
+                                        if ($result_event_mode->num_rows > 0) {
+                                            while($row = $result_event_mode->fetch_assoc()) {
+                                                echo "<tr>";
+                                                echo "<td data-label='Event Title'>" . $row['event_mode_name'] . "</td>";
+                                                echo "<td data-label='Action'>
+                                                <button class='btn_edit' onclick=\"editEventMode('" . $row['id'] . "', '" . $row['event_mode_name'] . "')\"><i class='fa fa-pencil'></i></button>
+                                                <button class='btn_delete' onclick=\"confirmDeleteEventMode('" . $row['id'] . "')\"><i class='fa fa-trash'></i></button>
+                                                </td>";
+                                                echo "</tr>";
+                                            }
+                                        } else 
+                                        {
+                                            echo "<tr><td colspan='2'>No event modes available</td></tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-
-                </section>                
-                <!-- ============all event ends ========-->
+                </div>
             </div>
-        </div>
-
-
-
-        
-
-
-
+  
 
         <!-- CONFIRM DELETE -->
         <script src=js/deleteEvent.js></script>
-            
+
+        <script src=js/eventSettings.js></script>
 
         <!--JS -->
         <script src="js/eventscript.js"></script>
@@ -327,9 +377,56 @@ if (isset($_SESSION['error'])) {
 
         <!--sidebar functionality-->
         <script src="js/sidebar.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!--filter event-->
         <script src="js/event_filter.js"></script>
+
+
+        <script>
+            function filterEvents(eventType) {
+                // Get all rows in the events table
+                const rows = document.querySelectorAll('.event-table tbody tr');
+                
+                rows.forEach(row => {
+                    // Get the text content of the event type cell (adjust the index if necessary)
+                    const eventTypeCell = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    // If the event type matches or 'All' is selected, display the row, otherwise hide it
+                    if (eventType === 'All' || eventTypeCell === eventType) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const eventTitleInput = document.getElementById('eventTitleInput');
+                
+                // Add an input event listener to the Event Title input
+                eventTitleInput.addEventListener('input', function () {
+                    const filterValue = eventTitleInput.value.toLowerCase(); // Get the input value and convert it to lowercase
+                    
+                    // Get all rows in the events table
+                    const rows = document.querySelectorAll('.event-table tbody tr');
+                    
+                    // Iterate through each row and filter based on the Event Title column
+                    rows.forEach(row => {
+                        const eventTitleCell = row.querySelector('td[data-label="Event Title"]').textContent.toLowerCase(); // Get the event title from the specific column
+                        
+                        // Check if the event title contains the filter value
+                        if (eventTitleCell.includes(filterValue)) {
+                            row.style.display = ''; // Show the row if it matches the filter
+                        } else {
+                            row.style.display = 'none'; // Hide the row if it doesn't match the filter
+                        }
+                    });
+                });
+            });
+            </script>
+
 
     </body> 
 
@@ -357,9 +454,9 @@ if (isset($_SESSION['error'])) {
             window.history.replaceState(null, '', newUrl);
         });
     }
-</script>
+    </script>
+
     <!--real-time update-->
     <script src="js/realTimeUpdate.js"></script>
 
 </html>
-
