@@ -109,7 +109,7 @@ $totalAbsent = $totalAbsentRow['totalAbsent'];
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if status button is clicked
+    // Check if the status button is clicked
     if (isset($_POST['status'])) {
         // Retrieve data from the form
         $participant_id = $_POST['participant_id'];
@@ -135,9 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('Attendance already recorded.');</script>";
             } else {
                 // The status is different, so update the existing record
-                $updateSql = "UPDATE attendance SET status = ? WHERE participant_id = ? AND event_id = ?";
+                $updateSql = "UPDATE attendance SET status = ?, day = ? WHERE participant_id = ? AND event_id = ?";
                 $updateStmt = $conn->prepare($updateSql);
-                $updateStmt->bind_param("sii", $status, $participant_id, $event_id);
+                $updateStmt->bind_param("siii", $status, $selectedDay, $participant_id, $event_id);
 
                 if ($updateStmt->execute()) {
                     echo "<script>alert('Attendance updated successfully.'); window.location.reload();</script>";
@@ -148,9 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // No record exists, so insert a new record
-            $insertSql = "INSERT INTO attendance (participant_id, event_id, attendance_date, status) VALUES (?, ?, ?, ?)";
+            $insertSql = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, day) VALUES (?, ?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertSql);
-            $insertStmt->bind_param("iiss", $participant_id, $event_id, $attendance_date, $status);
+            $insertStmt->bind_param("iissi", $participant_id, $event_id, $attendance_date, $status, $selectedDay);
             if ($insertStmt->execute()) {
                 echo "<script>alert('Attendance marked successfully.'); window.location.reload();</script>";
             } else {
@@ -164,6 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existingRecordResult->close();
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -386,13 +387,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="#" class="box">
                         <i class="fa-solid fa-calendar-days"></i>
                         <div>
-                            <select class="" name="event_day-filter" id="event_day-filter" onchange="updateAttendanceDate()">
+                            <select name="event_day-filter" id="event_day-filter" onchange="filterByDay()">
+                                <option value="">All Days</option> <!-- Add an option to show all -->
                                 <?php for ($i = 1; $i <= $numDays; $i++) : ?>
                                     <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
                     </a>
+
                 </div>
             </section>
 
@@ -418,15 +421,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="phone">
                                     <span>PHONE#</span>
                                 </div>
+
+                                <div class="phone" id="action_tab">
+                                    <span>STATUS</span>
+                                </div>
                                 
-                                <div class="status">
+                                <div class="phone" id="action_tab">
+                                    <span>DAY</span>
+                                </div>
+                                
+                                <div class="status" id="action_tab">
                                     <span>ACTION</span>
                                 </div>
+                                
 
+                                <!-- 
                                 <div class="days"></div>
                                 <div class="status">
                                     <span></span>
-                                </div>
+                                </div> -->
 
                             </div>
                         </li>
@@ -436,8 +449,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="table_body">
                     <?php
                     // Fetch and display participants for the specified event title
-                    $sql = "SELECT * FROM eventParticipants INNER JOIN user ON eventParticipants.UserID = user.UserID
-                            WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
+                    $sql = "SELECT *, attendance.status FROM eventParticipants
+                    INNER JOIN user ON eventParticipants.UserID = user.UserID
+                    LEFT JOIN attendance ON eventParticipants.participant_id = attendance.participant_id
+                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
+            
+     
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $eventTitle);
                     $stmt->execute();
@@ -452,10 +469,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $position = htmlspecialchars($row['Position']);
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
+                            $attendanceDay = htmlspecialchars($row['day']); 
+                            $status = htmlspecialchars($row['status']);
                     ?>
                             
                             <form action='' method='POST' onsubmit="return confirmAttendance(this);">
-                                
                                 <ul>
                                     <li>
                                         <div class="item">
@@ -478,7 +496,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="phone">
                                                 <span><?php echo $contactNo . ' ' ?></span>
                                             </div>
+
+                                            <div class="phone">
+                                                <span><?php echo ($row['status'] == 'present' ? 'Present' : 'Absent'); ?></span>
+                                            </div>
+
+                                            <div class="phone">
+                                            <?php if (!empty($attendanceDay)) : ?>
+                                                    <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                    <span>(Day: <?php echo $attendanceDay; ?>)</span>
+                                                <?php endif; ?>
+                                            </div>
+
                                             
+
+                                            <div class="action" id="action">
                                             <div class="days">
                                                 <input type="hidden" name="attendance_date" id="attendance_date">
                                                 <!--hide-->
@@ -500,7 +532,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                                 <button type="submit" name="status" value="absent" class="approve att">Absent</button>
                                             </div>
-
+                                            </div>
                                         </div>
                                     </li>
                                 </ul>
@@ -514,6 +546,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
+            <script>
+                // Function to filter participants by selected day
+                function filterByDay() {
+                    var selectedDay = document.getElementById("event_day-filter").value; // Get the selected day
+                    var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
+
+                    participants.forEach(function(participant) {
+                        var participantDay = participant.querySelector("input[name='attendance_day']"); // This should refer to your attendance day data
+
+                        // Check if the participant has a day set and if it matches the selected day
+                        if (participantDay && participantDay.value) {
+                            if (selectedDay === "" || participantDay.value == selectedDay) { // Show if "All Days" is selected or day matches
+                                participant.style.display = 'block'; // Show the participant
+                                var actionDivs = document.querySelectorAll('.action');
+                                actionDivs.forEach(function(actionDiv) {
+                                    actionDiv.style.display = 'block'; // Show each action div
+                                });
+                            } else {
+                                participant.style.display = 'none'; // Hide if it doesn't match
+                            }
+                        } else {
+                            // If there’s no day (meaning no attendance record), hide the participant
+                            participant.style.display = 'none';
+                        }
+                    });
+                }
+            </script>
             
 
             <!--search filter-->
@@ -558,8 +617,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (participantInput && participantInput.value == participantId) {
                                 participantElement.style.display = "block";
                             }
+                            
                         });
                     });
+
                 }
             </script>
 
@@ -590,6 +651,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     participants.forEach(function(participant) {
                         participant.style.display = 'block';
                     });
+
+                    // Show all action divs when Absent is active
+                    var actionDivs = document.querySelectorAll('.action');
+                    actionDivs.forEach(function(actionDiv) {
+                        actionDiv.style.display = 'block'; // Show each action div
+                    });
+
+                    document.getElementById('action_tab').style.display = 'block'; 
                 }
 
                 // Add event listener to the element with id="viewParticipants" only
@@ -598,9 +667,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </script>
 
-            <!-- DISPLAY PRESENT-->
+            <!-- DISPLAY PRESENT -->
             <script>
-                // Function to handle the present box click event and filter participants by status
                 function handlePresentBoxClick(event) {
                     event.preventDefault();
 
@@ -616,6 +684,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Add 'active' class to the clicked box
                     clickedBox.classList.add('active');
 
+                    // Get the selected day from the dropdown
+                    var selectedDay = document.getElementById("event_day-filter").value;
+
                     // Get all participant elements
                     var participants = document.querySelectorAll('.table_body ul li');
 
@@ -627,21 +698,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Show only participants fetched from the attendance table with status 'Present'
                     participants.forEach(function(participant) {
                         var participantId = participant.querySelector("input[name='participant_id']").value;
-                        if (participantId && presentParticipantIds.includes(parseInt(participantId))) {
-                            participant.style.display = 'block';
+                        var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
+                        
+                        // Check if participant is present and matches selected day
+                        if (participantId && presentParticipantIds.includes(parseInt(participantId)) &&
+                            (selectedDay === "" || attendanceDay == selectedDay)) {
+                            participant.style.display = 'block'; // Show the participant
                         }
                     });
-                }
 
-                // Add event listener to the element with id="viewPresent" only
-                var viewPresent = document.getElementById('viewPresent');
-                viewPresent.addEventListener('click', handlePresentBoxClick);
+                    // Hide all action divs when Present is active
+                    var actionDivs = document.querySelectorAll('.action');
+                    actionDivs.forEach(function(actionDiv) {
+                        actionDiv.style.display = 'none'; // Hide each action div
+                    });
+
+                    document.getElementById('action_tab').style.display = 'none'; 
+                }
             </script>
 
-
-            <!--DISPLAY ABSENT-->
+            <!-- DISPLAY ABSENT -->
             <script>
-                // Function to handle the present box click event and filter participants by status
                 function handleAbsentBoxClick(event) {
                     event.preventDefault();
 
@@ -657,6 +734,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Add 'active' class to the clicked box
                     clickedBox.classList.add('active');
 
+                    // Get the selected day from the dropdown
+                    var selectedDay = document.getElementById("event_day-filter").value;
+
                     // Get all participant elements
                     var participants = document.querySelectorAll('.table_body ul li');
 
@@ -668,16 +748,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Show only participants fetched from the attendance table with status 'Absent'
                     participants.forEach(function(participant) {
                         var participantId = participant.querySelector("input[name='participant_id']").value;
-                        if (participantId && !presentParticipantIds.includes(parseInt(participantId))) {
-                            participant.style.display = 'block';
+                        var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
+                        
+                        // Check if participant is absent and matches selected day
+                        if (participantId && !presentParticipantIds.includes(parseInt(participantId)) &&
+                            (selectedDay === "" || attendanceDay == selectedDay)) {
+                            participant.style.display = 'block'; // Show the participant
                         }
                     });
-                }
 
-                // Add event listener to the element with id="viewAbsent" only
-                var viewAbsent = document.getElementById('viewAbsent');
-                viewAbsent.addEventListener('click', handleAbsentBoxClick);
+                    // Show all action divs when Absent is active
+                    var actionDivs = document.querySelectorAll('.action');
+                    actionDivs.forEach(function(actionDiv) {
+                        actionDiv.style.display = 'none'; // Hide each action div
+                    });
+
+                    document.getElementById('action_tab').style.display = 'none'; 
+                }
             </script>
+
+
             
 
         </div>
@@ -704,7 +794,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 
-    <!--ATTENDANCE-->
+    <!-- ATTENDANCE
     <script>
         // Function to update the attendance date based on the selected day
         function updateAttendanceDate() {
@@ -727,7 +817,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Set the value of the attendance_date input field
             document.getElementById("attendance_date").value = formattedDate;
         }
-    </script>
+    </script> -->
     
 </body>
 
