@@ -114,6 +114,7 @@ if ($adminData) {
                             <?php } ?>
                             <a href="landingPage.php">Events</a>
                             <a href="addEvent.php">Add Event</a>
+                            <a href="addEventTypeMode.php">Event Settings</a>
                             <a href="history.php">History</a>
                             <a href="cancelEvent.php">Cancelled</a>
                         </ul>
