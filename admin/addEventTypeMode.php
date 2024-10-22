@@ -1,6 +1,3 @@
-<?php
-    include('../function/F.addEvent.php');
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,67 +14,182 @@
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
-
-
         <link rel="stylesheet" href="css/main.css">
+
+        
     </head>
+<style>
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+.event-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.event-table {
+    width: 48%; 
+    margin-bottom: 20px;
+}
+
+.tbl-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tbl th, .tbl td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.tbl th {
+    background-color: #f2f2f2;
+}
+
+@media (max-width: 768px) {
+    .event-wrapper {
+        flex-direction: column;
+    }
+
+    .event-table {
+        width: 100%;
+    }
+    
+    .tbl th, .tbl td {
+        padding: 12px; 
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tbl th, .tbl td {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .tbl-container {
+        padding: 15px;
+    }.event-filter form {
+    width: 60%;
+    padding: 15px;
+}
+}
+</style>
 
     <body>
-    <?php
+
+        <?php
+            session_start();
+            require_once('../db.connection/connection.php');
+            $sql_event_type = "SELECT event_type_name ,event_type_id as id FROM event_type";
+            $result_event_type = $conn->query($sql_event_type);
+            
+            $sql_event_mode = "SELECT event_mode_name ,event_mode_id as id FROM event_mode";
+            $result_event_mode = $conn->query($sql_event_mode);
+            function countPendingUsers($conn)
+            {
+                $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
+                $result = $conn->query($sqls);
+
+                if ($result) {
+                    $row = $result->fetch_assoc();
+                    return $row['totalPendingUsers'];
+                } else {
+                    return 0; 
+                }
+            }
+            function countPendingEvents($conn)
+            {
+                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+                $result = $conn->query($sqls);
+            
+                if ($result) {
+                    $row = $result->fetch_assoc();
+                    return $row['totalPendingEvents'];
+                } else {
+                    return 0; 
+                }
+            }
+            
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                // Check if AdminID is set in the session
+                if (isset($_SESSION['AdminID'])) {
+                    $AdminID = $_SESSION['AdminID'];
+
+                    $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
+                    $stmtAdmin = $conn->prepare($sqlAdmin);
+                    $stmtAdmin->bind_param("i", $AdminID); 
+                    $stmtAdmin->execute();
+                    $resultAdmin = $stmtAdmin->get_result();
+
+                    if ($resultAdmin->num_rows > 0) {
+                        while ($row = $resultAdmin->fetch_assoc()) {
+                            $LastName = $row['LastName'];
+                            $FirstName = $row['FirstName'];
+                            $MI = $row['MI'];
+                            $Email = $row['Email'];
+                            $ContactNo = $row['ContactNo'];
+                            $Position = $row['Position']; 
+                            $Affiliation = $row['Affiliation'];
+                            $Image = $row['Image'];
+
+                        }
+                    } else { 
+                        echo "No records found";
+                    }
+
+                    $stmtAdmin->close();
+
+                    $pendingUsersCount = countPendingUsers($conn);
+                    $pendingEventsCount = countPendingEvents($conn);
+                }
+            }
+        ?>
+   <?php
 if (isset($_SESSION['success'])) {
     echo "<script>
         Swal.fire({
-        title: 'Success!',
-        text: '" . $_SESSION['success'] . "',
-        icon: 'success',
-        customClass: {
-        popup: 'larger-swal' 
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+            popup: 'larger-swal' 
         }  
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = 'landingPage.php';
-      }
-    });
+        });
     </script>";
     unset($_SESSION['success']);
 }
-if (isset($_SESSION['success2'])) {
-    echo "<script>
-        Swal.fire({
-        title: 'Success!',
-        text: '" . $_SESSION['success2'] . "',
-        icon: 'success',
-        customClass: {
-        popup: 'larger-swal' 
-        }  
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = 'pendingEvents.php';
-      }
-    });
-    </script>";
-    unset($_SESSION['success2']);
-}
 if (isset($_SESSION['error'])) {
     echo "<script>
-            Swal.fire({
-            title: 'Error!',
-            text: '" . $_SESSION['error'] . "',
-            icon: 'error',
-            customClass: {
-            popup: 'larger-swal' 
-            }  
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
         });
     </script>";
     unset($_SESSION['error']);
 }
-
 ?>
-
-
-        <!--=========== SIDEBAR =============-->
+        <!-- ====SIDEBAR==== -->
         <div class="sidebar">
-            <div class="top"> 
+            <div class="top">
                 <div class="logo">
                     <img src="img/wesmaarrdec-removebg-preview.png" alt="">
                     <span>WESMAARRDEC</span>
@@ -85,7 +197,7 @@ if (isset($_SESSION['error'])) {
                 <i class="bx bx-menu" id="btnn"></i>
             </div>
             <div class="user">
-                <!-- ang photo dapat query sa actual not path-->
+
                 <?php if (!empty($Image)): ?>
                     <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" class="user-img">
                 <?php else: ?>
@@ -95,7 +207,6 @@ if (isset($_SESSION['error'])) {
                     <p class="bold"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></p>
                     <p><?php echo $Position; ?></p>
                 </div>
-
             </div>
 
             
@@ -117,7 +228,7 @@ if (isset($_SESSION['error'])) {
                     <span class="tooltip">Events</span>
                     <div class="uno">
                         <ul>
-                            <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                             <?php if ($_SESSION['Role'] === 'superadmin') { ?>
                             <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
                             <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
                                 <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
@@ -144,7 +255,6 @@ if (isset($_SESSION['error'])) {
                             <a href="validation.php">User Validation <span><?php echo $pendingUsersCount;  ?></span></a>
                             <a href="newAccount.php">Create Account</a>
                             <a href="allUser.php">All Users</a>
-                            <!-- <a href="accountSettings.php">Account Settings</a> -->
                         </ul>
                     </div>
                 </li>
@@ -159,136 +269,107 @@ if (isset($_SESSION['error'])) {
             </ul>
         </div>
 
-        
         <!-- ============ CONTENT ============-->
         <div class="main-content">
             <div class="containerr">
-                <!-- <h3 class="dashboard">EVENTS</h3> -->
-                
-
-                <div class="wrapper">
-                    <div class="title">
-                        Create New Event
+                <h3 class="dashboard">EVENTS TYPES AND MODES</h3>
+                <!--======= event filter starts ======= -->
+                <section class="event-filter">
+                    <!-- Dropdown menu for selecting between adding event type or mode -->
+                     <div style="display: flex; gap: 10px; margin-bottom:10px">
+                        <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                            <div class="dropdown-container">
+                                <div class="dropdown">
+                                    <input type="text" readonly name="eventDisplay" placeholder="Add" maxlength="20" class="output">
+                                    <div class="lists">
+                                        <p class="items" onclick="openEventTypeModal()">Event Type</p>
+                                        <p class="items" onclick="openEventModeModal()">Event Mode</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <form method="POST" action="" enctype="multipart/form-data">
-                        <div class="input_field">
-                            <label>Event Title</label>
-                            <input type="text" class="input" name="event_title" required>
-                        </div>
+                </section>
 
-                        <div class="input_field">
-                            <label>Event Description</label>
-                            <textarea class="textarea" name="event_description"></textarea>
-                        </div>
 
-                        <div class="input_field">
-                            <label>Event Type</label>
-                            <!-- <input type="text" class="input" name="event_type" required> -->
-                            <div class="custom_select">
-                                <select name="event_type" required>
-                                    <option value="">Select</option>
-                                    <option value="Training Sessions">Training Sessions</option>
-                                    <option value="Specialized Seminars">Specialized Seminars</option>
-                                    <option value="Cluster-specific gathering">Cluster-specific gathering</option>
-                                    <option value="General Assembly">General Assembly</option>
-                                    <option value="Workshop">Workshop</option>
-                                </select>
+            </div>
+            
+            <div class="container">
+                <!--========= all event start =============-->
+                <div class="event-wrapper">
+                    <div class="event-table">
+                        <div class="tbl-container">
+                            <h2>Events Type</h2>
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Event Title</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+
+                                    if ($result_event_type->num_rows > 0) {
+                                        while($row = $result_event_type->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td data-label='Event Title'>" . $row['event_type_name'] . "</td>";
+                                            echo "<td data-label='Action'>
+                                            <button class='btn_edit' onclick=\"editEventType('" . $row['id'] . "', '" . $row['event_type_name'] . "')\"><i class='fa fa-pencil'></i></button>
+                                            <button class='btn_delete' onclick=\"confirmDeleteEventType('" . $row['id'] . "')\"><i class='fa fa-trash'></i></button>
+                                            </td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='2'>No event types available</td></tr>";
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>  
+                        </div>
 
-                        <div class="input_field">
-                            <label>Event Mode</label>
-                            <div class="custom_select">
-                                <select name="event_mode" id="eventModeSelect" required onchange="toggleZoomLinkField()">
-                                    <option value="">Select</option>
-                                    <option value="Face-to-Face">Face-to-Face</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Hybrid">Hybrid</option>
-                                </select>
+                        <div class="event-table">
+                            <div class="tbl-container">
+                                <h2>Events Mode</h2>
+                                <table class="tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Event Title</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        
+                                        if ($result_event_mode->num_rows > 0) {
+                                            while($row = $result_event_mode->fetch_assoc()) {
+                                                echo "<tr>";
+                                                echo "<td data-label='Event Title'>" . $row['event_mode_name'] . "</td>";
+                                                echo "<td data-label='Action'>
+                                                <button class='btn_edit' onclick=\"editEventMode('" . $row['id'] . "', '" . $row['event_mode_name'] . "')\"><i class='fa fa-pencil'></i></button>
+                                                <button class='btn_delete' onclick=\"confirmDeleteEventMode('" . $row['id'] . "')\"><i class='fa fa-trash'></i></button>
+                                                </td>";
+                                                echo "</tr>";
+                                            }
+                                        } else 
+                                        {
+                                            echo "<tr><td colspan='2'>No event modes available</td></tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-
-                        <div class="input_field" id="zoomLinkField">
-                            <label>Event Link</label>
-                            <input type="text" class="input" name="zoom_link">
-                        </div>
-
-                        <div class="input_field">
-                            <label for="photoUpload">Event Photo</label>
-                            <input type="file" id="photoUpload" class="input" accept="image/*" name="event_photo">
-                        </div>
-
-                        <div class="input_field" id="participantLimitField">
-                            <label>Participant Limit</label>
-                            <input type="number" class="input" name="participant_limit" required>
-                        </div>
-
-                        <div class="input_field" id="locationField">
-                            <label>Location</label>
-                            <input type="text" class="input" name="location" required>
-                        </div>
-
-                        <div class="input_field">
-                            <label>Date Start</label>
-                            <input type="date" class="input" name="date_start" id="date_start" required>
-                        </div><div class="input_field">
-                            <label>Date End</label> 
-                            <input type="date" class="input" name="date_end" id="date_end" required>
-                        </div>
-                        <script>
-                        const dateStart = document.getElementById('date_start');
-                        const dateEnd = document.getElementById('date_end');
-                        const today = new Date().toISOString().split('T')[0];
-                        dateStart.min = today;
-                        dateEnd.min = today;
-                        dateStart.addEventListener('change', function() {
-                            const startDate = this.value;
-                            dateEnd.min = startDate;
-                            if (dateEnd.value < startDate) {
-                                dateEnd.value = '';
-                            }
-                        });
-                        </script>
-
-
-                        <div class="input_field">
-                            <label>Time Start</label>
-                            <input type="time" class="input" name="time_start" id="timeStart" required>
-                        </div>
-
-                        <div class="input_field">
-                            <label>Time End</label>
-                            <input type="time" class="input" name="time_end" id="timeEnd" required>
-                        </div>  
-
-                        <div class="input_field">
-                            <input type="submit" value="Create" class="createBtn">
-                        </div>
-
-                    </form>
+                    </div>
                 </div>
-            </div>            
-        </div>
+            </div>
+  
 
+        <!-- CONFIRM DELETE -->
+        <script src=js/deleteEvent.js></script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Function to set default time for Time Start and Time End
-                function setDefaultTime() {
-                    var timeStartInput = document.getElementById('timeStart');
-                    var timeEndInput = document.getElementById('timeEnd');
-
-                    // Set default values to 8 AM and 5 PM respectively
-                    timeStartInput.value = '08:00';
-                    timeEndInput.value = '17:00';
-                }
-
-                // Call the function to set default time when the page loads
-                setDefaultTime();
-            });
-        </script>
-        
-
+        <script src=js/eventSettings.js></script>
 
         <!--JS -->
         <script src="js/eventscript.js"></script>
@@ -296,95 +377,86 @@ if (isset($_SESSION['error'])) {
 
         <!--sidebar functionality-->
         <script src="js/sidebar.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!--filter event-->
+        <script src="js/event_filter.js"></script>
+
 
         <script>
-            
-            document.addEventListener('DOMContentLoaded', function () {
-                // Initial check on page load
-                toggleZoomLinkField();
-                toggleLocationField();
-
-                // Function to toggle Zoom Link field visibility
-                function toggleZoomLinkField() {
-                    var eventModeSelect = document.getElementById("eventModeSelect");
-                    var zoomLinkField = document.getElementById("zoomLinkField");
-
-                    // Show the "Zoom Link" input field only when "Hybrid" or "Online" is selected
-                    zoomLinkField.style.display = (eventModeSelect.value === "Hybrid" || eventModeSelect.value === "Online") ? "block" : "none";
-                }
-
-                // Function to toggle Location field visibility and required status
-                function toggleLocationField() {
-                    var eventModeSelect = document.getElementById("eventModeSelect");
-                    var locationField = document.getElementById("locationField");
-
-                    // Show the "Location" input field only when "Hybrid" or "Face-to-Face" is selected
-                    locationField.style.display = (eventModeSelect.value === "Hybrid" || eventModeSelect.value === "Face-to-Face") ? "block" : "none";
-
-                    // Set the "required" attribute based on the selected event mode
-                    locationField.querySelector("input").required = (eventModeSelect.value === "Hybrid" || eventModeSelect.value === "Face-to-Face");
-                }
-
-                // Attach the functions to the change event of the Event Mode select
-                document.getElementById("eventModeSelect").addEventListener("change", function() {
-                    toggleZoomLinkField();
-                    toggleLocationField();
+            function filterEvents(eventType) {
+                // Get all rows in the events table
+                const rows = document.querySelectorAll('.event-table tbody tr');
+                
+                rows.forEach(row => {
+                    // Get the text content of the event type cell (adjust the index if necessary)
+                    const eventTypeCell = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    // If the event type matches or 'All' is selected, display the row, otherwise hide it
+                    if (eventType === 'All' || eventTypeCell === eventType) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
                 });
-            });
-
+            }
         </script>
 
-
-        <!--CONFIRMATION===========-->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
         <script>
-            
             document.addEventListener('DOMContentLoaded', function () {
-                function confirmSaveChanges(event) {
-                    event.preventDefault();
-
-                    Swal.fire({
-                        title: 'Create Event?',
-                        text: 'Are you sure you want to create this event?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes',
-                        cancelButtonText: 'No',
-                        padding: '3rem', 
-                        customClass: {
-                        popup: 'larger-swal' 
-                        }          
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            event.target.submit();
+                const eventTitleInput = document.getElementById('eventTitleInput');
+                
+                // Add an input event listener to the Event Title input
+                eventTitleInput.addEventListener('input', function () {
+                    const filterValue = eventTitleInput.value.toLowerCase(); // Get the input value and convert it to lowercase
+                    
+                    // Get all rows in the events table
+                    const rows = document.querySelectorAll('.event-table tbody tr');
+                    
+                    // Iterate through each row and filter based on the Event Title column
+                    rows.forEach(row => {
+                        const eventTitleCell = row.querySelector('td[data-label="Event Title"]').textContent.toLowerCase(); // Get the event title from the specific column
+                        
+                        // Check if the event title contains the filter value
+                        if (eventTitleCell.includes(filterValue)) {
+                            row.style.display = ''; // Show the row if it matches the filter
+                        } else {
+                            row.style.display = 'none'; // Hide the row if it doesn't match the filter
                         }
                     });
-                }
-
-                document.querySelector('form').addEventListener('submit', confirmSaveChanges);
+                });
             });
-        </script>
+            </script>
 
 
+    </body> 
 
-        <script>
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
 
-            let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
+    if (status === 'success') {
+        Swal.fire({
+            title: "Success!",
+            text: "Event successfully updated!",
+            icon: "success"
+        }).then(() => {
+            const newUrl = window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        });
+    }
+    if (status === 'cancelled') {
+        Swal.fire({
+            title: "Cancelled!",
+            text: "Event successfully cancelled!",
+            icon: "error"
+        }).then(() => {
+            const newUrl = window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        });
+    }
+    </script>
 
-            dropdown_items.forEach(items =>{
-                items.onclick = () =>{
-                    items_parent = items.parentElement.parentElement;
-                    let output = items_parent.querySelector('.output');
-                    output.value = items.innerText;
-                }
-            });
-
-        </script>
-    </body>
-
+    <!--real-time update-->
+    <script src="js/realTimeUpdate.js"></script>
 
 </html>

@@ -416,7 +416,7 @@ section{
     height: 250px; 
 } 
 .sidebar.active .events-side2:hover {
-    height: 290px; 
+    height: 335px; 
 }
 .sidebar.active .events-side:hover, .sidebar.active .events-side2:hover {
     background-color: var(--first-color-alt);
