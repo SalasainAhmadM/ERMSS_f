@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 21, 2024 at 08:07 AM
+-- Generation Time: Oct 22, 2024 at 03:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -84,18 +84,19 @@ CREATE TABLE `attendance` (
   `event_id` int(11) DEFAULT NULL,
   `attendance_date` date DEFAULT NULL,
   `status` enum('present','absent') DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `day` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `attendance`
 --
 
-INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`) VALUES
-(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23'),
-(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51'),
-(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04'),
-(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19');
+INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`, `day`) VALUES
+(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL),
+(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL),
+(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL),
+(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19', NULL);
 
 -- --------------------------------------------------------
 
@@ -187,7 +188,8 @@ INSERT INTO `eventparticipants` (`participant_id`, `event_id`, `UserID`) VALUES
 (107, 50, 26),
 (108, 50, 26),
 (109, 50, 26),
-(110, 50, 26);
+(110, 50, 26),
+(117, 209, 6);
 
 -- --------------------------------------------------------
 
@@ -211,118 +213,119 @@ CREATE TABLE `events` (
   `event_link` text DEFAULT NULL,
   `cancelReason` text NOT NULL,
   `event_cancel` varchar(255) NOT NULL,
-  `participant_limit` int(11) NOT NULL
+  `participant_limit` int(11) NOT NULL,
+  `sponsor` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `events`
 --
 
-INSERT INTO `events` (`event_id`, `event_title`, `event_description`, `event_type`, `event_mode`, `event_photo_path`, `location`, `date_start`, `date_end`, `time_start`, `time_end`, `date_created`, `event_link`, `cancelReason`, `event_cancel`, `participant_limit`) VALUES
-(50, 'zoom link', 's', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-01', '2024-03-01', '20:18:00', '20:21:00', '2024-03-01 12:17:01', 'https://meet.google.com/xux-xsau-zbn', '', '', 0),
-(58, 'Pilar&#039;s event', 'asfads asdfasdf', 'Specialized Seminars', 'Online', '../admin/img/eventPhoto/mark.png', '', '2024-01-02', '2024-01-11', '18:30:00', '18:31:00', '2024-03-02 10:24:53', 'https://meet.google.com/xux-xsau-zbn', '', '', 0),
-(60, 'Location', 'dasfsdaf sadfasfasd', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2024-03-02', '2024-03-02', '19:01:00', '19:01:00', '2024-03-02 11:01:31', '', '', '', 0),
-(64, 'loopinggg', 'sdfasfsadf', 'Training Sessions', 'Online', '', '', '2024-03-09', '2024-03-09', '23:42:00', '23:44:00', '2024-03-02 16:46:24', 'https://meet.google.com/xux-xsau-zbn', '', '', 0),
-(66, 'hahaha', 'sdfadasd', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2021-03-03', '2021-03-12', '01:06:00', '01:06:00', '2024-03-02 17:06:57', '', '', '', 0),
-(68, 'Join this event check', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-08', '2024-03-08', '17:57:00', '18:56:00', '2024-03-08 09:56:54', '', '', '', 0),
-(74, 'Join Join Join Event', 'adfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-09', '2024-03-09', '22:40:00', '22:51:00', '2024-03-08 10:24:39', '', '', '', 0),
-(75, 'WESMAARRDEC EVENT CREATION TRIAL', '', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-08', '2022-02-17', '19:15:00', '19:16:00', '2024-03-08 11:16:21', '', '', '', 0),
-(76, 'Try if pwede ', 'asdfads asdfasdf ', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-09', '2024-03-09', '22:59:00', '23:00:00', '2024-03-09 14:56:51', '', '', '', 0),
-(77, 'Hello Wesmaardec', 'sdfas asdfasdf sdafasd asdfas', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '00:04:00', '00:19:00', '2024-03-09 16:02:48', '', '', '', 0),
-(78, 'view participants', 'sdafsad sadfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '11:05:00', '11:07:00', '2024-03-10 03:03:54', '', '', '', 0),
-(79, 'Join to view', 'asdfasfda asdfasdf as', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '13:46:00', '13:50:00', '2024-03-10 05:44:46', '', '', '', 0),
-(81, 'Heloo', 'sdfasdf', 'Specialized Seminars', 'Hybrid', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '20:43:00', '20:45:00', '2024-03-10 12:42:23', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(82, 'TRy to join this event', 'sdafasd asdfasd asdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:11:00', '17:14:00', '2024-03-11 07:04:37', '', '', '', 0),
-(83, 'Helo helo', 'asdfasd asdfasd', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:02:00', '17:03:00', '2024-03-11 08:19:18', '', '', '', 0),
-(84, 'History', 'sdfas asdfasd adfasf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '16:34:00', '16:36:00', '2024-03-11 08:34:21', '', '', '', 0),
-(85, 'sadfsdsdfasd', 'asdasdfasdf', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:34:00', '19:31:00', '2024-03-11 09:31:53', '', '', '', 0),
-(86, 'mock defense', 'dasfasd asdfasdf sadfasf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '14:13:00', '15:15:00', '2024-03-11 14:09:08', '', '', '', 0),
-(87, 'asdfasfasfasfasfasdf', 'fasfs', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '22:20:00', '23:20:00', '2024-03-11 14:20:47', '', '', '', 0),
-(88, 'Networking Gala', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod justo eget magna fermentum, sit amet fermentum sapien tincidunt.', 'Cluster-specific gathering', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2018-01-04', '2018-01-16', '13:58:00', '17:58:00', '2024-03-11 17:58:58', '', '', '', 0),
-(89, 'Conference on Innovation', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod justo eget magna fermentum, sit amet fermentum sapien tincidunt.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-01-17', '2018-01-18', '14:00:00', '16:00:00', '2024-03-11 18:00:31', '', '', '', 0),
-(90, 'Art Exhibition', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu justo a neque viverra posuere.', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-01-23', '2018-01-26', '15:02:00', '17:01:00', '2024-03-11 18:01:47', '', '', '', 0),
-(91, 'Music Festival', ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vivamus fringilla tortor ut risus sagittis, ac tincidunt purus dictum.', 'Cluster-specific gathering', 'Online', '', '', '2018-01-29', '2018-01-31', '14:03:00', '16:03:00', '2024-03-11 18:03:15', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(92, ' Health and Wellness Expo', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget neque vel est imperdiet suscipit eu at leo.', 'Specialized Seminars', 'Online', '', '', '2018-02-02', '2024-03-02', '14:04:00', '15:04:00', '2024-03-11 18:04:28', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(93, 'Literature Symposiu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu tellus et tellus feugiat cursus eget eu mauris.', 'Training Sessions', 'Hybrid', '', 'Tugbungan, Zamboanga City', '2018-02-12', '2018-02-13', '15:05:00', '16:05:00', '2024-03-11 18:05:56', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(94, 'Sustainable Living Workshop', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel libero ut nibh placerat euismod nec id lacus.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-14', '2018-02-21', '02:07:00', '04:08:00', '2024-03-11 18:07:42', '', '', '', 0),
-(95, 'Food Tasting Event', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula metus nec justo ullamcorper, vel lacinia odio consequat.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-03-01', '2018-03-01', '02:09:00', '05:09:00', '2024-03-11 18:09:09', '', '', '', 0),
-(96, 'Dance Competition', ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce efficitur odio a magna suscipit, ac malesuada est malesuada.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-03-07', '2018-03-08', '02:10:00', '03:10:00', '2024-03-11 18:10:41', '', '', '', 0),
-(97, 'Environmental Awareness Campaign', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ac ligula nec nunc fermentum consequat.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-04-11', '2018-04-16', '14:12:00', '16:12:00', '2024-03-11 18:12:33', '', '', '', 0),
-(98, 'Film Festival', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in tellus nec sem dapibus efficitur.', 'Cluster-specific gathering', 'Hybrid', '', 'Tugbungan, Zamboanga City', '2018-05-06', '2018-05-07', '02:15:00', '04:15:00', '2024-03-11 18:15:13', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(99, 'Science Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec elit in arcu tincidunt tincidunt.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-05-14', '2018-05-13', '02:16:00', '04:16:00', '2024-03-11 18:16:49', '', '', '', 0),
-(100, 'Charity Run', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu augue eget nunc sollicitudin hendrerit non eu odio.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-13', '2018-06-13', '02:18:00', '02:18:00', '2024-03-11 18:18:13', '', '', '', 0),
-(101, 'Business Expo', 'afasdfsa afda sdfasdfdasf das', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-20', '2018-06-14', '10:00:00', '13:00:00', '2024-03-11 18:20:28', '', '', '', 0),
-(102, 'adsfas dfasdfa', 'asdfasfdfds', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-12', '2018-06-12', '11:11:00', '14:22:00', '2024-03-11 18:21:30', '', '', '', 0),
-(103, 'dfadadfsd sadfasfa', '', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-14', '2018-06-14', '02:22:00', '03:00:00', '2024-03-11 18:23:01', '', '', '', 0),
-(104, 'sadf dsfadf wwgata d', 'dfsadfw hfddfng', 'Training Sessions', 'Online', '', '', '2018-07-17', '2018-07-19', '02:23:00', '04:00:00', '2024-03-11 18:24:00', 'https://meet.google.com/sgm-jdfr-ucn?authuser', '', '', 0),
-(105, 'yththweeeeeeee', 'wwwwwwwwfrfffffffffffffaaaaaaaaaaa', 'Specialized Seminars', 'Online', '', '', '2018-07-17', '2018-07-20', '15:00:00', '16:00:00', '2024-03-11 18:25:20', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(106, 'asdfwwer w', 'qwrwqer 2qf wefaw', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-02', '2018-06-03', '13:00:00', '14:00:00', '2024-03-11 18:26:36', '', '', '', 0),
-(107, 'hjkhwofwue hwu', 'whefuqwhfaf sdjkfhw', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-02', '2018-06-04', '14:00:00', '15:00:00', '2024-03-11 18:27:24', '', '', '', 0),
-(108, 'fadfafdda', 'sdafasdfsa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-08', '2018-08-09', '14:00:00', '15:00:00', '2024-03-11 18:28:59', '', '', '', 0),
-(109, 'asdfasdf', 'asdfasf', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-02', '2018-08-04', '12:00:00', '13:00:00', '2024-03-11 18:30:07', '', '', '', 0),
-(110, 'dfad sadfasdda', 'asdfasfs', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-13', '2018-08-13', '14:00:00', '15:00:00', '2024-03-11 23:44:48', '', '', '', 0),
-(111, 'adfa dasdfasd dasfasdfasdfas', 'sdadfasdfds', 'Specialized Seminars', 'Online', '', '', '2018-09-02', '2018-09-03', '13:00:00', '14:00:00', '2024-03-11 23:45:55', 'https://meet.google.com/sgm-jdfr-ucn?authuser', '', '', 0),
-(112, 'kkjhkasfhsa', 'sjdahfklsfha', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-11-02', '2018-11-23', '15:00:00', '16:00:00', '2024-03-11 23:47:16', '', '', '', 0),
-(113, 'sadfas sdadasa', 'adfasd sadfasd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-12-23', '2018-12-25', '09:00:00', '10:00:00', '2024-03-11 23:48:11', '', '', '', 0),
-(114, 'sdafas', 'asdfasf', 'Specialized Seminars', 'Online', '', '', '2019-01-01', '2019-01-03', '12:00:00', '13:00:00', '2024-03-11 23:49:34', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(115, 'adf wadfsdf w', 'asdfwfasdfbrg', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-02', '2018-02-04', '11:00:00', '14:00:00', '2024-03-11 23:50:40', '', '', '', 0),
-(116, 'sdfas sdafwe fawsdf', 'fasdfsadf wawf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-02', '2018-02-04', '13:00:00', '14:00:00', '2024-03-11 23:52:14', '', '', '', 0),
-(117, 'sdsasdf', 'asdfasdfa sdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2019-02-02', '2019-02-04', '13:00:00', '14:00:00', '2024-03-11 23:54:28', '', '', '', 0),
-(118, 'sadfasf', 'sdfasf weafefsadfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-02-14', '2019-02-15', '14:00:00', '15:00:00', '2024-03-11 23:55:32', '', '', '', 0),
-(119, 'asdfas sadfsf', '', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-06', '2019-01-07', '09:00:00', '11:00:00', '2024-03-11 23:56:54', '', '', '', 0),
-(120, 'asdfas fasdfas', 'adfasfa', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-04-02', '2019-04-03', '14:00:00', '15:00:00', '2024-03-11 23:57:53', '', '', '', 0),
-(121, 'sadfsadfa', 'sfasdfa\r\n', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-03-02', '2019-03-05', '11:00:00', '13:00:00', '2024-03-11 23:59:15', '', '', '', 0),
-(122, 'asdfasdf', 'sadfasd ', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-05-01', '2019-05-02', '12:00:00', '13:00:00', '2024-03-12 00:00:52', '', '', '', 0),
-(123, 'safdf asdfasdfas', 'asdfasdfas', 'Training Sessions', 'Online', '', '', '2019-06-01', '2019-06-05', '13:00:00', '14:00:00', '2024-03-12 00:01:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(124, 'adsfasdf', 'afasdfa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-01', '2020-01-02', '13:00:00', '14:00:00', '2024-03-12 00:05:01', '', '', '', 0),
-(125, 'asdfasdfasf', 'asdfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-04', '2020-01-05', '12:00:00', '13:00:00', '2024-03-12 00:05:54', '', '', '', 0),
-(126, 'asdfasfasd sadas', 'asdfasf', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-02-02', '2020-02-04', '13:00:00', '14:00:00', '2024-03-12 00:06:37', '', '', '', 0),
-(127, 'sdfas', 'asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-02-06', '2020-02-08', '13:00:00', '14:00:00', '2024-03-12 00:07:39', '', '', '', 0),
-(128, 'asdfas asdf asf', 'asdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-03-01', '2020-03-04', '13:00:00', '14:59:00', '2024-03-12 00:08:23', '', '', '', 0),
-(129, 'asdfas', 'sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-04-01', '2020-04-02', '13:00:00', '14:00:00', '2024-03-12 00:08:57', '', '', '', 0),
-(130, 'afsdfaw fawweasdf ', 'asdfaswe wefwa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-05-01', '2020-05-03', '13:00:00', '14:00:00', '2024-03-12 00:09:42', '', '', '', 0),
-(131, 'asdfa sfwfa', 'sdafasd weaf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-07-01', '2020-07-02', '13:00:00', '14:00:00', '2024-03-12 00:10:18', '', '', '', 0),
-(132, 'ggggg', 'ggggg', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-06-03', '2020-06-05', '13:00:00', '14:00:00', '2024-03-12 00:11:24', '', '', '', 0),
-(133, 'jhljkhj', 'jhkhlkjb', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-08-13', '2020-08-31', '12:00:00', '13:00:00', '2024-03-12 00:12:10', '', '', '', 0),
-(134, 'dafas dasdfasdfas', 'adsfas wefawef', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-09-02', '2020-09-04', '13:00:00', '13:00:00', '2024-03-12 00:13:15', '', '', '', 0),
-(135, 'dasf w', 'fww', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-10-02', '2020-10-28', '12:59:00', '13:01:00', '2024-03-12 00:13:54', '', '', '', 0),
-(136, 'sdfaswe afawfw', 'faskjkjhrflifhjkdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-11-01', '2020-11-21', '11:00:00', '13:00:00', '2024-03-12 00:14:29', '', '', '', 0),
-(137, 'dasfwfwewfw', 'sdfawf wefwa', 'Cluster-specific gathering', 'Hybrid', '', 'Tetuan, Zamboanga City', '2020-12-01', '2020-12-30', '12:59:00', '14:00:00', '2024-03-12 00:15:09', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(138, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0),
-(139, 'jhjhljk', 'jhkhlk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-05', '2022-03-06', '13:00:00', '14:00:00', '2024-03-12 00:19:45', '', '', '', 0),
-(140, 'hgggg', 'hhhhhh', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-06-02', '2022-06-03', '13:00:00', '14:59:00', '2024-03-12 00:20:28', '', '', '', 0),
-(141, 'kkkkkkkkkkk', 'kkkkkkkk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-02', '2020-02-02', '22:00:00', '23:00:00', '2024-03-12 00:21:11', '', '', '', 0),
-(142, 'asdfasdf weff', 'ddddd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-01-03', '2023-01-04', '13:00:00', '14:00:00', '2024-03-12 00:22:01', '', '', '', 0),
-(143, 'jkhlkhkj', 'jhljhk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-02-01', '2023-02-04', '13:00:00', '14:59:00', '2024-03-12 00:22:35', '', '', '', 0),
-(144, 'jjj', 'jjjj\r\n', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-03-01', '2023-04-02', '13:00:00', '15:00:00', '2024-03-12 00:23:27', '', '', '', 0),
-(145, 'lhgjhlghg', 'gfhgfhk', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2023-07-03', '2023-07-06', '13:00:00', '14:00:00', '2024-03-12 00:24:01', '', '', '', 0),
-(146, 'dddddd', 'dddddddddd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-08-13', '2023-08-16', '13:59:00', '15:59:00', '2024-03-12 00:24:55', '', '', '', 0),
-(147, 'dfsadf', 'dsafsdfwwe', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-10-01', '2023-10-02', '14:00:00', '15:00:00', '2024-03-12 00:25:57', '', '', '', 0),
-(148, 'hdfsdafasdfasd', 'sdfadsfdas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-01-03', '2024-01-07', '13:00:00', '14:00:00', '2024-03-12 00:27:02', '', '', '', 0),
-(149, 'sfasasdfsdf', 'dsfafs', 'Specialized Seminars', 'Online', '', '', '2024-01-06', '2024-01-03', '15:00:00', '16:00:00', '2024-03-12 00:27:37', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(150, 'asdfaswefwe', 'asdfasdf', 'Training Sessions', 'Online', '', '', '2025-06-04', '2025-06-06', '13:00:00', '14:00:00', '2024-03-12 00:28:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(151, 'Art and Craft Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla turpis in mi feugiat eleifend.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-11', '2026-03-14', '22:24:00', '22:27:00', '2024-03-12 00:31:33', '', '', '', 0),
-(155, 'ongoing testing', 'asdfsadfa asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-09-25', '2025-09-29', '22:28:00', '22:30:00', '2024-03-12 14:27:00', '', '', '', 0),
-(156, 'upcoming testing', 'asdfasf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-08-24', '2026-08-28', '22:31:00', '22:33:00', '2024-03-12 14:29:26', '', '', '', 0),
-(157, 'sdfas asdfa', 'sadfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-01-27', '2026-01-28', '22:53:00', '22:54:00', '2024-03-12 14:51:17', '', '', '', 0),
-(163, 'hehe', 'dafasdf asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-05-01', '2025-05-06', '23:57:00', '23:59:00', '2024-03-12 15:54:31', '', '', '', 0),
-(166, 'ongoing', 'asdfasd asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-08-17', '2025-08-22', '01:34:00', '01:37:00', '2024-03-12 17:33:00', '', '', '', 0),
-(168, 'oongoing', 'asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-12-31', '2025-01-04', '02:04:00', '02:09:00', '2024-03-12 18:02:12', '', '', '', 0),
-(169, 'upcoming', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-11', '02:17:00', '02:21:00', '2024-03-12 18:08:53', '', '', '', 0),
-(172, 'haaaa', 'asdfasfd', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-01-13', '2025-01-14', '08:38:00', '10:38:00', '2024-03-12 18:38:25', '', '', '', 0),
-(173, 'hiiiii', 'asdfasdf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '02:45:00', '02:48:00', '2024-03-12 18:43:27', '', '', '', 0),
-(176, 'real time', 'asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-08', '09:57:00', '09:58:00', '2024-03-13 01:55:44', '', '', '', 0),
-(178, 'will ongoing', 'asdfasdf sdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-07-09', '2025-07-10', '10:30:00', '10:31:00', '2024-03-13 02:22:49', '', '', '', 0),
-(179, 'create event sample', 'asdfsdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '13:26:00', '13:31:00', '2024-03-13 05:24:29', '', '', '', 0),
-(180, 'event join', 'sdafsadf sdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-05-01', '2026-05-06', '13:28:00', '15:28:00', '2024-03-13 05:28:43', '', '', '', 0),
-(181, 'hehehe', 'asdfasdfasd', 'Specialized Seminars', 'Online', '', '', '2025-05-09', '2025-05-11', '13:37:00', '13:39:00', '2024-03-13 05:36:02', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0),
-(182, 'SE Defense', 'asdfasdf asdfsad', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-06-29', '2025-07-01', '15:00:00', '16:00:00', '2024-03-13 08:01:32', '', '', '', 0),
-(187, 'letsss gggg', 'adsfasdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-12-15', '2025-12-20', '07:06:00', '07:15:00', '2024-04-22 23:04:42', '', '', '', 0),
-(203, 'Date and time try', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tubungan, Zamboanga City', '2026-02-26', '2026-03-02', '03:20:00', '18:36:00', '2024-04-28 05:36:30', '', '', '', 2),
-(206, 'Attendance table save', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2025-10-06', '2025-10-07', '14:58:00', '18:56:00', '2024-04-29 06:57:00', '', '', '', 2),
-(207, 'try create event', 'sdfasd', 'Specialized Seminars', 'Online', '', '', '2025-09-23', '2025-09-27', '09:43:00', '10:43:00', '2024-04-30 06:44:05', '', '', '', 1),
-(208, 'data analytics for the future', 'chu chuc chu', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2026-09-26', '2026-10-01', '08:00:00', '17:00:00', '2024-04-30 07:25:11', '', 'Try cancel', 'Cancelled', 3),
-(209, 'workshop', 'asdfasdf asdfasdf asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2025-12-25', '2025-12-26', '08:44:00', '17:44:00', '2024-04-30 23:45:04', '', '', '', 1);
+INSERT INTO `events` (`event_id`, `event_title`, `event_description`, `event_type`, `event_mode`, `event_photo_path`, `location`, `date_start`, `date_end`, `time_start`, `time_end`, `date_created`, `event_link`, `cancelReason`, `event_cancel`, `participant_limit`, `sponsor`) VALUES
+(50, 'zoom link', 's', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-01', '2024-03-01', '20:18:00', '20:21:00', '2024-03-01 12:17:01', 'https://meet.google.com/xux-xsau-zbn', '', '', 0, NULL),
+(58, 'Pilar&#039;s event', 'asfads asdfasdf', 'Specialized Seminars', 'Online', '../admin/img/eventPhoto/mark.png', '', '2024-01-02', '2024-01-11', '18:30:00', '18:31:00', '2024-03-02 10:24:53', 'https://meet.google.com/xux-xsau-zbn', '', '', 0, NULL),
+(60, 'Location', 'dasfsdaf sadfasfasd', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2024-03-02', '2024-03-02', '19:01:00', '19:01:00', '2024-03-02 11:01:31', '', '', '', 0, NULL),
+(64, 'loopinggg', 'sdfasfsadf', 'Training Sessions', 'Online', '', '', '2024-03-09', '2024-03-09', '23:42:00', '23:44:00', '2024-03-02 16:46:24', 'https://meet.google.com/xux-xsau-zbn', '', '', 0, NULL),
+(66, 'hahaha', 'sdfadasd', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2021-03-03', '2021-03-12', '01:06:00', '01:06:00', '2024-03-02 17:06:57', '', '', '', 0, NULL),
+(68, 'Join this event check', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-08', '2024-03-08', '17:57:00', '18:56:00', '2024-03-08 09:56:54', '', '', '', 0, NULL),
+(74, 'Join Join Join Event', 'adfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-09', '2024-03-09', '22:40:00', '22:51:00', '2024-03-08 10:24:39', '', '', '', 0, NULL),
+(75, 'WESMAARRDEC EVENT CREATION TRIAL', '', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-08', '2022-02-17', '19:15:00', '19:16:00', '2024-03-08 11:16:21', '', '', '', 0, NULL),
+(76, 'Try if pwede ', 'asdfads asdfasdf ', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-09', '2024-03-09', '22:59:00', '23:00:00', '2024-03-09 14:56:51', '', '', '', 0, NULL),
+(77, 'Hello Wesmaardec', 'sdfas asdfasdf sdafasd asdfas', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '00:04:00', '00:19:00', '2024-03-09 16:02:48', '', '', '', 0, NULL),
+(78, 'view participants', 'sdafsad sadfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '11:05:00', '11:07:00', '2024-03-10 03:03:54', '', '', '', 0, NULL),
+(79, 'Join to view', 'asdfasfda asdfasdf as', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '13:46:00', '13:50:00', '2024-03-10 05:44:46', '', '', '', 0, NULL),
+(81, 'Heloo', 'sdfasdf', 'Specialized Seminars', 'Hybrid', '', 'Tetuan, Zamboanga City', '2024-03-10', '2024-03-10', '20:43:00', '20:45:00', '2024-03-10 12:42:23', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(82, 'TRy to join this event', 'sdafasd asdfasd asdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:11:00', '17:14:00', '2024-03-11 07:04:37', '', '', '', 0, NULL),
+(83, 'Helo helo', 'asdfasd asdfasd', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:02:00', '17:03:00', '2024-03-11 08:19:18', '', '', '', 0, NULL),
+(84, 'History', 'sdfas asdfasd adfasf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '16:34:00', '16:36:00', '2024-03-11 08:34:21', '', '', '', 0, NULL),
+(85, 'sadfsdsdfasd', 'asdasdfasdf', 'Training Sessions', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '17:34:00', '19:31:00', '2024-03-11 09:31:53', '', '', '', 0, NULL),
+(86, 'mock defense', 'dasfasd asdfasdf sadfasf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-12', '2024-03-12', '14:13:00', '15:15:00', '2024-03-11 14:09:08', '', '', '', 0, NULL),
+(87, 'asdfasfasfasfasfasdf', 'fasfs', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-03-11', '2024-03-11', '22:20:00', '23:20:00', '2024-03-11 14:20:47', '', '', '', 0, NULL),
+(88, 'Networking Gala', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod justo eget magna fermentum, sit amet fermentum sapien tincidunt.', 'Cluster-specific gathering', 'Face-to-Face', '../admin/img/eventPhoto/wesmaarrdec-removebg-preview.png', 'Tetuan, Zamboanga City', '2018-01-04', '2018-01-16', '13:58:00', '17:58:00', '2024-03-11 17:58:58', '', '', '', 0, NULL),
+(89, 'Conference on Innovation', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod justo eget magna fermentum, sit amet fermentum sapien tincidunt.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-01-17', '2018-01-18', '14:00:00', '16:00:00', '2024-03-11 18:00:31', '', '', '', 0, NULL),
+(90, 'Art Exhibition', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu justo a neque viverra posuere.', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-01-23', '2018-01-26', '15:02:00', '17:01:00', '2024-03-11 18:01:47', '', '', '', 0, NULL),
+(91, 'Music Festival', ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vivamus fringilla tortor ut risus sagittis, ac tincidunt purus dictum.', 'Cluster-specific gathering', 'Online', '', '', '2018-01-29', '2018-01-31', '14:03:00', '16:03:00', '2024-03-11 18:03:15', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(92, ' Health and Wellness Expo', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget neque vel est imperdiet suscipit eu at leo.', 'Specialized Seminars', 'Online', '', '', '2018-02-02', '2024-03-02', '14:04:00', '15:04:00', '2024-03-11 18:04:28', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(93, 'Literature Symposiu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu tellus et tellus feugiat cursus eget eu mauris.', 'Training Sessions', 'Hybrid', '', 'Tugbungan, Zamboanga City', '2018-02-12', '2018-02-13', '15:05:00', '16:05:00', '2024-03-11 18:05:56', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(94, 'Sustainable Living Workshop', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel libero ut nibh placerat euismod nec id lacus.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-14', '2018-02-21', '02:07:00', '04:08:00', '2024-03-11 18:07:42', '', '', '', 0, NULL),
+(95, 'Food Tasting Event', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula metus nec justo ullamcorper, vel lacinia odio consequat.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-03-01', '2018-03-01', '02:09:00', '05:09:00', '2024-03-11 18:09:09', '', '', '', 0, NULL),
+(96, 'Dance Competition', ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce efficitur odio a magna suscipit, ac malesuada est malesuada.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-03-07', '2018-03-08', '02:10:00', '03:10:00', '2024-03-11 18:10:41', '', '', '', 0, NULL),
+(97, 'Environmental Awareness Campaign', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ac ligula nec nunc fermentum consequat.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-04-11', '2018-04-16', '14:12:00', '16:12:00', '2024-03-11 18:12:33', '', '', '', 0, NULL),
+(98, 'Film Festival', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in tellus nec sem dapibus efficitur.', 'Cluster-specific gathering', 'Hybrid', '', 'Tugbungan, Zamboanga City', '2018-05-06', '2018-05-07', '02:15:00', '04:15:00', '2024-03-11 18:15:13', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(99, 'Science Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec elit in arcu tincidunt tincidunt.', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-05-14', '2018-05-13', '02:16:00', '04:16:00', '2024-03-11 18:16:49', '', '', '', 0, NULL),
+(100, 'Charity Run', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu augue eget nunc sollicitudin hendrerit non eu odio.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-13', '2018-06-13', '02:18:00', '02:18:00', '2024-03-11 18:18:13', '', '', '', 0, NULL),
+(101, 'Business Expo', 'afasdfsa afda sdfasdfdasf das', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-20', '2018-06-14', '10:00:00', '13:00:00', '2024-03-11 18:20:28', '', '', '', 0, NULL),
+(102, 'adsfas dfasdfa', 'asdfasfdfds', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-12', '2018-06-12', '11:11:00', '14:22:00', '2024-03-11 18:21:30', '', '', '', 0, NULL),
+(103, 'dfadadfsd sadfasfa', '', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-14', '2018-06-14', '02:22:00', '03:00:00', '2024-03-11 18:23:01', '', '', '', 0, NULL),
+(104, 'sadf dsfadf wwgata d', 'dfsadfw hfddfng', 'Training Sessions', 'Online', '', '', '2018-07-17', '2018-07-19', '02:23:00', '04:00:00', '2024-03-11 18:24:00', 'https://meet.google.com/sgm-jdfr-ucn?authuser', '', '', 0, NULL),
+(105, 'yththweeeeeeee', 'wwwwwwwwfrfffffffffffffaaaaaaaaaaa', 'Specialized Seminars', 'Online', '', '', '2018-07-17', '2018-07-20', '15:00:00', '16:00:00', '2024-03-11 18:25:20', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(106, 'asdfwwer w', 'qwrwqer 2qf wefaw', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-02', '2018-06-03', '13:00:00', '14:00:00', '2024-03-11 18:26:36', '', '', '', 0, NULL),
+(107, 'hjkhwofwue hwu', 'whefuqwhfaf sdjkfhw', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-06-02', '2018-06-04', '14:00:00', '15:00:00', '2024-03-11 18:27:24', '', '', '', 0, NULL),
+(108, 'fadfafdda', 'sdafasdfsa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-08', '2018-08-09', '14:00:00', '15:00:00', '2024-03-11 18:28:59', '', '', '', 0, NULL),
+(109, 'asdfasdf', 'asdfasf', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-02', '2018-08-04', '12:00:00', '13:00:00', '2024-03-11 18:30:07', '', '', '', 0, NULL),
+(110, 'dfad sadfasdda', 'asdfasfs', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-08-13', '2018-08-13', '14:00:00', '15:00:00', '2024-03-11 23:44:48', '', '', '', 0, NULL),
+(111, 'adfa dasdfasd dasfasdfasdfas', 'sdadfasdfds', 'Specialized Seminars', 'Online', '', '', '2018-09-02', '2018-09-03', '13:00:00', '14:00:00', '2024-03-11 23:45:55', 'https://meet.google.com/sgm-jdfr-ucn?authuser', '', '', 0, NULL),
+(112, 'kkjhkasfhsa', 'sjdahfklsfha', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-11-02', '2018-11-23', '15:00:00', '16:00:00', '2024-03-11 23:47:16', '', '', '', 0, NULL),
+(113, 'sadfas sdadasa', 'adfasd sadfasd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-12-23', '2018-12-25', '09:00:00', '10:00:00', '2024-03-11 23:48:11', '', '', '', 0, NULL),
+(114, 'sdafas', 'asdfasf', 'Specialized Seminars', 'Online', '', '', '2019-01-01', '2019-01-03', '12:00:00', '13:00:00', '2024-03-11 23:49:34', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(115, 'adf wadfsdf w', 'asdfwfasdfbrg', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-02', '2018-02-04', '11:00:00', '14:00:00', '2024-03-11 23:50:40', '', '', '', 0, NULL),
+(116, 'sdfas sdafwe fawsdf', 'fasdfsadf wawf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2018-02-02', '2018-02-04', '13:00:00', '14:00:00', '2024-03-11 23:52:14', '', '', '', 0, NULL),
+(117, 'sdsasdf', 'asdfasdfa sdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2019-02-02', '2019-02-04', '13:00:00', '14:00:00', '2024-03-11 23:54:28', '', '', '', 0, NULL),
+(118, 'sadfasf', 'sdfasf weafefsadfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-02-14', '2019-02-15', '14:00:00', '15:00:00', '2024-03-11 23:55:32', '', '', '', 0, NULL),
+(119, 'asdfas sadfsf', '', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-06', '2019-01-07', '09:00:00', '11:00:00', '2024-03-11 23:56:54', '', '', '', 0, NULL),
+(120, 'asdfas fasdfas', 'adfasfa', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-04-02', '2019-04-03', '14:00:00', '15:00:00', '2024-03-11 23:57:53', '', '', '', 0, NULL),
+(121, 'sadfsadfa', 'sfasdfa\r\n', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-03-02', '2019-03-05', '11:00:00', '13:00:00', '2024-03-11 23:59:15', '', '', '', 0, NULL),
+(122, 'asdfasdf', 'sadfasd ', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2019-05-01', '2019-05-02', '12:00:00', '13:00:00', '2024-03-12 00:00:52', '', '', '', 0, NULL),
+(123, 'safdf asdfasdfas', 'asdfasdfas', 'Training Sessions', 'Online', '', '', '2019-06-01', '2019-06-05', '13:00:00', '14:00:00', '2024-03-12 00:01:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(124, 'adsfasdf', 'afasdfa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-01', '2020-01-02', '13:00:00', '14:00:00', '2024-03-12 00:05:01', '', '', '', 0, NULL),
+(125, 'asdfasdfasf', 'asdfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-01-04', '2020-01-05', '12:00:00', '13:00:00', '2024-03-12 00:05:54', '', '', '', 0, NULL),
+(126, 'asdfasfasd sadas', 'asdfasf', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-02-02', '2020-02-04', '13:00:00', '14:00:00', '2024-03-12 00:06:37', '', '', '', 0, NULL),
+(127, 'sdfas', 'asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-02-06', '2020-02-08', '13:00:00', '14:00:00', '2024-03-12 00:07:39', '', '', '', 0, NULL),
+(128, 'asdfas asdf asf', 'asdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-03-01', '2020-03-04', '13:00:00', '14:59:00', '2024-03-12 00:08:23', '', '', '', 0, NULL),
+(129, 'asdfas', 'sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-04-01', '2020-04-02', '13:00:00', '14:00:00', '2024-03-12 00:08:57', '', '', '', 0, NULL),
+(130, 'afsdfaw fawweasdf ', 'asdfaswe wefwa', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-05-01', '2020-05-03', '13:00:00', '14:00:00', '2024-03-12 00:09:42', '', '', '', 0, NULL),
+(131, 'asdfa sfwfa', 'sdafasd weaf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-07-01', '2020-07-02', '13:00:00', '14:00:00', '2024-03-12 00:10:18', '', '', '', 0, NULL),
+(132, 'ggggg', 'ggggg', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-06-03', '2020-06-05', '13:00:00', '14:00:00', '2024-03-12 00:11:24', '', '', '', 0, NULL),
+(133, 'jhljkhj', 'jhkhlkjb', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-08-13', '2020-08-31', '12:00:00', '13:00:00', '2024-03-12 00:12:10', '', '', '', 0, NULL),
+(134, 'dafas dasdfasdfas', 'adsfas wefawef', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-09-02', '2020-09-04', '13:00:00', '13:00:00', '2024-03-12 00:13:15', '', '', '', 0, NULL),
+(135, 'dasf w', 'fww', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-10-02', '2020-10-28', '12:59:00', '13:01:00', '2024-03-12 00:13:54', '', '', '', 0, NULL),
+(136, 'sdfaswe afawfw', 'faskjkjhrflifhjkdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-11-01', '2020-11-21', '11:00:00', '13:00:00', '2024-03-12 00:14:29', '', '', '', 0, NULL),
+(137, 'dasfwfwewfw', 'sdfawf wefwa', 'Cluster-specific gathering', 'Hybrid', '', 'Tetuan, Zamboanga City', '2020-12-01', '2020-12-30', '12:59:00', '14:00:00', '2024-03-12 00:15:09', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(138, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, NULL),
+(139, 'jhjhljk', 'jhkhlk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-05', '2022-03-06', '13:00:00', '14:00:00', '2024-03-12 00:19:45', '', '', '', 0, NULL),
+(140, 'hgggg', 'hhhhhh', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-06-02', '2022-06-03', '13:00:00', '14:59:00', '2024-03-12 00:20:28', '', '', '', 0, NULL),
+(141, 'kkkkkkkkkkk', 'kkkkkkkk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-02', '2020-02-02', '22:00:00', '23:00:00', '2024-03-12 00:21:11', '', '', '', 0, NULL),
+(142, 'asdfasdf weff', 'ddddd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-01-03', '2023-01-04', '13:00:00', '14:00:00', '2024-03-12 00:22:01', '', '', '', 0, NULL),
+(143, 'jkhlkhkj', 'jhljhk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-02-01', '2023-02-04', '13:00:00', '14:59:00', '2024-03-12 00:22:35', '', '', '', 0, NULL),
+(144, 'jjj', 'jjjj\r\n', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-03-01', '2023-04-02', '13:00:00', '15:00:00', '2024-03-12 00:23:27', '', '', '', 0, NULL),
+(145, 'lhgjhlghg', 'gfhgfhk', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2023-07-03', '2023-07-06', '13:00:00', '14:00:00', '2024-03-12 00:24:01', '', '', '', 0, NULL),
+(146, 'dddddd', 'dddddddddd', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-08-13', '2023-08-16', '13:59:00', '15:59:00', '2024-03-12 00:24:55', '', '', '', 0, NULL),
+(147, 'dfsadf', 'dsafsdfwwe', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-10-01', '2023-10-02', '14:00:00', '15:00:00', '2024-03-12 00:25:57', '', '', '', 0, NULL),
+(148, 'hdfsdafasdfasd', 'sdfadsfdas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-01-03', '2024-01-07', '13:00:00', '14:00:00', '2024-03-12 00:27:02', '', '', '', 0, NULL),
+(149, 'sfasasdfsdf', 'dsfafs', 'Specialized Seminars', 'Online', '', '', '2024-01-06', '2024-01-03', '15:00:00', '16:00:00', '2024-03-12 00:27:37', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(150, 'asdfaswefwe', 'asdfasdf', 'Training Sessions', 'Online', '', '', '2025-06-04', '2025-06-06', '13:00:00', '14:00:00', '2024-03-12 00:28:32', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(151, 'Art and Craft Fair', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum fringilla turpis in mi feugiat eleifend.', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-11', '2026-03-14', '22:24:00', '22:27:00', '2024-03-12 00:31:33', '', '', '', 0, NULL),
+(155, 'ongoing testing', 'asdfsadfa asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-09-25', '2025-09-29', '22:28:00', '22:30:00', '2024-03-12 14:27:00', '', '', '', 0, NULL),
+(156, 'upcoming testing', 'asdfasf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-08-24', '2026-08-28', '22:31:00', '22:33:00', '2024-03-12 14:29:26', '', '', '', 0, NULL),
+(157, 'sdfas asdfa', 'sadfasfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-01-27', '2026-01-28', '22:53:00', '22:54:00', '2024-03-12 14:51:17', '', '', '', 0, NULL),
+(163, 'hehe', 'dafasdf asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-05-01', '2025-05-06', '23:57:00', '23:59:00', '2024-03-12 15:54:31', '', '', '', 0, NULL),
+(166, 'ongoing', 'asdfasd asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-08-17', '2025-08-22', '01:34:00', '01:37:00', '2024-03-12 17:33:00', '', '', '', 0, NULL),
+(168, 'oongoing', 'asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2024-12-31', '2025-01-04', '02:04:00', '02:09:00', '2024-03-12 18:02:12', '', '', '', 0, NULL),
+(169, 'upcoming', 'asdfasdf asdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-11', '02:17:00', '02:21:00', '2024-03-12 18:08:53', '', '', '', 0, NULL),
+(172, 'haaaa', 'asdfasfd', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-01-13', '2025-01-14', '08:38:00', '10:38:00', '2024-03-12 18:38:25', '', '', '', 0, NULL),
+(173, 'hiiiii', 'asdfasdf sadfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '02:45:00', '02:48:00', '2024-03-12 18:43:27', '', '', '', 0, NULL),
+(176, 'real time', 'asdfasdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-03-07', '2025-03-08', '09:57:00', '09:58:00', '2024-03-13 01:55:44', '', '', '', 0, NULL),
+(178, 'will ongoing', 'asdfasdf sdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-07-09', '2025-07-10', '10:30:00', '10:31:00', '2024-03-13 02:22:49', '', '', '', 0, NULL),
+(179, 'create event sample', 'asdfsdafas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-03-04', '2026-03-09', '13:26:00', '13:31:00', '2024-03-13 05:24:29', '', '', '', 0, NULL),
+(180, 'event join', 'sdafsadf sdfas', 'Cluster-specific gathering', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2026-05-01', '2026-05-06', '13:28:00', '15:28:00', '2024-03-13 05:28:43', '', '', '', 0, NULL),
+(181, 'hehehe', 'asdfasdfasd', 'Specialized Seminars', 'Online', '', '', '2025-05-09', '2025-05-11', '13:37:00', '13:39:00', '2024-03-13 05:36:02', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, NULL),
+(182, 'SE Defense', 'asdfasdf asdfsad', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-06-29', '2025-07-01', '15:00:00', '16:00:00', '2024-03-13 08:01:32', '', '', '', 0, NULL),
+(187, 'letsss gggg', 'adsfasdfas', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2025-12-15', '2025-12-20', '07:06:00', '07:15:00', '2024-04-22 23:04:42', '', '', '', 0, NULL),
+(203, 'Date and time try', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tubungan, Zamboanga City', '2026-02-26', '2026-03-02', '03:20:00', '18:36:00', '2024-04-28 05:36:30', '', '', '', 2, NULL),
+(206, 'Attendance table save', 'sdfasdf', 'Training Sessions', 'Face-to-Face', '', 'Tugbungan, Zamboanga City', '2025-10-06', '2025-10-07', '14:58:00', '18:56:00', '2024-04-29 06:57:00', '', '', '', 2, NULL),
+(207, 'try create event', 'sdfasd', 'Specialized Seminars', 'Online', '', '', '2025-09-23', '2025-09-27', '09:43:00', '10:43:00', '2024-04-30 06:44:05', '', '', '', 1, NULL),
+(208, 'data analytics for the future', 'chu chuc chu', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2026-09-26', '2026-10-01', '08:00:00', '17:00:00', '2024-04-30 07:25:11', '', 'Try cancel', 'Cancelled', 3, NULL),
+(209, 'workshop', 'asdfasdf asdfasdf asdfasd', 'Specialized Seminars', 'Face-to-Face', '', 'wmsu social hall', '2025-12-25', '2025-12-26', '08:44:00', '17:44:00', '2024-04-30 23:45:04', '', '', '', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -351,6 +354,48 @@ CREATE TABLE `event_facilitator` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `event_mode`
+--
+
+CREATE TABLE `event_mode` (
+  `event_mode_id` int(11) NOT NULL,
+  `event_mode_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `event_mode`
+--
+
+INSERT INTO `event_mode` (`event_mode_id`, `event_mode_name`) VALUES
+(1, 'Face-to-Face'),
+(2, 'Online'),
+(4, 'Hybrid');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_type`
+--
+
+CREATE TABLE `event_type` (
+  `event_type_id` int(11) NOT NULL,
+  `event_type_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `event_type`
+--
+
+INSERT INTO `event_type` (`event_type_id`, `event_type_name`) VALUES
+(3, 'Training Sessions'),
+(4, 'Specialized Seminars'),
+(5, 'Cluster-specific gathering'),
+(6, 'General Assembly'),
+(7, 'Workshop');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `facilitator`
 --
 
@@ -372,28 +417,6 @@ CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(64) NOT NULL,
   `expires_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_type`
---
-
-CREATE TABLE `event_type` (
-  `event_type_id` int(11) NOT NULL,
-  `event_type_name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_mode`
---
-
-CREATE TABLE `event_mode` (
-  `event_mode_id` int(11) NOT NULL,
-  `event_mode_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
@@ -539,10 +562,10 @@ ALTER TABLE `events`
   ADD PRIMARY KEY (`event_id`);
 
 --
--- Indexes for table `facilitator`
+-- Indexes for table `event_mode`
 --
-ALTER TABLE `facilitator`
-  ADD PRIMARY KEY (`facilitatorID`);
+ALTER TABLE `event_mode`
+  ADD PRIMARY KEY (`event_mode_id`);
 
 --
 -- Indexes for table `event_type`
@@ -551,10 +574,10 @@ ALTER TABLE `event_type`
   ADD PRIMARY KEY (`event_type_id`);
 
 --
--- Indexes for table `event_mode`
+-- Indexes for table `facilitator`
 --
-ALTER TABLE `event_mode`
-  ADD PRIMARY KEY (`event_mode_id`);
+ALTER TABLE `facilitator`
+  ADD PRIMARY KEY (`facilitatorID`);
 
 --
 -- Indexes for table `password_reset_tokens`
@@ -607,7 +630,7 @@ ALTER TABLE `director`
 -- AUTO_INCREMENT for table `eventparticipants`
 --
 ALTER TABLE `eventparticipants`
-  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -616,22 +639,22 @@ ALTER TABLE `events`
   MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
 
 --
--- AUTO_INCREMENT for table `facilitator`
+-- AUTO_INCREMENT for table `event_mode`
 --
-ALTER TABLE `facilitator`
-  MODIFY `facilitatorID` int(15) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `event_mode`
+  MODIFY `event_mode_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `event_type`
 --
 ALTER TABLE `event_type`
-  MODIFY `event_type_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `event_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `event_mode`
+-- AUTO_INCREMENT for table `facilitator`
 --
-ALTER TABLE `event_mode`
-  MODIFY `event_mode_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `facilitator`
+  MODIFY `facilitatorID` int(15) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pendingevents`

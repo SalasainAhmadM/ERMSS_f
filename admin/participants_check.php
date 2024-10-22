@@ -200,7 +200,7 @@ $participantsResult = $participantsStmt->get_result();
                             <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
                                 <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
                             <?php } ?>
-                            <a href="landingPage.php">Events</a>s
+                            <a href="landingPage.php">Events</a>
                             <a href="addEvent.php">Add Event</a>
                             <a href="addEventTypeMode.php">Event Settings</a>
                             <a href="history.php">History</a>

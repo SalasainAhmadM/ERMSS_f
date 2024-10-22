@@ -187,11 +187,17 @@ if (isset($_SESSION['error'])) {
                             <div class="custom_select">
                                 <select name="event_type" required>
                                     <option value="">Select</option>
-                                    <option value="Training Sessions">Training Sessions</option>
-                                    <option value="Specialized Seminars">Specialized Seminars</option>
-                                    <option value="Cluster-specific gathering">Cluster-specific gathering</option>
-                                    <option value="General Assembly">General Assembly</option>
-                                    <option value="Workshop">Workshop</option>
+                                    <?php
+                                    $query = "SELECT event_type_id, event_type_name FROM event_type";
+                                    $result = mysqli_query($conn, $query);
+                                    if ($result) {
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            echo '<option value="' . $row['event_type_name'] . '">' . $row['event_type_name'] . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No event types found</option>';
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>  
@@ -201,9 +207,17 @@ if (isset($_SESSION['error'])) {
                             <div class="custom_select">
                                 <select name="event_mode" id="eventModeSelect" required onchange="toggleZoomLinkField()">
                                     <option value="">Select</option>
-                                    <option value="Face-to-Face">Face-to-Face</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Hybrid">Hybrid</option>
+                                    <?php
+                                    $query = "SELECT event_mode_id, event_mode_name FROM event_mode";
+                                    $result = mysqli_query($conn, $query);
+                                    if ($result) {
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            echo '<option value="' . $row['event_mode_name'] . '">' . $row['event_mode_name'] . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No event modes found</option>';
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>
