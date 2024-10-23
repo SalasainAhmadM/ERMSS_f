@@ -18,11 +18,31 @@ $eventsJoinedStmt->bind_param("i", $UserID);
 $eventsJoinedStmt->execute();
 $eventsJoinedResult = $eventsJoinedStmt->get_result();
 $eventsJoinedRow = mysqli_fetch_assoc($eventsJoinedResult);
-$totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
+$totalEventsJoined = $eventsJoinedRow['totalEventsJoined'];
+function countCanceledEvents($conn)
+{
+    $sql = "
+            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+            FROM events e
+            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalCanceledEvents'];
+    } else {
+        return 0;
+    }
+}
+
+// Call the function to get the number of canceled events
+$canceledEventsCount = countCanceledEvents($conn);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,206 +51,227 @@ $totalEventsJoined = $eventsJoinedRow['totalEventsJoined']
 
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
 
-<?php include('sidebar.php'); ?>
+    <?php include('sidebar.php'); ?>
 
 
-<div class="main-content">
-    <section class="accounts section--lg">
-        <div class="accounts__container container grid">
-            <div class="account__tabs">
-                <p class="account__tab active-tab" data-target="#dashboard">
-                    <i class="fa-regular fa-user"></i>  My Profile
-                </p>
+    <div class="main-content">
+        <section class="accounts section--lg">
+            <div class="accounts__container container grid">
+                <div class="account__tabs">
+                    <p class="account__tab active-tab" data-target="#dashboard">
+                        <i class="fa-regular fa-user"></i> My Profile
+                    </p>
 
-                <p class="account__tab" data-target="#update-profile">
-                    <i class="fa-solid fa-sliders"></i> Update Profile
-                </p>
+                    <p class="account__tab" data-target="#update-profile">
+                        <i class="fa-solid fa-sliders"></i> Update Profile
+                    </p>
 
-                <p class="account__tab" data-target="#change-password">
-                    <i class="fa-solid fa-lock"></i> Change Password
-                </p>
+                    <p class="account__tab" data-target="#change-password">
+                        <i class="fa-solid fa-lock"></i> Change Password
+                    </p>
 
-            </div>
-
-            <div class="tabs__content">
-                <div class="tab__content active-tab" content id="dashboard">
-                    <h3 class="tab__header"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></h3>
-
-                    <div class="tab__body">
-                    <?php if (!empty($Image)): ?>
-                    <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon">
-                <?php else: ?>
-                    <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon">
-                <?php endif; ?>
-
-                        <p class="tab__description">
-                            <span>Gender: </span> <?php echo $Gender; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Age: </span> <?php echo $Age; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Email: </span> <?php echo $Email; ?>
-                        </p>
-                        <p class="tab__description">
-                            <span>Phone: </span> <?php echo $ContactNo; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Address: </span> <?php echo $Address; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Occupation: </span> <?php echo $Position; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Affiliation: </span> <?php echo $Affiliation; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Educational Attainment: </span> <?php echo $EducationalAttainment; ?>
-                        </p>
-
-                        <p class="tab__description">
-                            <span>Total Events Joined: </span> <?php echo $totalEventsJoined; ?>
-                        </p>
-                                    
-                    </div>
                 </div>
 
-                            
-                <div class="tab__content" content id="update-profile">
-                    <h3 class="tab__header">Update Profile</h3>
-                    <div class="tab__body">
-                    <form id="profileForm" action="" method="POST" enctype="multipart/form-data" class="form grid">
-                        <label for="photoUpload">Change Photo</label>
-                        <?php if (!empty($Image)): ?>
-                            <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100" class="profile-icon" id="profilePreview">
-                        <?php else: ?>
-                            <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon" id="profilePreview">
-                        <?php endif; ?>
-                        <input type="file" name="Image" id="Image" accept="image/*" class="form__input" onchange="previewImage(event)">
+                <div class="tabs__content">
+                    <div class="tab__content active-tab" content id="dashboard">
+                        <h3 class="tab__header"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></h3>
 
-                        <input type="text" name="FirstName" style="display: none;" value="<?php echo $FirstName; ?>">
-                        <input type="text" name="LastName" style="display: none;" value="<?php echo $LastName; ?>">
-                        <input type="text" name="MI" style="display: none;" value="<?php echo $MI; ?>">
-                        <input type="text" name="Gender" style="display: none;" value="<?php echo $Gender; ?>">
-                        <input type="text" name="Email" style="display: none;" value="<?php echo $Email; ?>">
-                        <input type="password" name="Password" style="display: none;" value="<?php echo $Password; ?>">
+                        <div class="tab__body">
+                            <?php if (!empty($Image)): ?>
+                                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100"
+                                    class="profile-icon">
+                            <?php else: ?>
+                                <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon">
+                            <?php endif; ?>
 
-                        <input type="text" name="ContactNo" placeholder="Phone" class="form__input" value="<?php echo $ContactNo; ?>">
+                            <p class="tab__description">
+                                <span>Gender: </span> <?php echo $Gender; ?>
+                            </p>
 
-                        <input type="text" name="Address" placeholder="Address" class="form__input" value="<?php echo $Address; ?>">
+                            <p class="tab__description">
+                                <span>Age: </span> <?php echo $Age; ?>
+                            </p>
 
-                        <input type="number" name="Age" placeholder="Age" class="form__input" value="<?php echo $Age; ?>" required>
+                            <p class="tab__description">
+                                <span>Email: </span> <?php echo $Email; ?>
+                            </p>
+                            <p class="tab__description">
+                                <span>Phone: </span> <?php echo $ContactNo; ?>
+                            </p>
 
-                        <input type="text" name="Position" placeholder="Occupation" class="form__input" value="<?php echo $Position; ?>">
+                            <p class="tab__description">
+                                <span>Address: </span> <?php echo $Address; ?>
+                            </p>
 
-                        <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input" value="<?php echo $Affiliation; ?>">
+                            <p class="tab__description">
+                                <span>Occupation: </span> <?php echo $Position; ?>
+                            </p>
 
-                        <label for="EducationalAttainment">Educational Attainment</label>
-                        <select name="EducationalAttainment" class="form__input">
-                            <option value="" disabled selected>Select your educational attainment</option>
-                            <option value="High School" <?php echo ($EducationalAttainment == 'High School') ? 'selected' : ''; ?>>High School</option>
-                            <option value="Associate Degree" <?php echo ($EducationalAttainment == 'Associate Degree') ? 'selected' : ''; ?>>Associate Degree</option>
-                            <option value="Bachelors Degree" <?php echo ($EducationalAttainment == 'Bachelors Degree') ? 'selected' : ''; ?>>Bachelors Degree</option>
-                            <option value="Masters Degree" <?php echo ($EducationalAttainment == 'Masters Degree') ? 'selected' : ''; ?>>Masters Degree</option>
-                            <option value="Doctorate" <?php echo ($EducationalAttainment == 'Doctorate') ? 'selected' : ''; ?>>Doctorate</option>
-                        </select>
+                            <p class="tab__description">
+                                <span>Affiliation: </span> <?php echo $Affiliation; ?>
+                            </p>
 
-                        <div class="form__btn">
-                            <button class="btn btn--md" id="submitBtn" name="Submit">Save</button>
+                            <p class="tab__description">
+                                <span>Educational Attainment: </span> <?php echo $EducationalAttainment; ?>
+                            </p>
+
+                            <p class="tab__description">
+                                <span>Total Events Joined: </span> <?php echo $totalEventsJoined; ?>
+                            </p>
+
                         </div>
-                    </form>
-
                     </div>
-                </div>
 
 
-                <div class="tab__content" content id="change-password">
-                    <h3 class="tab__header">Change Password</h3>
+                    <div class="tab__content" content id="update-profile">
+                        <h3 class="tab__header">Update Profile</h3>
+                        <div class="tab__body">
+                            <form id="profileForm" action="" method="POST" enctype="multipart/form-data"
+                                class="form grid">
+                                <label for="photoUpload">Change Photo</label>
+                                <?php if (!empty($Image)): ?>
+                                    <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100"
+                                        class="profile-icon" id="profilePreview">
+                                <?php else: ?>
+                                    <img src="../assets/img/profile.jpg" alt="default user" width="100" class="profile-icon"
+                                        id="profilePreview">
+                                <?php endif; ?>
+                                <input type="file" name="Image" id="Image" accept="image/*" class="form__input"
+                                    onchange="previewImage(event)">
 
-                    <div class="tab__body">
-                        <form action="" method="POST" enctype="multipart/form-data" class="form grid">
-                            <input type="password" name="currentPassword" placeholder="Current Password" class="form__input">
+                                <input type="text" name="FirstName" style="display: none;"
+                                    value="<?php echo $FirstName; ?>">
+                                <input type="text" name="LastName" style="display: none;"
+                                    value="<?php echo $LastName; ?>">
+                                <input type="text" name="MI" style="display: none;" value="<?php echo $MI; ?>">
+                                <input type="text" name="Gender" style="display: none;" value="<?php echo $Gender; ?>">
+                                <input type="text" name="Email" style="display: none;" value="<?php echo $Email; ?>">
+                                <input type="password" name="Password" style="display: none;"
+                                    value="<?php echo $Password; ?>">
 
-                            <input type="password" name="newPassword" placeholder="New Password" class="form__input">
+                                <input type="text" name="ContactNo" placeholder="Phone" class="form__input"
+                                    value="<?php echo $ContactNo; ?>">
 
-                            <input type="password" name="confirmNewPassword" placeholder="Confirm New Password" class="form__input">
+                                <input type="text" name="Address" placeholder="Address" class="form__input"
+                                    value="<?php echo $Address; ?>">
 
-                            <div class="form__btn">
-                                <button type="submit" name="submitp" class="btn btn--md">Save</button>
-                            </div>
-                        </form>
+                                <input type="number" name="Age" placeholder="Age" class="form__input"
+                                    value="<?php echo $Age; ?>" required>
+
+                                <input type="text" name="Position" placeholder="Occupation" class="form__input"
+                                    value="<?php echo $Position; ?>">
+
+                                <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input"
+                                    value="<?php echo $Affiliation; ?>">
+
+                                <label for="EducationalAttainment">Educational Attainment</label>
+                                <select name="EducationalAttainment" class="form__input">
+                                    <option value="" disabled selected>Select your educational attainment</option>
+                                    <option value="High School" <?php echo ($EducationalAttainment == 'High School') ? 'selected' : ''; ?>>High School</option>
+                                    <option value="Associate Degree" <?php echo ($EducationalAttainment == 'Associate Degree') ? 'selected' : ''; ?>>Associate Degree</option>
+                                    <option value="Bachelors Degree" <?php echo ($EducationalAttainment == 'Bachelors Degree') ? 'selected' : ''; ?>>Bachelors Degree</option>
+                                    <option value="Masters Degree" <?php echo ($EducationalAttainment == 'Masters Degree') ? 'selected' : ''; ?>>Masters Degree</option>
+                                    <option value="Doctorate" <?php echo ($EducationalAttainment == 'Doctorate') ? 'selected' : ''; ?>>Doctorate</option>
+                                </select>
+
+                                <div class="form__btn">
+                                    <button class="btn btn--md" id="submitBtn" name="Submit">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
                     </div>
-                </div>
 
+
+                    <div class="tab__content" content id="change-password">
+                        <h3 class="tab__header">Change Password</h3>
+
+                        <div class="tab__body">
+                            <form action="" method="POST" enctype="multipart/form-data" class="form grid">
+                                <input type="password" name="currentPassword" placeholder="Current Password"
+                                    class="form__input" required>
+
+                                <input type="password" name="newPassword" placeholder="New Password" class="form__input"
+                                    required>
+
+                                <input type="password" name="confirmNewPassword" placeholder="Confirm New Password"
+                                    class="form__input" required>
+
+                                <div class="form__btn">
+                                    <button type="submit" name="submitp" class="btn btn--md">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
 
 
-<!--profile-->
-<!--SWIPER JS CDN-->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    const tabs = document.querySelectorAll('[data-target]'),
-    tabContents = document.querySelectorAll('[content]');
-
-    tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-        const target = document.querySelector(tab.dataset.target);
-        tabContents.forEach((tabContent) => {
-        tabContent.classList.remove('active-tab');
-        });
-
-        target.classList.add('active-tab');
+    <!--profile-->
+    <!--SWIPER JS CDN-->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const tabs = document.querySelectorAll('[data-target]'),
+            tabContents = document.querySelectorAll('[content]');
 
         tabs.forEach((tab) => {
-        tab.classList.remove('active-tab');
+            tab.addEventListener('click', () => {
+                const target = document.querySelector(tab.dataset.target);
+                tabContents.forEach((tabContent) => {
+                    tabContent.classList.remove('active-tab');
+                });
+
+                target.classList.add('active-tab');
+
+                tabs.forEach((tab) => {
+                    tab.classList.remove('active-tab');
+                });
+
+                tab.classList.add('active-tab');
+            });
         });
-
-        tab.classList.add('active-tab');
-    });
-    });
-    function previewImage(event) {
-        var reader = new FileReader();
-        reader.onload = function() {
-            var output = document.getElementById('profilePreview');
-            output.src = reader.result;
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('profilePreview');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
         }
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
+    </script>
 
-<!--JS -->
-<script src="js/eventscript.js"></script>
+    <!--JS -->
+    <script src="js/eventscript.js"></script>
+    <?php echo $alertMessage; ?>
+    <!--sidebar functionality-->
+    <script src="js/sidebar.js"></script>
 
-<!--sidebar functionality-->
-<script src="js/sidebar.js"></script>
+    <script>
+        let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
 
-<script>
-    let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
-
-    dropdown_items.forEach(items =>{
-        items.onclick = () =>{
-            items_parent = items.parentElement.parentElement;
-            let output = items_parent.querySelector('.output');
-            output.value = items.innerText;
-        }
-    });
-</script>
+        dropdown_items.forEach(items => {
+            items.onclick = () => {
+                items_parent = items.parentElement.parentElement;
+                let output = items_parent.querySelector('.output');
+                output.value = items.innerText;
+            }
+        });
+    </script>
 </body>
+
 </html>

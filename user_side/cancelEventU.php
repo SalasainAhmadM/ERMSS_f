@@ -68,6 +68,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit();
     }
 }
+function countCanceledEvents($conn)
+{
+    $sql = "
+            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+            FROM events e
+            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalCanceledEvents'];
+    } else {
+        return 0;
+    }
+}
+
+// Call the function to get the number of canceled events
+$canceledEventsCount = countCanceledEvents($conn);
 ?>
 
 
@@ -137,8 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     <ul>
                         <a href="landingPageU.php">Join Event</a>
                         <a href="history.php">History</a>
-                        <a href="cancelEventU.php">Cancelled
-                            <span><?php echo $totalCancelledEvents; ?></span></span></a>
+                        <a href="cancelEventU.php">Cancelled <span><?php echo $canceledEventsCount; ?></span></a>
                     </ul>
                 </div>
             </li>

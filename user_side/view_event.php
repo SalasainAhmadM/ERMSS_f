@@ -30,7 +30,6 @@ $participantLimit = $participantLimitRow['participant_limit'];
 // Calculate the ratio of total participants to participant limit
 $participantRatio = $totalParticipants . "/" . $participantLimit;
 
-// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../db.connection/connection.php');
 
@@ -38,8 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $UserID = $_SESSION['UserID'];
         $eventId = isset($_POST['event_id']) ? $_POST['event_id'] : null;
 
+        // Check if the user previously canceled the event
+        if (hasCanceledEvent($conn, $eventId, $UserID)) {
+            $_SESSION['error'] = 'You cannot rejoin this event since you previously canceled your participation.';
+            header("Location: view_event.php?event_id=$eventId");
+            exit();
+        }
+
         if ($totalParticipants >= $participantLimit) {
-            // Participant limit reached, store an error message in the session
             $_SESSION['error'] = 'Sorry, the participant limit for this event has been reached. You cannot join at the moment.';
             header("Location: view_event.php?event_id=$eventId");
             exit();
@@ -56,24 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $eventDetails = $resultEventDetails->fetch_assoc();
             $eventStatus = '';
 
-            // Get current date and time in the event's timezone
             $eventTimeZone = new DateTimeZone('Asia/Manila');
             $currentDateTime = new DateTime('now', $eventTimeZone);
             $eventStartDateTime = new DateTime($eventDetails['date_start'] . ' ' . $eventDetails['time_start'], $eventTimeZone);
             $eventEndDateTime = new DateTime($eventDetails['date_end'] . ' ' . $eventDetails['time_end'], $eventTimeZone);
 
-            // Check if the event is ongoing, upcoming, or ended
             if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
                 $eventStatus = 'ongoing';
             } elseif ($currentDateTime < $eventStartDateTime) {
                 $eventStatus = 'upcoming';
-            } elseif ($currentDateTime > $eventEndDateTime) {
+            } else {
                 $eventStatus = 'ended';
             }
 
-            // Check if the event status is "upcoming" before allowing the user to join
             if ($eventStatus === 'upcoming') {
-                // Check if the user has already joined the same event
                 $sqlCheck = "SELECT * FROM EventParticipants WHERE event_id = ? AND UserID = ?";
                 $stmtCheck = $conn->prepare($sqlCheck);
                 $stmtCheck->bind_param("ii", $eventId, $UserID);
@@ -81,19 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $resultCheck = $stmtCheck->get_result();
 
                 if ($resultCheck->num_rows > 0) {
-                    // User has already joined this event
                     $_SESSION['error'] = 'You have already joined this event!';
                 } else {
-                    // Insert into EventParticipants table
                     $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
                     $stmtInsert = $conn->prepare($sqlInsert);
                     $stmtInsert->bind_param("ii", $eventId, $UserID);
 
                     if ($stmtInsert->execute()) {
-                        // Successful insertion
                         $_SESSION['success'] = 'Successfully joined the event!';
                     } else {
-                        // Insertion failed
                         $_SESSION['error'] = 'Failed to join the event. Please try again.';
                     }
 
@@ -102,11 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $stmtCheck->close();
             } else {
-                // Event is not upcoming
                 $_SESSION['error'] = 'Unfortunately, participation in this event is no longer available as it has already commenced.';
             }
         } else {
-            // Event details not found
             $_SESSION['error'] = 'Event details not found.';
         }
 
@@ -114,13 +109,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: view_event.php?event_id=$eventId");
         exit();
     } else {
-        // Redirect to login page if UserID is not set in session
         header("Location: login.php");
         exit();
     }
 }
-?>
+// Place this function before your form submission logic
+function hasCanceledEvent($conn, $eventId, $UserID)
+{
+    $sqlCancelCheck = "SELECT * FROM cancel_reason WHERE event_id = ? AND UserID = ?";
+    $stmtCancelCheck = $conn->prepare($sqlCancelCheck);
+    $stmtCancelCheck->bind_param("ii", $eventId, $UserID);
+    $stmtCancelCheck->execute();
+    $resultCancelCheck = $stmtCancelCheck->get_result();
 
+    $hasCanceled = $resultCancelCheck->num_rows > 0;
+
+    $stmtCancelCheck->close();
+    return $hasCanceled;
+}
+?>
 
 
 

@@ -87,20 +87,33 @@
             $countOngoingEventsResult = $countOngoingEventsStmt->get_result();
             $countOngoingEventsRow = $countOngoingEventsResult->fetch_assoc();
             $totalOngoingEvents = $countOngoingEventsRow['totalOngoingEvents'];
-
-
-            // Fetch total number of cancelled events
-            $countCancelledEventsSql = "SELECT COUNT(*) AS totalCancelledEvents FROM Events WHERE event_cancel IS NOT NULL AND event_cancel <> ''";
-            $countCancelledEventsResult = mysqli_query($conn, $countCancelledEventsSql);
-            $countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
-            $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
-
+            // Function to retrieve the total number of cancelled events
+    
         } else {
             // Redirect to login page or handle the case where UserID is not set in the session
             header("Location: login.php");
             exit();
         }
     }
+    function countCanceledEvents($conn)
+    {
+        $sql = "
+            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+            FROM events e
+            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+
+        $result = $conn->query($sql);
+
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['totalCanceledEvents'];
+        } else {
+            return 0;
+        }
+    }
+
+    // Call the function to get the number of canceled events
+    $canceledEventsCount = countCanceledEvents($conn);
     ?>
 
     <!--=========== SIDEBAR =============-->
@@ -145,7 +158,7 @@
                     <ul>
                         <a href="landingPageU.php">Join Event</a>
                         <a href="history.php">History</a>
-                        <a href="cancelEventU.php">Cancelled <span><?php echo $totalCancelledEvents; ?></span></a>
+                        <a href="cancelEventU.php">Cancelled <span><?php echo $canceledEventsCount; ?></span></a>
                     </ul>
                 </div>
             </li>

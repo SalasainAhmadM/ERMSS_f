@@ -2,13 +2,15 @@
 session_start();
 require_once('../db.connection/connection.php');
 
-function showProfileModal($message) {
+function showProfileModal($message)
+{
     echo "<script>
               showModal('$message');
           </script>";
 }
 
-function getUserData($conn, $UserID) {
+function getUserData($conn, $UserID)
+{
     $sql = "SELECT * FROM user WHERE UserID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $UserID);
@@ -79,7 +81,7 @@ function updateUserProfile($userID, $firstName, $lastName, $mi, $gender, $age, $
     }
 
     $sql .= " WHERE UserID = ?";
-    
+
     $stmt = $conn->prepare($sql);
 
     // Bind parameters
@@ -174,6 +176,7 @@ if (isset($_POST['Submit'])) {
     updateUserProfile($userID, $firstName, $lastName, $mi, $gender, $age, $email, $contactNo, $address, $affiliation, $position, $educationalAttainment, $image);
 }
 
+$alertMessage = '';
 // Check if the password change form is submitted
 if (isset($_POST['submitp'])) {
     // Retrieve form data
@@ -182,19 +185,60 @@ if (isset($_POST['submitp'])) {
     $newPassword = $_POST['newPassword'];
     $confirmNewPassword = $_POST['confirmNewPassword'];
 
-    // Check if the new password and confirm new password match
+    // Check if new password matches the confirmation password
     if ($newPassword === $confirmNewPassword) {
         // Verify the current password
         if (password_verify($currentPassword, $userData['Password'])) {
-            // Call the function to change the user password
+            // Change user password
             changeUserPassword($userID, $newPassword);
+
+            // Set success SweetAlert message
+            $alertMessage = "
+                <script>
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Your password has been successfully reset.',
+                        icon: 'success'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'profile.php';
+                        }
+                    });
+                </script>
+            ";
         } else {
-            // Display an error message if the current password is incorrect
-            echo "Current password is incorrect.";
+            // Trigger SweetAlert error for incorrect current password
+            $alertMessage = "
+                <script>
+                    Swal.fire({
+                        title: 'Incorrect Password!',
+                        text: 'The current password you entered is incorrect.',
+                        icon: 'error'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'profile.php';
+                        }
+                    });
+                </script>
+            ";
         }
     } else {
-        // Display an error message if the new password and confirm new password do not match
-        echo "New password and confirm password do not match.";
+        // Trigger SweetAlert error for password mismatch
+        $alertMessage = "
+            <script>
+                Swal.fire({
+                    title: 'Password Mismatch!',
+                    text: 'New password and confirmation do not match.',
+                    icon: 'error'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'profile.php';
+                    }
+                });
+            </script>
+        ";
     }
 }
+
+
 ?>

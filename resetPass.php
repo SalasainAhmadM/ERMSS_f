@@ -110,6 +110,7 @@ if (isset($_GET['token'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,10 +120,11 @@ if (isset($_GET['token'])) {
 
     <!-- Browser icon -->
     <link rel="icon" href="assets/img/wesmaarrdec.jpg" type="image/png">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Remixicons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css" />
 
     <title>Reset Password | Event Record Management</title>
 </head>
@@ -152,7 +154,7 @@ if (isset($_GET['token'])) {
                 </form>
             </div>
         </div>
- 
+
         <div class="panels-container">
             <div class="panel left-panel">
                 <img src="assets/img/wesmaarrdec-removebg-preview.png" class="image" alt="">
@@ -161,7 +163,8 @@ if (isset($_GET['token'])) {
             <div class="panel right-panel">
                 <div class="content">
                     <h3>Welcome to Event Management System!</h3>
-                    <p>Explore, join, and manage events seamlessly with our platform. Sign in to your account and be part of the vibrant WESMAARRDEC community.</p>
+                    <p>Explore, join, and manage events seamlessly with our platform. Sign in to your account and be
+                        part of the vibrant WESMAARRDEC community.</p>
                     <button class="btn transparent" id="sign-in-btn">Sign in</button>
                 </div>
                 <img src="assets/img/wesmaarrdec-removebg-preview.png" class="image" alt="">
@@ -175,4 +178,5 @@ if (isset($_GET['token'])) {
     <!-- Font Awesome Kit -->
     <script src="https://kit.fontawesome.com/7b27fcfa62.js" crossorigin="anonymous"></script>
 </body>
+
 </html>

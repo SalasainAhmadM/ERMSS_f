@@ -38,10 +38,31 @@ $countCancelledEventsSql = "SELECT COUNT(*) AS totalCancelledEvents FROM Events 
 $countCancelledEventsResult = mysqli_query($conn, $countCancelledEventsSql);
 $countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
 $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
+
+function countCanceledEvents($conn)
+{
+    $sql = "
+            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+            FROM events e
+            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalCanceledEvents'];
+    } else {
+        return 0;
+    }
+}
+
+// Call the function to get the number of canceled events
+$canceledEventsCount = countCanceledEvents($conn);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
@@ -56,6 +77,7 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
 
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
 
     <!--=========== SIDEBAR =============-->
@@ -79,7 +101,7 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
             </div>
         </div>
 
-        
+
         <ul>
             <li class="nav-sidebar">
                 <a href="userDashboard.php  ">
@@ -88,7 +110,7 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
                 </a>
                 <span class="tooltip">Dashboard</span>
             </li>
-            
+
             <li class="events-side first nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-archive'></i>
@@ -100,7 +122,7 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
                     <ul>
                         <a href="landingPageU.php">Join Event</a>
                         <a href="history.php">History</a>
-                        <a href="cancelEventU.php">Cancelled <span><?php echo $totalCancelledEvents; ?></span></span></a>
+                        <a href="cancelEventU.php">Cancelled <span><?php echo $canceledEventsCount; ?></span></a>
                     </ul>
                 </div>
             </li>
@@ -129,12 +151,12 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
         </ul>
     </div>
 
-    
+
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr apply">
             <!-- <h3 class="dashboard">EVENTS</h3> -->
-            
+
 
             <div class="wrapper">
                 <div class="title">
@@ -145,32 +167,33 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
 
                     <div class="input_field">
                         <label>Email</label>
-                        <input type="text" name="Email" class="input" value="<?php echo $Email; ?>" >
+                        <input type="text" name="Email" class="input" value="<?php echo $Email; ?>">
                     </div>
-                    
+
                     <div class="input_field">
                         <label>Full Name</label>
-                        <input type="text" name="FullName" class="input" value="<?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?>">
-                        
+                        <input type="text" name="FullName" class="input"
+                            value="<?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?>">
+
                     </div>
 
 
                     <div class="input_field">
                         <label>Contact Number</label>
-                        <input type="number" name="ContactNo" class="input" value="<?php echo $ContactNo; ?>" >
+                        <input type="number" name="ContactNo" class="input" value="<?php echo $ContactNo; ?>">
                     </div>
 
                     <div class="input_field">
                         <label>Affiliation</label>
-                        <input type="text" name="Affiliation" class="input" value="<?php echo $Affiliation; ?>" >
+                        <input type="text" name="Affiliation" class="input" value="<?php echo $Affiliation; ?>">
                     </div>
 
                     <div class="input_field">
                         <label>Position</label>
-                        <input type="text" name="Position" class="input" value="<?php echo $Position; ?>" >
+                        <input type="text" name="Position" class="input" value="<?php echo $Position; ?>">
                     </div>
 
-                    
+
 
                     <div class="input_field">
                         <input type="submit" value="Join" class="createBtn">
@@ -185,23 +208,23 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
         <!--back button-->
         <section class="category">
             <div class="box-container">
-              <a href="view_event.php" class="box">
-                <i class="fa-solid fa-arrow-left"></i>
-                <div>
-                  <h3>Go Back</h3>
-                  <span>Click to go back</span>
-                </div>
-              </a>
-      
+                <a href="view_event.php" class="box">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <div>
+                        <h3>Go Back</h3>
+                        <span>Click to go back</span>
+                    </div>
+                </a>
+
             </div>
-          </section>
+        </section>
 
 
-        
+
     </div>
 
 
-    
+
 
 
     <!--JS -->
@@ -216,8 +239,8 @@ $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
 
         let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
 
-        dropdown_items.forEach(items =>{
-            items.onclick = () =>{
+        dropdown_items.forEach(items => {
+            items.onclick = () => {
                 items_parent = items.parentElement.parentElement;
                 let output = items_parent.querySelector('.output');
                 output.value = items.innerText;
