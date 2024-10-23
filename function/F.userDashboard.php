@@ -43,7 +43,7 @@ if (isset($_SESSION['UserID'])) {
         <script>
             Swal.fire({
                 title: 'Warning!',
-                text: 'An event has been cancelled!',
+                text: 'An event you have joined has been cancelled!',
                 icon: 'warning',
                 toast: true,
                 position: 'top-right',
@@ -56,7 +56,7 @@ if (isset($_SESSION['UserID'])) {
 
     $_SESSION['eventsJoined'] = $eventsJoined;
 
-    echo "<h2>You have joined $eventsJoined event(s)</h2>";
+   
 
     while ($row = mysqli_fetch_assoc($result)) {
         $eventTitle = htmlspecialchars($row['event_title']);
