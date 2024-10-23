@@ -1,3 +1,76 @@
+<?php
+session_start();
+require_once('../db.connection/connection.php');
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Check if UserID is set in the session
+    if (isset($_SESSION['UserID'])) {
+        $UserID = $_SESSION['UserID'];
+
+        // Fetch user data
+        $sqlUser = "SELECT * FROM user WHERE UserID = ?";
+        $stmtUser = $conn->prepare($sqlUser);
+        $stmtUser->bind_param("i", $UserID);
+        $stmtUser->execute();
+        $resultUser = $stmtUser->get_result();
+
+        if ($resultUser->num_rows > 0) {
+            // Fetch the user details
+            while ($row = $resultUser->fetch_assoc()) {
+                $LastName = $row['LastName'];
+                $FirstName = $row['FirstName'];
+                $MI = $row['MI'];
+                $Position = $row['Position'];
+                $Image = $row['Image'];
+                // User data can now be used
+            }
+        }
+
+        // Fetch canceled events based on the cancel_reason table
+        $sqlCancelEvents = "
+            SELECT e.event_id, e.event_title, e.event_type, e.event_mode, e.location, e.date_start, e.date_end, e.time_start, e.time_end, cr.description 
+            FROM cancel_reason cr 
+            JOIN events e ON cr.event_id = e.event_id 
+            WHERE cr.UserID = ?";
+
+        $stmtCancelEvents = $conn->prepare($sqlCancelEvents);
+        $stmtCancelEvents->bind_param("i", $UserID);
+        $stmtCancelEvents->execute();
+        $resultCancelEvents = $stmtCancelEvents->get_result();
+
+        $cancelledEvents = [];
+
+        if ($resultCancelEvents->num_rows > 0) {
+            // Loop through the canceled events
+            while ($event = $resultCancelEvents->fetch_assoc()) {
+                $cancelledEvents[] = [
+                    'event_id' => $event['event_id'],
+                    'event_title' => $event['event_title'],
+                    'location' => $event['location'],
+                    'event_type' => $event['event_type'],
+                    'event_mode' => $event['event_mode'],
+                    'date_start' => $event['date_start'],
+                    'date_end' => $event['date_end'],
+                    'time_start' => $event['time_start'],
+                    'time_end' => $event['time_end'],
+                    'cancel_reason' => $event['description']
+                ];
+            }
+        } else {
+            // No canceled events found
+            $cancelledEvents = [];
+        }
+
+
+    } else {
+        // Redirect to login if UserID is not set
+        header("Location: login.php");
+        exit();
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,52 +93,6 @@
 
 <body>
 
-    <?php
-    session_start();
-    require_once('../db.connection/connection.php');
-
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Check if UserID is set in the session
-        if (isset($_SESSION['UserID'])) {
-            $UserID = $_SESSION['UserID'];
-
-            // Prepare and execute a query to fetch the specific admin's data
-            $sql = "SELECT * FROM user WHERE UserID = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $UserID); // Assuming UserID is an integer
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $LastName = $row['LastName'];
-                    $FirstName = $row['FirstName'];
-                    $MI = $row['MI'];
-                    $Position = $row['Position']; // Corrected the column name
-                    $Image = $row['Image'];
-
-
-                    // Now, you have the specific admin's data
-                }
-            } else {
-                echo "No records found";
-            }
-
-            $stmt->close();
-
-            // Fetch total number of cancelled events
-            $countCancelledEventsSql = "SELECT COUNT(*) AS totalCancelledEvents FROM Events WHERE event_cancel IS NOT NULL AND event_cancel <> ''";
-            $countCancelledEventsResult = mysqli_query($conn, $countCancelledEventsSql);
-            $countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
-            $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
-
-        } else {
-            // Redirect to login page or handle the case where UserID is not set in the session
-            header("Location: login.php");
-            exit();
-        }
-    }
-    ?>
 
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
@@ -164,14 +191,34 @@
                                 <th>Event Location</th>
                                 <th>Event Date</th>
                                 <th>Event Time</th>
-                                <th>Status</th>
+                                <th>Reason</th>
                                 <th colspan="3">Action</th>
                             </tr>
                         </thead>
-
                         <tbody>
-                            <?php include('../function/F.viewCancelU.php'); ?>
+                            <?php
+
+                            if (!empty($cancelledEvents)) {
+
+                                foreach ($cancelledEvents as $row) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['event_title']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['event_type']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['event_mode']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['location']) . "</td>";
+                                    echo "<td>" . date("F j, Y", strtotime($row['date_start'])) . " - " . date("F j, Y", strtotime($row['date_end'])) . "</td>";
+                                    echo "<td>" . date("h:i a", strtotime($row['time_start'])) . " - " . date("h:i a", strtotime($row['time_end'])) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['cancel_reason']) . "</td>";
+                                    echo "<td><a href='view_cancel.php?event_id=" . $row['event_id'] . "'><button class='btn_edit'><i class='fa-solid fa-eye'></i></button></a></td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+
+                                echo "<tr><td colspan='8'>No canceled events found for this user.</td></tr>";
+                            }
+                            ?>
                         </tbody>
+
                     </table>
                 </div>
             </div>
