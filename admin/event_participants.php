@@ -2,7 +2,8 @@
 include('../function/F.participants_retrieve.php');
 
 // Function to calculate the number of days between two dates
-function dateRange($start, $end) {
+function dateRange($start, $end)
+{
     $start = new DateTime($start);
     $end = new DateTime($end);
     // Adjust the end date to include it in the counting
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $selectedDay = $_POST['event_day']; // Get the selected day
         $attendance_date = date('Y-m-d', strtotime($dateStart . ' +' . ($selectedDay - 1) . ' days')); // Calculate attendance date
         $status = $_POST['status']; // 'present' or 'absent'
-        
+
         $timeIn = isset($_POST['timeIn']) ? $_POST['timeIn'] : "00:00";
         $timeOut = isset($_POST['timeOut']) ? $_POST['timeOut'] : "00:00";
 
@@ -189,7 +190,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Prepare and execute the statement
     $stmt = $conn->prepare($sql);
-    
+
     // Check if the statement was prepared successfully
     if ($stmt) {
         // Ensure the parameters are bound correctly
@@ -232,7 +233,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
     <!-- font awesome cdn-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -241,85 +244,85 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <style>
     .parent-container {
-    display: flex;
-    justify-content: center;
-    align-items: center; 
-    height: 100vh; 
-}
-
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
 </style>
+
 <body>
 
     <?php
-        session_start();
-        require_once('../db.connection/connection.php');
+    session_start();
+    require_once('../db.connection/connection.php');
 
-        function countPendingUsers($conn)
-        {
-            $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
-            $result = $conn->query($sqls);
+    function countPendingUsers($conn)
+    {
+        $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
+        $result = $conn->query($sqls);
 
-            if ($result) {
-                $row = $result->fetch_assoc();
-                return $row['totalPendingUsers'];
-            } else {
-                return 0; // Return 0 if there is an error or no pending users
-            }
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['totalPendingUsers'];
+        } else {
+            return 0; // Return 0 if there is an error or no pending users
         }
-        function countPendingEvents($conn)
-        {
-            $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-            $result = $conn->query($sqls);
-        
-            if ($result) {
-                $row = $result->fetch_assoc();
-                return $row['totalPendingEvents'];
-            } else {
-                return 0; 
-            }
+    }
+    function countPendingEvents($conn)
+    {
+        $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+        $result = $conn->query($sqls);
+
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['totalPendingEvents'];
+        } else {
+            return 0;
         }
-        
-        
+    }
 
-        $FirstName = "";
-        $MI = "";
-        $LastName = "";
-        $Position = "";
 
-        // Check if AdminID is set in the session
-        if (isset($_SESSION['AdminID'])) {
-            $AdminID = $_SESSION['AdminID'];
 
-            // Prepare and execute a query to fetch the specific admin's data
-            $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-            $stmtAdmin = $conn->prepare($sqlAdmin);
-            $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
-            $stmtAdmin->execute();
-            $resultAdmin = $stmtAdmin->get_result();
+    $FirstName = "";
+    $MI = "";
+    $LastName = "";
+    $Position = "";
 
-            if ($resultAdmin->num_rows > 0) {
-                while ($row = $resultAdmin->fetch_assoc()) {
-                    $LastName = $row['LastName'];
-                    $FirstName = $row['FirstName'];
-                    $MI = $row['MI'];
-                    $Email = $row['Email'];
-                    $ContactNo = $row['ContactNo'];
-                    $Position = $row['Position']; // Corrected the column name
-                    $Affiliation = $row['Affiliation'];
-                    $Image = $row['Image'];
+    // Check if AdminID is set in the session
+    if (isset($_SESSION['AdminID'])) {
+        $AdminID = $_SESSION['AdminID'];
 
-                    // Now, you have the specific admin's data
-                }
-            } else {
-                echo "No records found";
+        // Prepare and execute a query to fetch the specific admin's data
+        $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
+        $stmtAdmin = $conn->prepare($sqlAdmin);
+        $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
+        $stmtAdmin->execute();
+        $resultAdmin = $stmtAdmin->get_result();
+
+        if ($resultAdmin->num_rows > 0) {
+            while ($row = $resultAdmin->fetch_assoc()) {
+                $LastName = $row['LastName'];
+                $FirstName = $row['FirstName'];
+                $MI = $row['MI'];
+                $Email = $row['Email'];
+                $ContactNo = $row['ContactNo'];
+                $Position = $row['Position']; // Corrected the column name
+                $Affiliation = $row['Affiliation'];
+                $Image = $row['Image'];
+
+                // Now, you have the specific admin's data
             }
-
-            $stmtAdmin->close();
-
-            // Example usage of the countPendingUsers function
-            $pendingUsersCount = countPendingUsers($conn);
-            $pendingEventsCount = countPendingEvents($conn);
+        } else {
+            echo "No records found";
         }
+
+        $stmtAdmin->close();
+
+        // Example usage of the countPendingUsers function
+        $pendingUsersCount = countPendingUsers($conn);
+        $pendingEventsCount = countPendingEvents($conn);
+    }
     ?>
 
     <!-- ====SIDEBAR==== -->
@@ -344,7 +347,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
-                
+
         <ul>
             <li class="nav-sidebar">
                 <a href="adminDashboard.php">
@@ -353,7 +356,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </a>
                 <span class="tooltip">Dashboard</span>
             </li>
-                    
+
             <li class="events-side2 nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-archive'></i>
@@ -363,12 +366,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="tooltip">Events</span>
                 <div class="uno">
                     <ul>
-                         <?php if ($_SESSION['Role'] === 'superadmin') { ?>
-                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
-                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } ?>
-                            <a href="landingPage.php">Events</a>
+                        <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                            <a href="eventsValidation.php">Events Validation
+                                <span><?php echo $pendingEventsCount; ?></span></a>
+                        <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                            <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                        <?php } ?>
+                        <a href="landingPage.php">Events</a>
                         <a href="addEvent.php">Add Event</a>
                         <a href="addEventTypeMode.php">Event Settings</a>
                         <a href="history.php">History</a>
@@ -387,7 +391,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="uno">
                     <ul>
                         <a href="profile.php">My Profile</a>
-                        <a href="validation.php">User Validation <span><?php echo $pendingUsersCount;  ?></span></a>
+                        <a href="validation.php">User Validation <span><?php echo $pendingUsersCount; ?></span></a>
                         <a href="newAccount.php">Create Account</a>
                         <a href="allUser.php">All Users</a>
                         <!-- <a href="accountSettings.php">Account Settings</a> -->
@@ -427,7 +431,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <h3>Participants</h3>
                             <span><?php echo $totalParticipants; ?></span>
                         </div>
-                    </a>            
+                    </a>
 
                     <!-- Filter for Present -->
                     <a href="#" class="box" id="viewParticipants">
@@ -435,7 +439,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div>
                             <select name="present_day_filter" id="present_day_filter" onchange="filterByDay()">
                                 <option value="">All Days (Present)</option>
-                                <?php for ($i = 1; $i <= $numDays; $i++) : ?>
+                                <?php for ($i = 1; $i <= $numDays; $i++): ?>
                                     <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -447,8 +451,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <i class="fa-solid fa-calendar-days"></i>
                         <div>
                             <select name="absent_day_filter" id="absent_day_filter" onchange="filterByDay()">
-                                <option value="">All Days (Absent)</option> 
-                                <?php for ($i = 1; $i <= $numDays; $i++) : ?>
+                                <option value="">All Days (Absent)</option>
+                                <?php for ($i = 1; $i <= $numDays; $i++): ?>
                                     <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
@@ -460,7 +464,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div>
                             <h3>All Days Present</h3>
                         </div>
-                    </a> 
+                    </a>
                 </div>
             </section>
 
@@ -486,7 +490,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="phone">
                                     <span>PHONE#</span>
                                 </div>
-                                
+
                                 <!-- Table Header Elements to be hidden by default -->
                                 <div class="attendance-details" style="display: none;">
                                     <div class="phone" style="display: none;">
@@ -506,7 +510,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
 
-                                
+
                                 <div class="action" id="action_tab">
                                     <span>ACTION</span>
                                 </div>
@@ -529,7 +533,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?php
                     $sql = "SELECT * FROM eventParticipants INNER JOIN user ON eventParticipants.UserID = user.UserID
                             WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
-     
+
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $eventTitle);
                     $stmt->execute();
@@ -545,8 +549,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
 
-                    ?>
-                            
+                            ?>
+
                             <form action='' method='POST' onsubmit="return confirmAttendance(this);">
                                 <ul>
                                     <li>
@@ -571,37 +575,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <span><?php echo $contactNo . ' ' ?></span>
                                             </div>
 
-                                        <div class="action" id="action">
-                                        <div class="days" style="margin-bottom: 0.75rem;text-align:center;">
-                                                <input type="hidden" name="attendance_date" id="attendance_date">
-                                                <!--hide-->
-                                                <select name="event_day" id="event_day">
-                                                    <?php for ($i = 1; $i <= $numDays; $i++) : ?>
-                                                        <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
-                                                    <?php endfor; ?>
-                                                </select>
+                                            <div class="action" id="action">
+                                                <div class="days" style="margin-bottom: 0.75rem;text-align:center;">
+                                                    <input type="hidden" name="attendance_date" id="attendance_date">
+                                                    <!--hide-->
+                                                    <select name="event_day" id="event_day">
+                                                        <?php for ($i = 1; $i <= $numDays; $i++): ?>
+                                                            <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
+                                                        <?php endfor; ?>
+                                                    </select>
+                                                </div>
+
+
+
+                                                <div class="status" style="margin-bottom: 0.75rem;">
+                                                    <input type="hidden" name="participant_id"
+                                                        value="<?php echo $row['participant_id']; ?>">
+                                                    <input type="hidden" name="event_id"
+                                                        value="<?php echo $row['event_id']; ?>">
+                                                    <button type="submit" name="status" value="present"
+                                                        class="approve att">Present</button>
+                                                </div>
+
+                                                <div class="status">
+                                                    <input type="hidden" name="participant_id"
+                                                        value="<?php echo $row['participant_id']; ?>">
+                                                    <input type="hidden" name="event_id"
+                                                        value="<?php echo $row['event_id']; ?>">
+                                                    <button type="submit" name="status" value="absent"
+                                                        class="approve att">Absent</button>
+                                                </div>
                                             </div>
-
-
-
-                                            <div class="status" style="margin-bottom: 0.75rem;">
-                                               <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
-                                                <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
-                                                <button type="submit" name="status" value="present" class="approve att">Present</button>
-                                            </div>
-
-                                            <div class="status">
-                                                <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
-                                                <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
-                                                <button type="submit" name="status" value="absent" class="approve att">Absent</button>
-                                            </div>
-                                        </div>
 
                                         </div>
                                     </li>
                                 </ul>
                             </form>
-                    <?php
+                            <?php
                         }
                     } else {
                         echo "No participants found for the specified event.";
@@ -636,12 +646,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $position = htmlspecialchars($row['Position']);
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
-                            $attendanceDay = htmlspecialchars($row['day']); 
+                            $attendanceDay = htmlspecialchars($row['day']);
                             $attendanceStatus = htmlspecialchars($row['status']);
                             $timeIn = htmlspecialchars($row['time_in']) ?: '09:00'; // Default value if null
                             $timeOut = htmlspecialchars($row['time_out']) ?: '10:00'; // Default value if null
-                    ?>
-                    
+                            ?>
+
                             <form action='' method='POST' onsubmit="return confirmAttendance(this);">
                                 <ul>
                                     <li>
@@ -667,21 +677,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </div>
 
                                             <div class="attendance-details" style="display: none;">
-                                                <?php if ($attendanceStatus != "absent") : // Check if attendanceStatus is not "absent" ?>
+                                                <?php if ($attendanceStatus != "absent"): // Check if attendanceStatus is not "absent" ?>
                                                     <div class="time_in_out">
                                                         <div class="phone">
-                                                            <input type="time" id="timeIn_<?php echo $row['participant_id']; ?>" name="timeIn" value="<?php echo $timeIn; ?>" required onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
+                                                            <input type="time" id="timeIn_<?php echo $row['participant_id']; ?>"
+                                                                name="timeIn" value="<?php echo $timeIn; ?>" required
+                                                                onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
                                                             <br>
-                                                            <input type="time" id="timeOut_<?php echo $row['participant_id']; ?>" name="timeOut" value="<?php echo $timeOut; ?>" required onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
+                                                            <input type="time" id="timeOut_<?php echo $row['participant_id']; ?>"
+                                                                name="timeOut" value="<?php echo $timeOut; ?>" required
+                                                                onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
                                                         </div>
-                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                        <input type="hidden" name="attendance_day"
+                                                            value="<?php echo $attendanceDay; ?>">
                                                     </div>
                                                 <?php else: // If attendanceStatus is "absent" ?>
                                                     <div class="time_in_out">
                                                         <div class="phone">
-                                                            <h4 style="padding: 3.5rem;">N/A</h4> <!-- Display "No time" if absent -->
+                                                            <h4 style="padding: 3.5rem;">N/A</h4>
+                                                            <!-- Display "No time" if absent -->
                                                         </div>
-                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                        <input type="hidden" name="attendance_day"
+                                                            value="<?php echo $attendanceDay; ?>">
                                                     </div>
                                                 <?php endif; // End of check ?>
                                             </div>
@@ -690,8 +707,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <div class="attendance-details" style="display: none;">
 
                                                 <div class="day_present">
-                                                    <?php if (!empty($attendanceDay)) : ?>
-                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                    <?php if (!empty($attendanceDay)): ?>
+                                                        <input type="hidden" name="attendance_day"
+                                                            value="<?php echo $attendanceDay; ?>">
                                                         <span>(Day: <?php echo $attendanceDay; ?>)</span>
                                                     <?php endif; ?>
                                                 </div>
@@ -703,23 +721,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </div>
 
                                             <div class="action" id="action">
-                                                <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
+                                                <input type="hidden" name="participant_id"
+                                                    value="<?php echo $row['participant_id']; ?>">
                                                 <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                                 <div class="days">
                                                     <select name="event_day" id="event_day">
-                                                        <?php for ($i = 1; $i <= $numDays; $i++) : ?>
+                                                        <?php for ($i = 1; $i <= $numDays; $i++): ?>
                                                             <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
                                                         <?php endfor; ?>
                                                     </select>
                                                 </div>
 
                                                 <div class="status">
-                                                    <button type="submit" name="status" value="present" 
+                                                    <button type="submit" name="status" value="present"
                                                         class="approve att <?php echo ($row['status'] == 'present' ? 'active' : ''); ?>">Present</button>
                                                 </div>
 
                                                 <div class="status">
-                                                    <button type="submit" name="status" value="absent" 
+                                                    <button type="submit" name="status" value="absent"
                                                         class="approve att <?php echo ($row['status'] == 'absent' ? 'active' : ''); ?>">Absent</button>
                                                 </div>
                                             </div>
@@ -728,7 +747,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </li>
                                 </ul>
                             </form>
-                    <?php
+                            <?php
                         }
                     } else {
                         echo "No participants found for the specified event.";
@@ -774,7 +793,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             // Track attendance
                             if ($row['day'] && $row['status'] === 'present') {
-                                $participants[$participantId]['attendance'][] = (int)$row['day'];
+                                $participants[$participantId]['attendance'][] = (int) $row['day'];
                             }
                         }
 
@@ -782,52 +801,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         foreach ($participants as $participantId => $data) {
                             $numPresentDays = count($data['attendance']);
                             $isPresentAllDays = ($numPresentDays === $numDays); // Check if present on all days
-                    ?>
+                            ?>
 
-                    <?php if ($isPresentAllDays): ?>
-                    <form action='' method='POST' onsubmit="return confirmAttendance(this);">
-                        <ul>
-                            <li>
-                                <div class="item">
-                                    <!-- Participant Information -->
-                                    <div class="name">
-                                        <span><?php echo $data['fullName']; ?></span>
-                                    </div>
-                                    <div class="department">
-                                        <span><?php echo $data['affiliation'] . ' '; ?></span>
-                                    </div>
-                                    <div class="department">
-                                        <span><?php echo $data['position'] . ' '; ?></span>
-                                    </div>
-                                    <div class="info">
-                                        <span><?php echo $data['email'] . ' '; ?></span>
-                                    </div>
-                                    <div class="phone">
-                                        <span><?php echo $data['contactNo'] . ' '; ?></span>
-                                    </div>
-                                    
-                                    <!-- Attendance Information -->
-                                    <div class="attendance-summary">
-                                        <div class="days-present">
-                                            
-                                                <span>Present on all <?php echo $numDays; ?> days</span>
-                                            
-                                           
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </form>
-                    <?php endif; ?>
-                    <?php
+                            <?php if ($isPresentAllDays): ?>
+                                <form action='' method='POST' onsubmit="return confirmAttendance(this);">
+                                    <ul>
+                                        <li>
+                                            <div class="item">
+                                                <!-- Participant Information -->
+                                                <div class="name">
+                                                    <span><?php echo $data['fullName']; ?></span>
+                                                </div>
+                                                <div class="department">
+                                                    <span><?php echo $data['affiliation'] . ' '; ?></span>
+                                                </div>
+                                                <div class="department">
+                                                    <span><?php echo $data['position'] . ' '; ?></span>
+                                                </div>
+                                                <div class="info">
+                                                    <span><?php echo $data['email'] . ' '; ?></span>
+                                                </div>
+                                                <div class="phone">
+                                                    <span><?php echo $data['contactNo'] . ' '; ?></span>
+                                                </div>
+
+                                                <!-- Attendance Information -->
+                                                <div class="attendance-summary">
+                                                    <div class="days-present">
+
+                                                        <span>Present on all <?php echo $numDays; ?> days</span>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </form>
+                            <?php endif; ?>
+                            <?php
                         }
                     } else {
                         echo "No participants found for the specified event.";
                     }
                     ?>
                 </div>
-            
+
             </div>
 
 
@@ -847,14 +866,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             timeOut: timeOut,
                             attendance_day: attendanceDay // Include attendance_day in the data sent
                         },
-                        success: function(response) {
+                        success: function (response) {
                             var result = JSON.parse(response);
                             alert(result.message);
                             if (result.status === 'success') {
                                 // Optionally update UI or perform any other action
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             console.error("Error updating attendance:", error);
                         }
                     });
@@ -866,9 +885,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <script>
                 // Function to hide attendance details when the "Participants" button is clicked
-                document.getElementById("viewParticipants").addEventListener("click", function() {
+                document.getElementById("viewParticipants").addEventListener("click", function () {
                     var attendanceDetails = document.querySelectorAll('.attendance-details');
-                    attendanceDetails.forEach(function(detail) {
+                    attendanceDetails.forEach(function (detail) {
                         detail.style.display = 'none';
                     });
 
@@ -876,73 +895,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     document.getElementById("present_day_filter").value = "";
                     document.getElementById("absent_day_filter").value = "";
 
-                    document.getElementById('table_main').style.display = 'block'; 
-                    document.getElementById('table').style.display = 'none'; 
-                    document.getElementById('table_present_all_days').style.display = 'none'; 
+                    document.getElementById('table_main').style.display = 'block';
+                    document.getElementById('table').style.display = 'none';
+                    document.getElementById('table_present_all_days').style.display = 'none';
                 });
             </script>
 
             <script>
                 // Function to hide attendance details when the "Participants" button is clicked
-                document.getElementById("viewAllDaysPresent").addEventListener("click", function() {
+                document.getElementById("viewAllDaysPresent").addEventListener("click", function () {
                     var attendanceDetails = document.querySelectorAll('.attendance-details');
-                    attendanceDetails.forEach(function(detail) {
+                    attendanceDetails.forEach(function (detail) {
                         detail.style.display = 'none';
                     });
 
-                    document.getElementById('table_main').style.display = 'none'; 
-                    document.getElementById('table').style.display = 'none'; 
-                    document.getElementById('table_present_all_days').style.display = 'block'; 
+                    document.getElementById('table_main').style.display = 'none';
+                    document.getElementById('table').style.display = 'none';
+                    document.getElementById('table_present_all_days').style.display = 'block';
                 });
             </script>
 
             <script>
                 function toggleAttendanceDetails() {
-                var presentDayFilter = document.getElementById("present_day_filter").value;
-                var absentDayFilter = document.getElementById("absent_day_filter").value;
-                
-                // Check if any filter is applied
-                if (presentDayFilter !== "" || absentDayFilter !== "") {
-                    // Show elements when a filter is applied
-                    var attendanceDetails = document.querySelectorAll('.attendance-details');
-                    var actionDetails = document.querySelectorAll('.action');
-                    var dayPresentDetails = document.querySelectorAll('.day_present');
-                    
-                    attendanceDetails.forEach(function(detail) {
-                        detail.style.display = 'block';
-                    });
+                    var presentDayFilter = document.getElementById("present_day_filter").value;
+                    var absentDayFilter = document.getElementById("absent_day_filter").value;
 
-                    actionDetails.forEach(function(detail) {
-                        detail.style.display = 'none';
-                    });
+                    // Check if any filter is applied
+                    if (presentDayFilter !== "" || absentDayFilter !== "") {
+                        // Show elements when a filter is applied
+                        var attendanceDetails = document.querySelectorAll('.attendance-details');
+                        var actionDetails = document.querySelectorAll('.action');
+                        var dayPresentDetails = document.querySelectorAll('.day_present');
 
-                    dayPresentDetails.forEach(function(detail) {
-                        detail.style.display = 'none';
-                    });
+                        attendanceDetails.forEach(function (detail) {
+                            detail.style.display = 'block';
+                        });
 
-                    document.getElementById('table_main').style.display = 'none'; 
-                    document.getElementById('table').style.display = 'block'; 
-                    document.getElementById('table_present_all_days').style.display = 'none'; 
+                        actionDetails.forEach(function (detail) {
+                            detail.style.display = 'none';
+                        });
 
-                } else {
-                    // Hide elements when no filter is applied
-                    var attendanceDetails = document.querySelectorAll('.attendance-details');
-                    var dayPresentDetails = document.querySelectorAll('.day_present');
+                        dayPresentDetails.forEach(function (detail) {
+                            detail.style.display = 'none';
+                        });
 
-                    attendanceDetails.forEach(function(detail) {
-                        detail.style.display = 'block';                    
-                        document.getElementById('table').style.display = 'block'; 
-                    });
+                        document.getElementById('table_main').style.display = 'none';
+                        document.getElementById('table').style.display = 'block';
+                        document.getElementById('table_present_all_days').style.display = 'none';
 
-                    dayPresentDetails.forEach(function(detail) {
-                        detail.style.display = 'block';
-                    });
+                    } else {
+                        // Hide elements when no filter is applied
+                        var attendanceDetails = document.querySelectorAll('.attendance-details');
+                        var dayPresentDetails = document.querySelectorAll('.day_present');
+
+                        attendanceDetails.forEach(function (detail) {
+                            detail.style.display = 'block';
+                            document.getElementById('table').style.display = 'block';
+                        });
+
+                        dayPresentDetails.forEach(function (detail) {
+                            detail.style.display = 'block';
+                        });
+                    }
                 }
-            }
 
-            // Attach the function to filter change events
-            document.getElementById("present_day_filter").addEventListener("change", toggleAttendanceDetails);
-            document.getElementById("absent_day_filter").addEventListener("change", toggleAttendanceDetails);
+                // Attach the function to filter change events
+                document.getElementById("present_day_filter").addEventListener("change", toggleAttendanceDetails);
+                document.getElementById("absent_day_filter").addEventListener("change", toggleAttendanceDetails);
 
             </script>
 
@@ -950,84 +969,84 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
             <script>
-        function filterByDay() {
-            var presentDayFilter = document.getElementById("present_day_filter");
-            var absentDayFilter = document.getElementById("absent_day_filter");
+                function filterByDay() {
+                    var presentDayFilter = document.getElementById("present_day_filter");
+                    var absentDayFilter = document.getElementById("absent_day_filter");
 
-            // Check if the "Present" filter is changed
-            presentDayFilter.addEventListener('change', function() {
-                if (presentDayFilter.value !== "") {
-                    absentDayFilter.value = ""; // Reset the Absent filter to "All Days"
+                    // Check if the "Present" filter is changed
+                    presentDayFilter.addEventListener('change', function () {
+                        if (presentDayFilter.value !== "") {
+                            absentDayFilter.value = ""; // Reset the Absent filter to "All Days"
+                        }
+                        applyFilter(); // Apply the filter logic
+                    });
+
+                    // Check if the "Absent" filter is changed
+                    absentDayFilter.addEventListener('change', function () {
+                        if (absentDayFilter.value !== "") {
+                            presentDayFilter.value = ""; // Reset the Present filter to "All Days"
+                        }
+                        applyFilter(); // Apply the filter logic
+                    });
+
+                    // Initial filter application
+                    applyFilter();
                 }
-                applyFilter(); // Apply the filter logic
-            });
 
-            // Check if the "Absent" filter is changed
-            absentDayFilter.addEventListener('change', function() {
-                if (absentDayFilter.value !== "") {
-                    presentDayFilter.value = ""; // Reset the Present filter to "All Days"
+                // Function to filter participants based on current filter values
+                function applyFilter() {
+                    var presentDay = document.getElementById("present_day_filter").value; // Get the selected day for present
+                    var absentDay = document.getElementById("absent_day_filter").value; // Get the selected day for absent
+                    var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
+
+                    participants.forEach(function (participant) {
+                        var participantDay = participant.querySelector("input[name='attendance_day']"); // Get attendance day
+                        var statusButtons = participant.querySelectorAll("button[name='status']");
+
+                        var isPresent = false;
+                        var isAbsent = false;
+
+                        // Determine the status of the participant
+                        statusButtons.forEach(function (button) {
+                            if (button.value === "present" && button.classList.contains("active")) {
+                                isPresent = true;
+                            } else if (button.value === "absent" && button.classList.contains("active")) {
+                                isAbsent = true;
+                            }
+                        });
+
+                        // Show or hide based on filter conditions
+                        if ((presentDay === "" || (isPresent && participantDay && participantDay.value == presentDay)) &&
+                            (absentDay === "" || (isAbsent && participantDay && participantDay.value == absentDay))) {
+                            participant.style.display = 'block'; // Show if matches present and absent conditions
+
+                        } else {
+                            participant.style.display = 'none'; // Hide if conditions don't match
+                        }
+                    });
                 }
-                applyFilter(); // Apply the filter logic
-            });
-
-            // Initial filter application
-            applyFilter();
-        }
-
-        // Function to filter participants based on current filter values
-        function applyFilter() {
-            var presentDay = document.getElementById("present_day_filter").value; // Get the selected day for present
-            var absentDay = document.getElementById("absent_day_filter").value; // Get the selected day for absent
-            var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
-
-            participants.forEach(function(participant) {
-                var participantDay = participant.querySelector("input[name='attendance_day']"); // Get attendance day
-                var statusButtons = participant.querySelectorAll("button[name='status']");
-
-                var isPresent = false;
-                var isAbsent = false;
-
-                // Determine the status of the participant
-                statusButtons.forEach(function(button) {
-                    if (button.value === "present" && button.classList.contains("active")) {
-                        isPresent = true;
-                    } else if (button.value === "absent" && button.classList.contains("active")) {
-                        isAbsent = true;
-                    }
-                });
-
-                // Show or hide based on filter conditions
-                if ((presentDay === "" || (isPresent && participantDay && participantDay.value == presentDay)) &&
-                    (absentDay === "" || (isAbsent && participantDay && participantDay.value == absentDay))) {
-                    participant.style.display = 'block'; // Show if matches present and absent conditions
-
-                } else {
-                    participant.style.display = 'none'; // Hide if conditions don't match
-                }
-            });
-}
             </script>
 
-            
+
 
             <!--search filter-->
             <script>
                 var search_input = document.querySelector("#search_input");
 
-                search_input.addEventListener("keyup", function(e){
-                var span_items = document.querySelectorAll(".table_body .name span");
-                var table_body = document.querySelector(".table_body ul");
-                var search_item = e.target.value.toLowerCase();
-                
-                span_items.forEach(function(item){
-                if(item.textContent.toLowerCase().indexOf(search_item) != -1){
-                    item.closest("li").style.display = "block";
-                }
-                else{
-                    item.closest("li").style.display = "none";
-                    }
-                })
-                
+                search_input.addEventListener("keyup", function (e) {
+                    var span_items = document.querySelectorAll(".table_body .name span");
+                    var table_body = document.querySelector(".table_body ul");
+                    var search_item = e.target.value.toLowerCase();
+
+                    span_items.forEach(function (item) {
+                        if (item.textContent.toLowerCase().indexOf(search_item) != -1) {
+                            item.closest("li").style.display = "block";
+                        }
+                        else {
+                            item.closest("li").style.display = "none";
+                        }
+                    })
+
                 });
             </script>
 
@@ -1037,17 +1056,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 function filterAttendance() {
                     var participants = document.querySelectorAll(".table_body ul li");
                     var participantsWithoutAttendance = <?php echo json_encode($participantsWithoutAttendanceResult->fetch_all(MYSQLI_ASSOC)); ?>;
-                    
+
                     // Hide all participants initially
-                    participants.forEach(function(participant) {
+                    participants.forEach(function (participant) {
                         participant.style.display = "none";
                     });
 
                     // Show participants who have no attendance records
-                    participantsWithoutAttendance.forEach(function(participant) {
+                    participantsWithoutAttendance.forEach(function (participant) {
                         var participantId = participant.participant_id;
 
-                        participants.forEach(function(participantElement) {
+                        participants.forEach(function (participantElement) {
                             var participantInput = participantElement.querySelector(".status input[name='participant_id']");
                             if (participantInput && participantInput.value == participantId) {
                                 participantElement.style.display = "block";
@@ -1057,11 +1076,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Show all action divs when Absent is active
                     var actionDivs = document.querySelectorAll('.action');
-                    actionDivs.forEach(function(actionDiv) {
+                    actionDivs.forEach(function (actionDiv) {
                         actionDiv.style.display = 'block'; // Show each action div
                     });
 
-                    document.getElementById('action_tab').style.display = 'block'; 
+                    document.getElementById('action_tab').style.display = 'block';
                 }
             </script>
 
@@ -1070,7 +1089,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <script>
                 // Function to handle the box click event and filter participants
                 function handleBoxClick(event) {
-                    
+
                     event.preventDefault();
 
                     // Get the clicked box element
@@ -1078,7 +1097,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Remove 'active' class from all boxes
                     var boxes = document.querySelectorAll('.box');
-                    boxes.forEach(function(box) {
+                    boxes.forEach(function (box) {
                         box.classList.remove('active');
                     });
 
@@ -1089,17 +1108,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     var participants = document.querySelectorAll('.table_body ul li');
 
                     // Show all participants
-                    participants.forEach(function(participant) {
+                    participants.forEach(function (participant) {
                         participant.style.display = 'block';
                     });
 
                     // Show all action divs when Absent is active
                     var actionDivs = document.querySelectorAll('.action');
-                    actionDivs.forEach(function(actionDiv) {
+                    actionDivs.forEach(function (actionDiv) {
                         actionDiv.style.display = 'block'; // Show each action div
                     });
 
-                    document.getElementById('action_tab').style.display = 'block'; 
+                    document.getElementById('action_tab').style.display = 'block';
                 }
 
                 // Add event listener to the element with id="viewParticipants" only
@@ -1118,7 +1137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Remove 'active' class from all boxes
                     var boxes = document.querySelectorAll('.box');
-                    boxes.forEach(function(box) {
+                    boxes.forEach(function (box) {
                         box.classList.remove('active');
                     });
 
@@ -1132,15 +1151,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     var participants = document.querySelectorAll('.table_body ul li');
 
                     // Hide all participants initially
-                    participants.forEach(function(participant) {
+                    participants.forEach(function (participant) {
                         participant.style.display = 'none';
                     });
 
                     // Show only participants fetched from the attendance table with status 'Present'
-                    participants.forEach(function(participant) {
+                    participants.forEach(function (participant) {
                         var participantId = participant.querySelector("input[name='participant_id']").value;
                         var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
-                        
+
                         // Check if participant is present and matches selected day
                         if (participantId && presentParticipantIds.includes(parseInt(participantId)) &&
                             (selectedDay === "" || attendanceDay == selectedDay)) {
@@ -1150,62 +1169,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Hide all action divs when Present is active
                     var actionDivs = document.querySelectorAll('.action');
-                    actionDivs.forEach(function(actionDiv) {
+                    actionDivs.forEach(function (actionDiv) {
                         actionDiv.style.display = 'none'; // Hide each action div
                     });
 
-                    document.getElementById('action_tab').style.display = 'none'; 
+                    document.getElementById('action_tab').style.display = 'none';
                 }
             </script>
 
             <!-- DISPLAY ABSENT -->
             <script>
-            function handleAbsentBoxClick(event) {
-                event.preventDefault();
+                function handleAbsentBoxClick(event) {
+                    event.preventDefault();
 
-                // Get the clicked box element
-                var clickedBox = event.currentTarget;
+                    // Get the clicked box element
+                    var clickedBox = event.currentTarget;
 
-                // Remove 'active' class from all boxes
-                var boxes = document.querySelectorAll('.box');
-                boxes.forEach(function(box) {
-                    box.classList.remove('active');
-                });
+                    // Remove 'active' class from all boxes
+                    var boxes = document.querySelectorAll('.box');
+                    boxes.forEach(function (box) {
+                        box.classList.remove('active');
+                    });
 
-                // Add 'active' class to the clicked box
-                clickedBox.classList.add('active');
+                    // Add 'active' class to the clicked box
+                    clickedBox.classList.add('active');
 
-                // Get the selected day from the dropdown
-                var selectedDay = document.getElementById("event_day-filter").value;
+                    // Get the selected day from the dropdown
+                    var selectedDay = document.getElementById("event_day-filter").value;
 
-                // Get all participant elements
-                var participants = document.querySelectorAll('.table_body ul li');
+                    // Get all participant elements
+                    var participants = document.querySelectorAll('.table_body ul li');
 
-                // Hide all participants initially
-                participants.forEach(function(participant) {
-                    participant.style.display = 'none';
-                });
+                    // Hide all participants initially
+                    participants.forEach(function (participant) {
+                        participant.style.display = 'none';
+                    });
 
-                // Show only participants fetched from the attendance table with status 'Absent'
-                participants.forEach(function(participant) {
-                    var participantId = participant.querySelector("input[name='participant_id']").value;
-                    var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
-                    
-                    // Check if participant is absent and matches selected day
-                    if (participantId && !presentParticipantIds.includes(parseInt(participantId)) &&
-                        (selectedDay === "" || attendanceDay == selectedDay)) {
-                        participant.style.display = 'block'; // Show the participant
-                    }
-                });
+                    // Show only participants fetched from the attendance table with status 'Absent'
+                    participants.forEach(function (participant) {
+                        var participantId = participant.querySelector("input[name='participant_id']").value;
+                        var attendanceDay = participant.querySelector("input[name='attendance_day']").value; // Get attendance day
 
-                // Show all action divs when Absent is active
-                var actionDivs = document.querySelectorAll('.action');
-                actionDivs.forEach(function(actionDiv) {
-                    actionDiv.style.display = 'none'; // Hide each action div
-                });
+                        // Check if participant is absent and matches selected day
+                        if (participantId && !presentParticipantIds.includes(parseInt(participantId)) &&
+                            (selectedDay === "" || attendanceDay == selectedDay)) {
+                            participant.style.display = 'block'; // Show the participant
+                        }
+                    });
 
-                document.getElementById('action_tab').style.display = 'none';              
-            }
+                    // Show all action divs when Absent is active
+                    var actionDivs = document.querySelectorAll('.action');
+                    actionDivs.forEach(function (actionDiv) {
+                        actionDiv.style.display = 'none'; // Hide each action div
+                    });
+
+                    document.getElementById('action_tab').style.display = 'none';
+                }
 
             </script>
 
@@ -1213,23 +1232,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <!--sidebar functionality-->
-    <script src="js/sidebar.js"></script>    
+    <script src="js/sidebar.js"></script>
 
     <script>
-        // Function to show confirmation pop-up before submitting attendance
+        // Function to show SweetAlert confirmation pop-up before submitting attendance
         function confirmAttendance(form) {
-            // Display confirmation dialog
-            if (confirm("Are you sure you want to record the attendance?")) {
-                // If user clicks OK, submit the form
-                form.submit();
-            } else {
-                // If user clicks Cancel, do nothing
-                return false;
-            }
+            // SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to record the attendance?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, confirm it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user clicks "Yes", submit the form
+                    form.submit();
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // If user clicks "No", do nothing
+                    Swal.fire(
+                        'Cancelled',
+                        'Your attendance has not been recorded.',
+                        'error'
+                    );
+                }
+            });
+
+            // Prevent default form submission until confirmed
+            return false;
         }
     </script>
-    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 
 </html>
-
