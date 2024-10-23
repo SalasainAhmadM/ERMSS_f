@@ -39,6 +39,17 @@ if (isset($_GET['event_id'])) {
         }
         $stmt->close();
     }
+    // Delete cancel_reason
+    $deleteCancelReasonSql = "DELETE FROM cancel_reason WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deleteCancelReasonSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending sponsors!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
     // Delete the event
     $deleteEventSql = "DELETE FROM pendingevents WHERE event_id = ?";
     if ($stmt = $conn->prepare($deleteEventSql)) {
