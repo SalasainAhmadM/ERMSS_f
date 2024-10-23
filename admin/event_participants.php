@@ -398,6 +398,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </a>
 
+                    <a href="#" class="box" id="viewAllDaysPresent">
+                        <i class="fa-solid fa-check"></i>
+                        <div>
+                            <h3>All Days Present</h3>
+                        </div>
+                    </a> 
 
 
                 </div>
@@ -644,7 +650,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     ?>
                 </div>
-                
+
+
+                <div class="table_body" style="Display:none;" id="table_present_all_days">
+                    <?php
+                    $sql = "SELECT user.FirstName, user.LastName, user.Affiliation, user.Position, user.Email, user.ContactNo, 
+                            attendance.day, attendance.status, eventParticipants.participant_id, eventParticipants.event_id
+                            FROM eventParticipants 
+                            INNER JOIN user ON eventParticipants.UserID = user.UserID
+                            LEFT JOIN attendance ON attendance.participant_id = eventParticipants.participant_id 
+                            WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)
+                            ORDER BY user.FirstName, user.LastName, attendance.day";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("s", $eventTitle);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows > 0) {
+                        $participants = [];
+
+                        // Organize participant data
+                        while ($row = $result->fetch_assoc()) {
+                            $participantId = $row['participant_id'];
+
+                            // Initialize if not already
+                            if (!isset($participants[$participantId])) {
+                                $participants[$participantId] = [
+                                    'fullName' => htmlspecialchars($row['FirstName']) . ' ' . htmlspecialchars($row['LastName']),
+                                    'affiliation' => htmlspecialchars($row['Affiliation']),
+                                    'position' => htmlspecialchars($row['Position']),
+                                    'email' => htmlspecialchars($row['Email']),
+                                    'contactNo' => htmlspecialchars($row['ContactNo']),
+                                    'attendance' => []
+                                ];
+                            }
+
+                            // Track attendance
+                            if ($row['day'] && $row['status'] === 'present') {
+                                $participants[$participantId]['attendance'][] = (int)$row['day'];
+                            }
+                        }
+
+                        // Display participants
+                        foreach ($participants as $participantId => $data) {
+                            $numPresentDays = count($data['attendance']);
+                            $isPresentAllDays = ($numPresentDays === $numDays); // Check if present on all days
+                    ?>
+
+                    <?php if ($isPresentAllDays): ?>
+                    <form action='' method='POST' onsubmit="return confirmAttendance(this);">
+                        <ul>
+                            <li>
+                                <div class="item">
+                                    <!-- Participant Information -->
+                                    <div class="name">
+                                        <span><?php echo $data['fullName']; ?></span>
+                                    </div>
+                                    <div class="department">
+                                        <span><?php echo $data['affiliation'] . ' '; ?></span>
+                                    </div>
+                                    <div class="department">
+                                        <span><?php echo $data['position'] . ' '; ?></span>
+                                    </div>
+                                    <div class="info">
+                                        <span><?php echo $data['email'] . ' '; ?></span>
+                                    </div>
+                                    <div class="phone">
+                                        <span><?php echo $data['contactNo'] . ' '; ?></span>
+                                    </div>
+                                    
+                                    <!-- Attendance Information -->
+                                    <div class="attendance-summary">
+                                        <div class="days-present">
+                                            
+                                                <span>Present on all <?php echo $numDays; ?> days</span>
+                                            
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                    <?php endif; ?>
+                    <?php
+                        }
+                    } else {
+                        echo "No participants found for the specified event.";
+                    }
+                    ?>
+                </div>
+            
             </div>
 
 
@@ -662,8 +759,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     document.getElementById('table_main').style.display = 'block'; 
                     document.getElementById('table').style.display = 'none'; 
+                    document.getElementById('table_present_all_days').style.display = 'none'; 
                 });
+            </script>
 
+            <script>
+                // Function to hide attendance details when the "Participants" button is clicked
+                document.getElementById("viewAllDaysPresent").addEventListener("click", function() {
+                    var attendanceDetails = document.querySelectorAll('.attendance-details');
+                    attendanceDetails.forEach(function(detail) {
+                        detail.style.display = 'none';
+                    });
+
+                    document.getElementById('table_main').style.display = 'none'; 
+                    document.getElementById('table').style.display = 'none'; 
+                    document.getElementById('table_present_all_days').style.display = 'block'; 
+                });
             </script>
 
             <script>
@@ -692,6 +803,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     document.getElementById('table_main').style.display = 'none'; 
                     document.getElementById('table').style.display = 'block'; 
+                    document.getElementById('table_present_all_days').style.display = 'none'; 
 
                 } else {
                     // Hide elements when no filter is applied
@@ -716,62 +828,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </script>
 
             <script>
-                function filterByDay() {
-                    var presentDayFilter = document.getElementById("present_day_filter");
-                    var absentDayFilter = document.getElementById("absent_day_filter");
+        function filterByDay() {
+            var presentDayFilter = document.getElementById("present_day_filter");
+            var absentDayFilter = document.getElementById("absent_day_filter");
 
-                    // Check if the "Present" filter is changed
-                    presentDayFilter.addEventListener('change', function() {
-                        if (presentDayFilter.value !== "") {
-                            absentDayFilter.value = ""; // Reset the Absent filter to "All Days"
-                        }
-                        applyFilter(); // Apply the filter logic
-                    });
-
-                    // Check if the "Absent" filter is changed
-                    absentDayFilter.addEventListener('change', function() {
-                        if (absentDayFilter.value !== "") {
-                            presentDayFilter.value = ""; // Reset the Present filter to "All Days"
-                        }
-                        applyFilter(); // Apply the filter logic
-                    });
-
-                    // Initial filter application
-                    applyFilter();
+            // Check if the "Present" filter is changed
+            presentDayFilter.addEventListener('change', function() {
+                if (presentDayFilter.value !== "") {
+                    absentDayFilter.value = ""; // Reset the Absent filter to "All Days"
                 }
+                applyFilter(); // Apply the filter logic
+            });
 
-                // Function to filter participants based on current filter values
-                function applyFilter() {
-                    var presentDay = document.getElementById("present_day_filter").value; // Get the selected day for present
-                    var absentDay = document.getElementById("absent_day_filter").value; // Get the selected day for absent
-                    var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
-
-                    participants.forEach(function(participant) {
-                        var participantDay = participant.querySelector("input[name='attendance_day']"); // Get attendance day
-                        var statusButtons = participant.querySelectorAll("button[name='status']");
-
-                        var isPresent = false;
-                        var isAbsent = false;
-
-                        // Determine the status of the participant
-                        statusButtons.forEach(function(button) {
-                            if (button.value === "present" && button.classList.contains("active")) {
-                                isPresent = true;
-                            } else if (button.value === "absent" && button.classList.contains("active")) {
-                                isAbsent = true;
-                            }
-                        });
-
-                        // Show or hide based on filter conditions
-                        if ((presentDay === "" || (isPresent && participantDay && participantDay.value == presentDay)) &&
-                            (absentDay === "" || (isAbsent && participantDay && participantDay.value == absentDay))) {
-                            participant.style.display = 'block'; // Show if matches present and absent conditions
-
-                        } else {
-                            participant.style.display = 'none'; // Hide if conditions don't match
-                        }
-                    });
+            // Check if the "Absent" filter is changed
+            absentDayFilter.addEventListener('change', function() {
+                if (absentDayFilter.value !== "") {
+                    presentDayFilter.value = ""; // Reset the Present filter to "All Days"
                 }
+                applyFilter(); // Apply the filter logic
+            });
+
+            // Initial filter application
+            applyFilter();
+        }
+
+        // Function to filter participants based on current filter values
+        function applyFilter() {
+            var presentDay = document.getElementById("present_day_filter").value; // Get the selected day for present
+            var absentDay = document.getElementById("absent_day_filter").value; // Get the selected day for absent
+            var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
+
+            participants.forEach(function(participant) {
+                var participantDay = participant.querySelector("input[name='attendance_day']"); // Get attendance day
+                var statusButtons = participant.querySelectorAll("button[name='status']");
+
+                var isPresent = false;
+                var isAbsent = false;
+
+                // Determine the status of the participant
+                statusButtons.forEach(function(button) {
+                    if (button.value === "present" && button.classList.contains("active")) {
+                        isPresent = true;
+                    } else if (button.value === "absent" && button.classList.contains("active")) {
+                        isAbsent = true;
+                    }
+                });
+
+                // Show or hide based on filter conditions
+                if ((presentDay === "" || (isPresent && participantDay && participantDay.value == presentDay)) &&
+                    (absentDay === "" || (isAbsent && participantDay && participantDay.value == absentDay))) {
+                    participant.style.display = 'block'; // Show if matches present and absent conditions
+
+                } else {
+                    participant.style.display = 'none'; // Hide if conditions don't match
+                }
+            });
+}
             </script>
 
             
