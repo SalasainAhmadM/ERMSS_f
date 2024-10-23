@@ -210,7 +210,7 @@ $canceledEventsCount = countCanceledEvents($conn);
                                 <th>Event Date</th>
                                 <th>Event Time</th>
                                 <th>Reason</th>
-                                <th colspan="3">Action</th>
+                                <!-- <th colspan="3">Action</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -227,7 +227,7 @@ $canceledEventsCount = countCanceledEvents($conn);
                                     echo "<td>" . date("F j, Y", strtotime($row['date_start'])) . " - " . date("F j, Y", strtotime($row['date_end'])) . "</td>";
                                     echo "<td>" . date("h:i a", strtotime($row['time_start'])) . " - " . date("h:i a", strtotime($row['time_end'])) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['cancel_reason']) . "</td>";
-                                    echo "<td><a href='view_cancel.php?event_id=" . $row['event_id'] . "'><button class='btn_edit'><i class='fa-solid fa-eye'></i></button></a></td>";
+                                    // echo "<td><a href='view_cancel.php?event_id=" . $row['event_id'] . "'><button class='btn_edit'><i class='fa-solid fa-eye'></i></button></a></td>";
                                     echo "</tr>";
                                 }
                             } else {
