@@ -370,25 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <h3>Participants</h3>
                             <span><?php echo $totalParticipants; ?></span>
                         </div>
-                    </a>
-
-                    <!-- <a href="#" class="box" id="viewPresent">
-                        <i class="fa-solid fa-person-running"></i>
-                        <div>
-                            <h3>Present</h3>
-                            <span><?php echo $totalPresent; ?></span>
-                        </div>
-                    </a>
-
-                    <a href="#" class="box" id="viewAbsent">
-                        <i class="fa-solid fa-user-xmark"></i>
-                        <div>
-                            <h3>Absent</h3>
-                            <span><?php echo $totalAbsent; ?></span>
-                        </div>
-                    </a> -->
-
-                    
+                    </a>            
 
                     <!-- Filter for Present -->
                     <a href="#" class="box" id="viewParticipants">
@@ -421,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </section>
 
-            <button class="aButton"  onclick="filterAttendance()">Attendance</button>
+            <!-- <button class="aButton"  onclick="filterAttendance()">Attendance</button> -->
 
             <div class="table_wrap">
                 <div class="table_header">
@@ -734,12 +716,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </script>
 
             <script>
-                // Function to filter participants by selected day for both Present and Absent
                 function filterByDay() {
+                    var presentDayFilter = document.getElementById("present_day_filter");
+                    var absentDayFilter = document.getElementById("absent_day_filter");
+
+                    // Check if the "Present" filter is changed
+                    presentDayFilter.addEventListener('change', function() {
+                        if (presentDayFilter.value !== "") {
+                            absentDayFilter.value = ""; // Reset the Absent filter to "All Days"
+                        }
+                        applyFilter(); // Apply the filter logic
+                    });
+
+                    // Check if the "Absent" filter is changed
+                    absentDayFilter.addEventListener('change', function() {
+                        if (absentDayFilter.value !== "") {
+                            presentDayFilter.value = ""; // Reset the Present filter to "All Days"
+                        }
+                        applyFilter(); // Apply the filter logic
+                    });
+
+                    // Initial filter application
+                    applyFilter();
+                }
+
+                // Function to filter participants based on current filter values
+                function applyFilter() {
                     var presentDay = document.getElementById("present_day_filter").value; // Get the selected day for present
                     var absentDay = document.getElementById("absent_day_filter").value; // Get the selected day for absent
                     var participants = document.querySelectorAll('.table_body ul li'); // Get all participant elements
-                    var statusDetails = document.querySelectorAll('.status');
 
                     participants.forEach(function(participant) {
                         var participantDay = participant.querySelector("input[name='attendance_day']"); // Get attendance day
