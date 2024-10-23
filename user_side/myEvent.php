@@ -46,8 +46,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
         $stmtDelete->bind_param("ii", $eventId, $UserID);
 
         if ($stmtDelete->execute()) {
-            // Deletion successful
-            echo "<script>alert('Successfully canceled the event!'); window.location.href='userDashboard.php';</script>";
+            echo "
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.10/dist/sweetalert2.all.min.js'></script>
+            <script>
+        Swal.fire({
+            title: 'Success!',
+            text: 'Successfully Cancelled!',
+            icon: 'success',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'userDashboard.php'; 
+            }
+        });
+    </script>";
         } else {
             // Deletion failed
             echo "<script>alert('Failed to cancel the event. Please try again.'); window.location.href='userDashboard.php';</script>";
@@ -63,6 +77,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
     }
 }
 
+?>
+<?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'userDashboard.php'; 
+            }
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Error!',
+            text: '" . $_SESSION['error'] . "',
+            icon: 'error',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'userDashboard.php'; 
+            }
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -210,46 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
 
 
             <div class="containerr">
-                <!--========= all event start =============-->
-
-                <!-- <section class="category">
-
-                    <div class="box-container">
-
-                        <a href="#" class="box">
-                            <i class="fa-solid fa-child"></i>
-                            <div>
-                                <h3>Total</h3>
-                                <span>50 Particpants</span>
-                            </div>
-                        </a>
-
-                        <a href="#" class="box">
-                            <i class="fa-solid fa-person-running"></i>
-                            <div>
-                                <h3>Attendees</h3>
-                                <span>45 Participants</span>
-                            </div>
-                        </a>
-
-                        <a href="#" class="box">
-                            <i class="fa-solid fa-user-xmark"></i>
-                            <div>
-                                <h3>Absentees</h3>
-                                <span>5 Participants</span>
-                            </div>
-                        </a>
-
-                        <a href="#" class="box">
-                            <i class="fa-solid fa-qrcode"></i>
-                            <div>
-                                <h3>Generate QR</h3>
-                                <span>For Attendance</span>
-                            </div>
-                        </a>
-                    </div>
-                </section> -->
-
+            
                 <section class="event-details">
 
                     <h1 class="heading">event details</h1>
@@ -286,16 +298,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                             </ul>    
                         </div>
 
-
-                        <!-- <form action="" method="post" class="flex-btn">
-                            <a href="applyEvent.php" class="btn">Join Event</a>
-                        </form> -->
-                        <!-- <form action="" method="post" class="flex-btn" id="cancelEventForm">
-                            <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
-                            <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
-                        </form> -->
-                        
-
                         <!-- Cancel Event Form -->
                         <form action="" method="post" class="flex-btn" id="cancelEventForm">
                             <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
@@ -303,101 +305,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                         </form>
 
                         <!-- Cancel Event Button -->
-                        <?php if ($_SESSION['event_data']['eventStatus'] !== 'Ongoing') : ?>
+                         <?php if ($_SESSION['event_data']['eventStatus'] !== 'Ongoing') : ?>
                             <form action="" method="post" class="flex-btn" id="cancelEventBtn">
                                 <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                                 <button type="submit" name="cancel_event" class="btn">Cancel Event</button>
                             </form>
-
-
                             <script>
-                                document.getElementById('cancelEventBtn').addEventListener('click', function() {
-                                    Swal.fire({
-                                        title: 'Are you sure you want to cancel the event?',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'Yes, cancel it!',
-                                        cancelButtonText: 'No, keep it',
-                                        padding: '3rem',
-                                        customClass: {
-                                            popup: 'larger-swal'
-                                        }
-                                    }).then((result) => {
+                            document.getElementById('cancelEventBtn').addEventListener('click', function(e) {
+                                e.preventDefault(); // Prevent the form from submitting automatically
+                                 Swal.fire({
+                                    title: 'Are you sure you want to cancel the event?',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, cancel it!',
+                                    cancelButtonText: 'No, keep it',
+                                    padding: '3rem'
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    } }).then((result) => {
                                         if (result.isConfirmed) {
                                             // If confirmed, submit the form
                                             document.getElementById('cancelEventForm').submit();
                                         }
                                     });
                                 });
-
                             </script>
                         <?php endif; ?>
+
 
 
                     </div>
 
                 </section>
-                <!-- view event ends-->
-                
-
-                <!-- ALL EVENTS TABULAR FORM-->
-                <!-- <div class="event-table">
-                    <div class="tbl-container">
-                        <h2>ATTENDANCE</h2>
-                        <div class="tbl-wrapper">
-                            <table class="tbl">
-                                <thead>
-                                    <tr>
-                                        <th>Event Time</th>
-                                        <th>Status</th>
-                                        <th>Day 1 March 2, 2024</th>
-                                        <th>Day 2 March 2, 2024</th>
-                                        <th>Day 3 March 2, 2024</th>
-                                        
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr>
-                                        <td data-label="Event Time">1:00pm - 2:pm</td>
-                                        <td data-label="Status">Ongoing</td>
-                                        <td data-label="View Details" class="pad">
-                                            <a href="view_event.php"><button class="btn_edit">Present</button></a>
-                                        </td>
-                                        <td data-label="View Details" class="pad">
-                                            <a href="view_event.php"><button class="btn_edit">Present</button></a>
-                                        </td>
-                                        <td data-label="View Details" class="pad">
-                                            <a href="view_event.php"><button class="btn_edit">Present</button></a>
-                                        </td>
-                                        
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                    </div>
-                </div> -->
-
-                
+      
                 <!-- ============all event ends ========-->
             </div>
         </div>
 
 
 
-        
-       
-        
-
-        
-
-
         <!-- CONFIRM DELETE -->
-        <script src=js/deleteEvent.js></script>
+        <!-- <script src=js/deleteEvent.js></script> -->
             
 
         <!--JS -->

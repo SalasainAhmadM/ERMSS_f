@@ -10,8 +10,7 @@ $countCancelledEventsRow = mysqli_fetch_assoc($countCancelledEventsResult);
 $totalCancelledEvents = $countCancelledEventsRow['totalCancelledEvents'];
 
 // Fetch total participants for the specified event title
-$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
-                          WHERE event_id = ?";
+$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants WHERE event_id = ?";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
 $totalParticipantsStmt->bind_param("i", $eventId);
 $totalParticipantsStmt->execute();
@@ -35,16 +34,15 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../db.connection/connection.php');
 
-    // Check if UserID is set in the session
     if (isset($_SESSION['UserID'])) {
         $UserID = $_SESSION['UserID'];
         $eventId = isset($_POST['event_id']) ? $_POST['event_id'] : null;
 
-        // Check if the total number of participants has reached the participant limit
         if ($totalParticipants >= $participantLimit) {
-            // Participant limit reached, display a message and redirect
-            echo "<script>alert('Sorry, the participant limit for this event has been reached. You cannot join at the moment.'); window.location.href='userDashboard.php';</script>";
-            exit(); // Stop further execution
+            // Participant limit reached, store an error message in the session
+            $_SESSION['error'] = 'Sorry, the participant limit for this event has been reached. You cannot join at the moment.';
+            header("Location: view_event.php?event_id=$eventId");
+            exit();
         }
 
         // Fetch event details to check status
@@ -84,19 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($resultCheck->num_rows > 0) {
                     // User has already joined this event
-                    echo "<script>alert('You have already joined this event!'); window.location.href='userDashboard.php';</script>";
+                    $_SESSION['error'] = 'You have already joined this event!';
                 } else {
-                    // Prepare and execute a query to insert data into EventParticipants table
+                    // Insert into EventParticipants table
                     $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
                     $stmtInsert = $conn->prepare($sqlInsert);
                     $stmtInsert->bind_param("ii", $eventId, $UserID);
 
                     if ($stmtInsert->execute()) {
-                        // Insertion successful
-                        echo "<script>alert('Successfully joined the event!'); window.location.href='userDashboard.php';</script>";
+                        // Successful insertion
+                        $_SESSION['success'] = 'Successfully joined the event!';
                     } else {
                         // Insertion failed
-                        echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='userDashboard.php';</script>";
+                        $_SESSION['error'] = 'Failed to join the event. Please try again.';
                     }
 
                     $stmtInsert->close();
@@ -104,22 +102,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $stmtCheck->close();
             } else {
-                // Event is not upcoming, display a message and redirect
-                echo "<script>alert('Unfortunately, participation in this event is no longer available as it has already commenced.'); window.location.href='userDashboard.php';</script>";
+                // Event is not upcoming
+                $_SESSION['error'] = 'Unfortunately, participation in this event is no longer available as it has already commenced.';
             }
         } else {
             // Event details not found
-            echo "<script>alert('Event details not found.'); window.location.href='userDashboard.php';</script>";
+            $_SESSION['error'] = 'Event details not found.';
         }
 
         $stmtEventDetails->close();
+        header("Location: view_event.php?event_id=$eventId");
+        exit();
     } else {
-        // Redirect to login page or handle the case where UserID is not set in the session
+        // Redirect to login page if UserID is not set in session
         header("Location: login.php");
         exit();
     }
 }
 ?>
+
 
 
 
@@ -185,6 +186,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         ?>
+<?php
+if (isset($_SESSION['success'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'userDashboard.php'; 
+            }
+        });
+    </script>";
+    unset($_SESSION['success']);
+}
+
+if (isset($_SESSION['error'])) {
+    echo "<script>
+        Swal.fire({
+            title: 'Error!',
+            text: '" . $_SESSION['error'] . "',
+            icon: 'error',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'userDashboard.php'; 
+            }
+        });
+    </script>";
+    unset($_SESSION['error']);
+}
+?>
 
         <!--=========== SIDEBAR =============-->
         <div class="sidebar">

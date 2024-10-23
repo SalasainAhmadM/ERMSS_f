@@ -21,7 +21,18 @@
 
         <link rel="stylesheet" href="css/main.css">
     </head>
-
+    <style>
+    .sponsorRow {
+        display: flex;
+        gap: 3px;
+    }
+    .sponsor_firstName, .sponsor_lastName {
+        width: 45%;
+    }
+    .sponsor_MI {
+        width: 8%;
+    }
+    </style>
     <body>
     <?php
 if (isset($_SESSION['success'])) {
@@ -274,7 +285,56 @@ if (isset($_SESSION['error'])) {
                             <label>Time End</label>
                             <input type="time" class="input" name="time_end" id="timeEnd" required>
                         </div>  
+                        <div class="input_field">
+    <label>Sponsors</label>
+    <button type="button" class="addSponsorBtn" onclick="showSponsorField()">Add Sponsor</button>
+</div>
 
+<!-- Sponsor Input Fields (initially hidden) -->
+<div class="input_field" id="sponsorField1" style="display:none;">
+    <label>Sponsor 1</label>
+    <div class="sponsorRow">
+        <input type="text" class="input sponsor_firstName" name="sponsor1_firstName" placeholder="First Name">
+        <input type="text" class="input sponsor_MI" name="sponsor1_MI" placeholder="MI">
+        <input type="text" class="input sponsor_lastName" name="sponsor1_lastName" placeholder="Last Name">
+    </div>
+</div>
+
+<div class="input_field" id="sponsorField2" style="display:none;">
+    <label>Sponsor 2</label>
+    <div class="sponsorRow">
+        <input type="text" class="input sponsor_firstName" name="sponsor2_firstName" placeholder="First Name">
+        <input type="text" class="input sponsor_MI" name="sponsor2_MI" placeholder="MI">
+        <input type="text" class="input sponsor_lastName" name="sponsor2_lastName" placeholder="Last Name">
+    </div>
+</div>
+
+<div class="input_field" id="sponsorField3" style="display:none;">
+    <label>Sponsor 3</label>
+    <div class="sponsorRow">
+        <input type="text" class="input sponsor_firstName" name="sponsor3_firstName" placeholder="First Name">
+        <input type="text" class="input sponsor_MI" name="sponsor3_MI" placeholder="MI">
+        <input type="text" class="input sponsor_lastName" name="sponsor3_lastName" placeholder="Last Name">
+    </div>
+</div>
+
+<div class="input_field" id="sponsorField4" style="display:none;">
+    <label>Sponsor 4</label>
+    <div class="sponsorRow">
+        <input type="text" class="input sponsor_firstName" name="sponsor4_firstName" placeholder="First Name">
+        <input type="text" class="input sponsor_MI" name="sponsor4_MI" placeholder="MI">
+        <input type="text" class="input sponsor_lastName" name="sponsor4_lastName" placeholder="Last Name">
+    </div>
+</div>
+
+<div class="input_field" id="sponsorField5" style="display:none;">
+    <label>Sponsor 5</label>
+    <div class="sponsorRow">
+        <input type="text" class="input sponsor_firstName" name="sponsor5_firstName" placeholder="First Name">
+        <input type="text" class="input sponsor_MI" name="sponsor5_MI" placeholder="MI">
+        <input type="text" class="input sponsor_lastName" name="sponsor5_lastName" placeholder="Last Name">
+    </div>
+</div>
                         <div class="input_field">
                             <input type="submit" value="Create" class="createBtn">
                         </div>
@@ -284,6 +344,19 @@ if (isset($_SESSION['error'])) {
             </div>            
         </div>
 
+        <script>
+    let sponsorCount = 0;
+
+function showSponsorField() {
+    sponsorCount++;
+    if (sponsorCount <= 5) {
+        document.getElementById('sponsorField' + sponsorCount).style.display = 'block';
+    }
+    if (sponsorCount === 5) {
+        document.querySelector('.addSponsorBtn').disabled = true;  // Disable button after 5 sponsors
+    }
+}
+</script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {

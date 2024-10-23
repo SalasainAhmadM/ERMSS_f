@@ -1257,7 +1257,7 @@ section{
 }
 
 .wrapper form .input_field .input,
-.wrapper form .input_field .textarea{
+.wrapper form .input_field .textarea, .addSponsorBtn{
     width: 100%;
     outline: none;
     border: var(--border);

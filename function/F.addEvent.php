@@ -177,6 +177,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
     if ($stmt->execute()) {
+        for ($i = 1; $i <= 5; $i++) {
+            $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
+            $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
+            $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
+
+            if ($sponsorFirstName && $sponsorLastName) {
+                $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                               VALUES (?, ?, ?, ?)";
+                $sponsorStmt = $conn->prepare($sponsorSql);
+                $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                $sponsorStmt->execute();
+                $sponsorStmt->close();
+            }
+        }
         if ($Role == 'superadmin') {
             $_SESSION['success'] = 'Event successfully created!';
         } elseif ($Role == 'Admin') {

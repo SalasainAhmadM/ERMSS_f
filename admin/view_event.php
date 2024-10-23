@@ -2,6 +2,18 @@
 session_start();
 include('../function/F.event_retrieve.php');
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
+// Fetch sponsors for the event
+$sponsorsSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
+$sponsorsStmt = $conn->prepare($sponsorsSql);
+$sponsorsStmt->bind_param("i", $eventId);
+$sponsorsStmt->execute();
+$sponsorsResult = $sponsorsStmt->get_result();
+
+$sponsors = [];
+while ($row = $sponsorsResult->fetch_assoc()) {
+    $sponsors[] = $row;
+}
+$sponsorsStmt->close();
 
 $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
                           WHERE event_id IN (SELECT event_id FROM Events WHERE event_title = ?)";
@@ -81,22 +93,26 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                                 <li>Event Mode: <?php echo $_SESSION['event_data']['eventMode']; ?></li>
                                 <?php if ($_SESSION['event_data']['eventMode'] !== 'Face-to-Face') : ?>
                                     <li>Event link: <a href="<?php echo $_SESSION['event_data']['eventLink']; ?>" target="_blank"><?php echo $_SESSION['event_data']['eventLink']; ?></a></li>
-                                <?php endif; ?>
-                                <?php if ($_SESSION['event_data']['eventMode'] === 'Hybrid' || $_SESSION['event_data']['eventMode'] === 'Face-to-Face') : ?>
-                                <li>Location: <?php echo $_SESSION['event_data']['eventLocation']; ?></li>
-                                <?php endif; ?>
-                                <li>Status: <?php echo $_SESSION['event_data']['eventStatus']; ?></li>
-
+                                    <?php endif; ?>
+                                    <?php if ($_SESSION['event_data']['eventMode'] === 'Hybrid' || $_SESSION['event_data']['eventMode'] === 'Face-to-Face') : ?>
+                                        <li>Location: <?php echo $_SESSION['event_data']['eventLocation']; ?></li>
+                                        <?php endif; ?>
+                                    <li>Status: <?php echo $_SESSION['event_data']['eventStatus']; ?></li>
                                 <li>Participants: <?php echo $participantRatio; ?> </li>
-                            </ul>    
+
+                                <?php if (!empty($sponsors)) : ?>
+                                    <li><h4>Sponsors:</h4>
+                                    <ul>
+                                        <?php foreach ($sponsors as $sponsor): ?>
+                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . ($sponsor['sponsor_MI'] ? $sponsor['sponsor_MI'] . '. ' : '') . $sponsor['sponsor_lastName']; ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </li>
+                                <?php endif; ?>
+                            </ul>
                         </div>
 
 
-                        <!-- <form action="applyEvent.php?event_id=<?php echo $eventId; ?>" method="post" class="flex-btn">
-                            <button type="submit" class="btn">Add Participant</button>
-                            
-                            <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>" class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>
-                        </form> -->
 
                         <div class="flex-btn">
                             <a href="applyEvent.php?event_id=<?php echo $eventId; ?>" class="btn">Add Participant</a>
