@@ -1,5 +1,5 @@
 <?php
-session_start(); 
+session_start();
 
 require_once('db.connection/connection.php');
 require 'PHPMailer/src/Exception.php';
@@ -9,90 +9,133 @@ require 'PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$alertMessage = ''; 
+$alertMessage = '';
 
 if (isset($_POST['submit'])) {
     $email = $_POST['Email'];
 
-    $query = "SELECT Email FROM user WHERE Email = ? 
-    UNION 
-    SELECT Email FROM pendinguser WHERE Email = ? 
-    UNION 
-    SELECT Email FROM admin WHERE Email = ?";
+    // Query to search the email in all relevant tables
+    $query = "
+        SELECT Email, 'active' AS status FROM user WHERE Email = ? 
+        UNION 
+        SELECT Email, 'pending' AS status FROM pendinguser WHERE Email = ? 
+        UNION 
+        SELECT Email, 'admin' AS status FROM admin WHERE Email = ?";
+
     $stmt = $conn->prepare($query);
     $stmt->bind_param("sss", $email, $email, $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // User found, proceed with sending the reset link
-        $token = bin2hex(random_bytes(32)); // Generate a token
-        $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes')); // Token expiry time
+        $row = $result->fetch_assoc();
 
-        // Insert the token into the password_reset_tokens table
-        $insertTokenQuery = "INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($insertTokenQuery);
-        $stmt->bind_param("sss", $email, $token, $expiresAt);
-        $stmt->execute();
-
-        // PHPMailer initialization
-        $mail = new PHPMailer(true);
-
-        try {
-            // Server settings
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com'; // Set your SMTP server
-            $mail->SMTPAuth = true;
-            $mail->Username = 'eventmanagement917@gmail.com'; // Your email
-            $mail->Password = 'meapvvmlkmiccnjx'; // Your email password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
-
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
-
-            // Email settings
-            $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
-            $mail->addAddress($email);
-
-            $mail->isHTML(true);
-            $mail->Subject = 'Reset your password';
-            $mail->Body = "
-                <h3>Reset Password Request</h3>
-                <p>We received a request to reset your password. Click the link below to reset it:</p>
-                <a href='http://localhost/ERMSS_f/resetPass.php?token=$token'>Reset Password</a>
-                <p>If you did not request a password reset, please ignore this email.</p>
-            ";
-
-            $mail->send();
-
-            $alertMessage = "
-                <script>
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Password reset link has been sent to your email.',
-                        icon: 'success'
-                    });
-                </script>
-            ";
-        } catch (Exception $e) {
-         
+        // Check if the email belongs to a pending user
+        if ($row['status'] === 'pending') {
             $alertMessage = "
                 <script>
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Message could not be sent. Mailer Error: " . $mail->ErrorInfo . "',
-                        icon: 'error'
+                        text: 'This email is pending approval. Please wait for confirmation.',
+                        icon: 'warning'
                     });
                 </script>
             ";
+        } else {
+            // Proceed with password reset for active or admin users
+            $token = bin2hex(random_bytes(32)); // Generate token
+            $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes')); // Expiry time
+
+            // Insert token into the password_reset_tokens table
+            try {
+                $insertTokenQuery = "INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($insertTokenQuery);
+                $stmt->bind_param("sss", $email, $token, $expiresAt);
+                $stmt->execute();
+
+                // Initialize PHPMailer
+                $mail = new PHPMailer(true);
+
+                // SMTP server settings
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'eventmanagement917@gmail.com';
+                $mail->Password = 'meapvvmlkmiccnjx';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                $mail->SMTPOptions = array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                );
+
+                // Email settings
+                $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
+                $mail->addAddress($email);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Reset your password';
+                $mail->Body = "
+                    <h3>Reset Password Request</h3>
+                    <p>We received a request to reset your password. Click the link below to reset it:</p>
+                    <a href='http://localhost/ERMSS_f/resetPass.php?token=$token'>Reset Password</a>
+                    <p>If you did not request a password reset, please ignore this email.</p>
+                ";
+
+                $mail->send();
+
+                $alertMessage = "
+                    <script>
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Password reset link has been sent to your email.',
+                            icon: 'success'
+                        });
+                    </script>
+                ";
+            } catch (mysqli_sql_exception $e) {
+                // Handle duplicate entry error for token insertion
+                if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                    $alertMessage = "
+                        <script>
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'A reset link has already been generated for this email. Please check your inbox.',
+                                icon: 'error'
+                            });
+                        </script>
+                    ";
+                } else {
+                    // Handle other SQL errors
+                    $alertMessage = "
+                        <script>
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred: " . $e->getMessage() . "',
+                                icon: 'error'
+                            });
+                        </script>
+                    ";
+                }
+            } catch (Exception $e) {
+                // Handle PHPMailer errors
+                $alertMessage = "
+                    <script>
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Message could not be sent. Mailer Error: " . $mail->ErrorInfo . "',
+                            icon: 'error'
+                        });
+                    </script>
+                ";
+            }
         }
     } else {
+        // Email not found in any table
         $alertMessage = "
             <script>
                 Swal.fire({
@@ -103,11 +146,15 @@ if (isset($_POST['submit'])) {
             </script>
         ";
     }
+
+    // Display alert message
+    echo $alertMessage;
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,13 +164,46 @@ if (isset($_POST['submit'])) {
 
     <!-- browser icon-->
     <link rel="icon" href="assets/img/wesmaarrdec.jpg" type="image/png">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- remixicons-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css" />
 
     <title>Forget Password | Event Record Management</title>
 </head>
+<style>
+    .loader {
+        width: 90px;
+        height: 14px;
+        box-shadow: 0 3px 0 #fff;
+        display: none;
+        /* Initially hidden */
+        margin: 10px auto;
+        grid-area: 1/1;
+    }
+
+    .loader:before,
+    .loader:after {
+        content: "";
+        grid-area: 1/1;
+        background: radial-gradient(circle closest-side, var(--c, red) 92%, #0000) 0 0/calc(100%/4) 100%;
+        animation: l4 1s infinite linear;
+    }
+
+    .loader:after {
+        --c: #000;
+        background-color: #fff;
+        box-shadow: 0 -2px 0 0 #fff;
+        clip-path: inset(-2px calc(50% - 10px));
+    }
+
+    @keyframes l4 {
+        100% {
+            background-position: calc(100%/3) 0;
+        }
+    }
+</style>
 
 <body>
     <div class="container">
@@ -138,6 +218,8 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <input type="submit" value="Send Reset Link" name="submit" class="btn solid">
+                    <!-- Loader -->
+                    <div class="loader" id="loader"></div>
 
                     <div class="options">
                         <p class="social-text"><a href="index.php">Go Back</a></p>
@@ -154,10 +236,12 @@ if (isset($_POST['submit'])) {
             <div class="panel right-panel">
                 <div class="content">
                     <h3>Welcome to Event Management System!</h3>
-                    <p>Explore, join, and manage events seamlessly with our platform. Sign in to your account and be part of the vibrant WESMAARRDEC community. Collaborate on research events and stay informed about upcoming opportunities.</p>
+                    <p>Explore, join, and manage events seamlessly with our platform. Sign in to your account and be
+                        part of the vibrant WESMAARRDEC community. Collaborate on research events and stay informed
+                        about upcoming opportunities.</p>
                     <button class="btn transparent" id="sign-in-btn">Sign in</button>
                 </div>
-                
+
                 <img src="assets/img/wesmaarrdec-removebg-preview.png" class="image" alt="">
             </div>
         </div>
@@ -171,4 +255,5 @@ if (isset($_POST['submit'])) {
     <!-- font awesome kit -->
     <script src="https://kit.fontawesome.com/7b27fcfa62.js" crossorigin="anonymous"></script>
 </body>
+
 </html>

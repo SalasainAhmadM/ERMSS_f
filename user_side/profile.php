@@ -137,8 +137,8 @@ $canceledEventsCount = countCanceledEvents($conn);
                     <div class="tab__content" content id="update-profile">
                         <h3 class="tab__header">Update Profile</h3>
                         <div class="tab__body">
-                            <form id="profileForm" action="" method="POST" enctype="multipart/form-data"
-                                class="form grid">
+                            <form id="profileForm" action="update_profile.php" method="POST"
+                                enctype="multipart/form-data" class="form grid">
                                 <label for="photoUpload">Change Photo</label>
                                 <?php if (!empty($Image)): ?>
                                     <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" width="100"
@@ -254,7 +254,40 @@ $canceledEventsCount = countCanceledEvents($conn);
             reader.readAsDataURL(event.target.files[0]);
         }
     </script>
+    <!-- Include SweetAlert2 -->
+    <script src="assets/js/sweetalert2.js"></script>
 
+    <?php
+    // Display success message
+    if (isset($_SESSION['success'])) {
+        echo "<script>
+    Swal.fire({
+        title: 'Success!',
+        text: '" . $_SESSION['success'] . "',
+        icon: 'success',
+        customClass: {
+            popup: 'larger-swal' 
+        }
+    });
+    </script>";
+        unset($_SESSION['success']);  // Clear the message
+    }
+
+    // Display error message
+    if (isset($_SESSION['error'])) {
+        echo "<script>
+    Swal.fire({
+        title: 'Error!',
+        text: '" . $_SESSION['error'] . "',
+        icon: 'error',
+        customClass: {
+            popup: 'larger-swal' 
+        }
+    });
+    </script>";
+        unset($_SESSION['error']);  // Clear the message
+    }
+    ?>
     <!--JS -->
     <script src="js/eventscript.js"></script>
     <?php echo $alertMessage; ?>
