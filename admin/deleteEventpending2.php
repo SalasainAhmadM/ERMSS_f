@@ -4,7 +4,7 @@ require_once('../db.connection/connection.php');
 
 if (isset($_GET['event_id'])) {
     $eventId = intval($_GET['event_id']);
-    
+
     // Delete attendance records
     $deleteAttendanceSql = "DELETE FROM attendance WHERE participant_id IN (SELECT participant_id FROM eventparticipants WHERE event_id = ?)";
     if ($stmt = $conn->prepare($deleteAttendanceSql)) {
@@ -28,7 +28,17 @@ if (isset($_GET['event_id'])) {
         }
         $stmt->close();
     }
-
+    // Delete pending sponsors
+    $deletePendingSponsorsSql = "DELETE FROM pendingsponsor WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deletePendingSponsorsSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending sponsors!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
     // Delete the event
     $deleteEventSql = "DELETE FROM pendingevents WHERE event_id = ?";
     if ($stmt = $conn->prepare($deleteEventSql)) {
@@ -39,7 +49,7 @@ if (isset($_GET['event_id'])) {
             $_SESSION['error'] = 'Error deleting the event!';
         }
         $stmt->close();
-        redirectBasedOnRole($conn); 
+        redirectBasedOnRole($conn);
         exit;
     } else {
         $_SESSION['error'] = 'Failed to prepare the SQL statement!';
@@ -53,7 +63,8 @@ if (isset($_GET['event_id'])) {
 }
 
 
-function redirectBasedOnRole($conn) {
+function redirectBasedOnRole($conn)
+{
     if (isset($_SESSION['AdminID'])) {
         $AdminID = $_SESSION['AdminID'];
         $sqlAdmin = "SELECT Role FROM admin WHERE AdminID = ?";
@@ -66,11 +77,11 @@ function redirectBasedOnRole($conn) {
             $row = $resultAdmin->fetch_assoc();
             $Role = $row['Role'];
             if ($Role === 'superadmin') {
-                header('Location: eventsValidation2.php'); 
+                header('Location: eventsValidation2.php');
             } else if ($Role === 'Admin') {
-                header('Location: pendingEvents2.php'); 
+                header('Location: pendingEvents2.php');
             } else {
-                header('Location: adminDashboard.php'); 
+                header('Location: adminDashboard.php');
             }
         }
         $stmtAdmin->close();

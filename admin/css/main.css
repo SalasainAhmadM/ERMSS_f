@@ -1210,7 +1210,50 @@ section{
 
 
 
+.sponsorRow {
+    display: flex;
+    gap: 3px;
+}
 
+.sponsor_firstName,
+.sponsor_lastName {
+    width: 45%;
+}
+
+.sponsor_MI {
+    width: 8%;
+}
+
+.sponsorRow {
+    display: flex;
+    gap: 3px;
+}
+
+.sponsor_fields_container {
+    margin-bottom: 20px;
+}
+
+.input_field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.input {
+    width: 30%;
+}
+
+.deleteSponsorIcon {
+    color: #d9534f;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.deleteSponsorIcon:hover {
+    color: #c9302c;
+}
 
 
 /* =================== CREATE EVENT FORM START ==============*/
@@ -1257,7 +1300,7 @@ section{
 }
 
 .wrapper form .input_field .input,
-.wrapper form .input_field .textarea, .addSponsorBtn{
+.wrapper form .input_field .textarea, .addSponsorBtn , #addSponsorBtn{
     width: 100%;
     outline: none;
     border: var(--border);

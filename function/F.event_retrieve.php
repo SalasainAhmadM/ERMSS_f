@@ -11,8 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $event_id = isset($_GET['event_id']) ? intval($_GET['event_id']) : 0;
 
     if ($event_id > 0) {
-        $sql = "SELECT *, IF(event_cancel IS NULL OR event_cancel = '', '', event_cancel) AS cancel_status, cancelReason FROM Events WHERE event_id = $event_id";
-
+        // Query to get event details
+        $sql = "SELECT *, IF(event_cancel IS NULL OR event_cancel = '', '', event_cancel) AS cancel_status, cancelReason 
+                FROM Events 
+                WHERE event_id = $event_id";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -20,15 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $eventTitle = $row['event_title'];
                 $eventDesc = $row['event_description'];
                 $eventLocation = $row['location'];
-                $eventDateStart = date('F j, Y', strtotime($row['date_start'])); 
-                $eventDateEnd = date('F j, Y', strtotime($row['date_end'])); 
-                $eventTimeStart = date('h:ia', strtotime($row['time_start'])); 
-                $eventTimeEnd = date('h:ia', strtotime($row['time_end'])); 
+                $eventDateStart = date('F j, Y', strtotime($row['date_start']));
+                $eventDateEnd = date('F j, Y', strtotime($row['date_end']));
+                $eventTimeStart = date('h:ia', strtotime($row['time_start']));
+                $eventTimeEnd = date('h:ia', strtotime($row['time_end']));
                 $eventMode = $row['event_mode'];
                 $eventLink = $row['event_link'];
                 $eventType = $row['event_type'];
                 $eventPhoto = $row['event_photo_path'];
-                $eventCancel = $row['cancel_status']; // Use the cancel_status as event status
+                $eventCancel = $row['cancel_status'];
                 $cancelReason = $row['cancelReason'];
 
                 // Get current date and time in the event's timezone
@@ -39,10 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 // Check if the event is ongoing, upcoming, ended, or cancelled
                 $eventStatus = '';
-
                 if (!empty($eventCancel)) {
-                    // If event is cancelled, set event status to cancellation status
-                    $eventStatus = $eventCancel;
+                    $eventStatus = 'Cancelled';
                 } elseif ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
                     $eventStatus = 'Ongoing';
                 } elseif ($currentDateTime < $eventStartDateTime) {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     $eventStatus = 'Ended';
                 }
 
-                // Store retrieved data in session variables
+                // Store retrieved event data in session
                 $_SESSION['event_data'] = array(
                     'eventTitle' => $eventTitle,
                     'eventDesc' => $eventDesc,
@@ -65,9 +65,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'eventType' => $eventType,
                     'eventPhoto' => $eventPhoto,
                     'eventStatus' => $eventStatus,
-                    'cancelReason' => $cancelReason, // Include cancel reason in session data
+                    'cancelReason' => $cancelReason,
                 );
             }
+
+            // Query to get sponsors for the event
+            $sponsorSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName 
+                           FROM sponsor 
+                           WHERE event_id = $event_id";
+            $sponsorResult = $conn->query($sponsorSql);
+
+            if ($sponsorResult->num_rows > 0) {
+                // Store sponsor data in session
+                $sponsors = array();
+                while ($sponsorRow = $sponsorResult->fetch_assoc()) {
+                    $sponsors[] = $sponsorRow;
+                }
+                $_SESSION['event_data']['sponsors'] = $sponsors;
+            } else {
+                $_SESSION['event_data']['sponsors'] = [];
+            }
+
         } else {
             echo "No records found for the specified event_id";
         }

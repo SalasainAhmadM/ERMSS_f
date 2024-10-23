@@ -199,6 +199,7 @@ INSERT INTO `eventparticipants` (`participant_id`, `event_id`, `UserID`) VALUES
 
 CREATE TABLE `cancel_reason` (
   `cancel_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
   `UserID` int(15) NOT NULL,
   `description` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -211,11 +212,24 @@ CREATE TABLE `cancel_reason` (
 
 CREATE TABLE `sponsor` (
   `sponsor_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,   
+  `sponsor_firstName` varchar(255) NOT NULL,
+  `sponsor_MI` varchar(255) DEFAULT NULL,  
+  `sponsor_lastName` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `pendingsponsor`
+--
+
+CREATE TABLE `pendingsponsor` (
+  `sponsor_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,  
   `sponsor_firstName` varchar(255) NOT NULL,
   `sponsor_MI` varchar(255) DEFAULT NULL,  
   `sponsor_lastName` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -592,6 +606,12 @@ ALTER TABLE `sponsor`
   ADD PRIMARY KEY (`sponsor_id`);
 
 --
+-- Indexes for table `pendingsponsor`
+--
+ALTER TABLE `pendingsponsor`
+  ADD PRIMARY KEY (`sponsor_id`);
+
+--
 -- Indexes for table `cancel_reason `
 --
 ALTER TABLE `cancel_reason`
@@ -681,6 +701,12 @@ ALTER TABLE `sponsor`
   MODIFY `sponsor_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `pendingsponsor`
+--
+ALTER TABLE `pendingsponsor`
+  MODIFY `sponsor_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `cancel_reason`
 --
 ALTER TABLE `cancel_reason`
@@ -746,10 +772,17 @@ ALTER TABLE `sponsor`
   ADD CONSTRAINT `sponsor_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
 
 --
+-- Constraints for table `pendingsponsor`
+--
+ALTER TABLE `pendingsponsor`
+  ADD CONSTRAINT `pendingsponsor_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `pendingevents` (`event_id`);
+
+--
 -- Constraints for table `cancel_reason`
 --
 ALTER TABLE `cancel_reason`
-  ADD CONSTRAINT `cancel_reason_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`);
+  ADD CONSTRAINT `cancel_reason_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  ADD CONSTRAINT `cancel_reason_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`);
 
 --
 -- Constraints for table `eventparticipants`

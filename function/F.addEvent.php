@@ -2,7 +2,8 @@
 session_start();
 require_once('../db.connection/connection.php');
 
-function showProfileModal($message) {
+function showProfileModal($message)
+{
     echo "<script>
               showModal('$message');
           </script>";
@@ -17,7 +18,7 @@ function countPendingUsers($conn)
         $row = $result->fetch_assoc();
         return $row['totalPendingUsers'];
     } else {
-        return 0; 
+        return 0;
     }
 }
 
@@ -32,13 +33,14 @@ function countPendingEvents($conn)
         $row = $result->fetch_assoc();
         return $row['totalPendingEvents'];
     } else {
-        return 0; 
+        return 0;
     }
 }
 
 $pendingEventsCount = countPendingEvents($conn);
 
-function getAdminData($conn, $AdminID) {
+function getAdminData($conn, $AdminID)
+{
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $AdminID);
@@ -55,7 +57,7 @@ function getAdminData($conn, $AdminID) {
     }
 }
 
-$AdminID = $_SESSION['AdminID']; 
+$AdminID = $_SESSION['AdminID'];
 $adminData = getAdminData($conn, $AdminID);
 
 if ($adminData) {
@@ -69,13 +71,14 @@ if ($adminData) {
     $Affiliation = $adminData['Affiliation'];
     $Position = $adminData['Position'];
     $Image = isset($adminData['Image']) ? $adminData['Image'] : null;
-    $Role = $adminData['Role'];  
+    $Role = $adminData['Role'];
 } else {
     showProfileModal("Admin data not found");
     exit();
 }
 
-function generateUniqueEventID($conn) {
+function generateUniqueEventID($conn)
+{
     $sqlMaxEvents = "SELECT MAX(event_id) as maxEventID FROM events";
     $sqlMaxPendingEvents = "SELECT MAX(event_id) as maxPendingEventID FROM pendingevents";
 
@@ -98,10 +101,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventDateEnd = trim($_POST['date_end']);
     $eventTimeStart = trim($_POST['time_start']);
     $eventTimeEnd = trim($_POST['time_end']);
-    $participantLimit = isset($_POST['participant_limit']) ? (int)$_POST['participant_limit'] : 0;
+    $participantLimit = isset($_POST['participant_limit']) ? (int) $_POST['participant_limit'] : 0;
 
     $uploadDir = "../admin/img/eventPhoto/";
     $eventPhotoPath = "";
+
+    // Check for duplicate event title in 'events' table
+    $sqlCheckTitle = "SELECT * FROM events WHERE event_title = ? LIMIT 1";
+    $stmtCheckTitle = $conn->prepare($sqlCheckTitle);
+    $stmtCheckTitle->bind_param("s", $eventTitle);
+    $stmtCheckTitle->execute();
+    $resultCheckTitle = $stmtCheckTitle->get_result();
+
+    if ($resultCheckTitle->num_rows > 0) {
+        $_SESSION['error'] = 'An active event with this title already exists!';
+        header("Location: addEvent.php");
+        exit();
+    }
+
+    // Check for duplicate event title in 'pendingevents' table
+    $sqlCheckTitle = "SELECT * FROM pendingevents WHERE event_title = ? LIMIT 1";
+    $stmtCheckTitle = $conn->prepare($sqlCheckTitle);
+    $stmtCheckTitle->bind_param("s", $eventTitle);
+    $stmtCheckTitle->execute();
+    $resultCheckTitle = $stmtCheckTitle->get_result();
+
+    if ($resultCheckTitle->num_rows > 0) {
+        $_SESSION['error'] = 'A pending event with this title already exists!';
+        header("Location: addEvent.php");
+        exit();
+    }
 
     if (isset($_FILES['event_photo']) && $_FILES['event_photo']['error'] === UPLOAD_ERR_OK) {
         $photoTmpPath = $_FILES['event_photo']['tmp_name'];
@@ -111,16 +140,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $newPhotoName = uniqid('event_', true) . '.' . $photoExtension;
         $eventPhotoPath = $uploadDir . $newPhotoName;
 
-        if (move_uploaded_file($photoTmpPath, $eventPhotoPath)) {
-        } else {
+        if (!move_uploaded_file($photoTmpPath, $eventPhotoPath)) {
             echo "<script>alert('Error uploading event photo.');</script>";
             exit();
         }
-        
     }
 
     $eventLink = isset($_POST['zoom_link']) ? $_POST['zoom_link'] : '';
 
+    // Check if location is already occupied at the specified date and time
     $sqlCheckExisting = "SELECT * FROM events WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
     $stmtCheckExisting = $conn->prepare($sqlCheckExisting);
     $stmtCheckExisting->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
@@ -128,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultCheckExisting = $stmtCheckExisting->get_result();
 
     if ($resultCheckExisting->num_rows > 0) {
-        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events! ' . $stmt->error;
+        $_SESSION['error'] = 'Location venue is already occupied on this date in the current events!';
         header("Location: addEvent.php");
         exit();
     }
@@ -140,13 +168,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultCheckPending = $stmtCheckPending->get_result();
 
     if ($resultCheckPending->num_rows > 0) {
-        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events! ' . $stmt->error;
+        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events!';
         header("Location: addEvent.php");
-        exit(); 
+        exit();
     }
 
+    // Generate new unique event ID
     $newEventID = generateUniqueEventID($conn);
 
+    // Insert the event based on user role
     if ($Role == 'superadmin') {
         $sql = "INSERT INTO events (event_id, event_title, event_description, event_type, event_mode, location, date_start, date_end, time_start, time_end, participant_limit, event_photo_path, event_link) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -161,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
         "issssssssssss",
-        $newEventID,  
+        $newEventID,
         $eventTitle,
         $eventDescription,
         $eventType,
@@ -171,29 +201,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $eventDateEnd,
         $eventTimeStart,
         $eventTimeEnd,
-        $participantLimit, 
+        $participantLimit,
         $eventPhotoPath,
         $eventLink
     );
 
     if ($stmt->execute()) {
-        for ($i = 1; $i <= 5; $i++) {
-            $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
-            $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
-            $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
 
-            if ($sponsorFirstName && $sponsorLastName) {
-                $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
-                               VALUES (?, ?, ?, ?)";
-                $sponsorStmt = $conn->prepare($sponsorSql);
-                $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
-                $sponsorStmt->execute();
-                $sponsorStmt->close();
-            }
-        }
         if ($Role == 'superadmin') {
+            // Sponsor Insertion logic
+            for ($i = 1; $i <= 5; $i++) {
+                $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
+                $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
+                $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
+
+                if ($sponsorFirstName && $sponsorLastName) {
+                    $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                               VALUES (?, ?, ?, ?)";
+                    $sponsorStmt = $conn->prepare($sponsorSql);
+                    $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                    $sponsorStmt->execute();
+                    $sponsorStmt->close();
+                }
+            }
             $_SESSION['success'] = 'Event successfully created!';
         } elseif ($Role == 'Admin') {
+            // Sponsor Insertion logic
+            for ($i = 1; $i <= 5; $i++) {
+                $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
+                $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
+                $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
+
+                if ($sponsorFirstName && $sponsorLastName) {
+                    $sponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                               VALUES (?, ?, ?, ?)";
+                    $sponsorStmt = $conn->prepare($sponsorSql);
+                    $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                    $sponsorStmt->execute();
+                    $sponsorStmt->close();
+                }
+            }
             $_SESSION['success2'] = 'Event successfully created and is now pending approval!';
         }
         header("Location: addEvent.php");
@@ -206,4 +253,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $conn->close();
 }
+
 ?>

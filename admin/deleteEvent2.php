@@ -1,12 +1,12 @@
 <?php
-session_start();  
+session_start();
 require_once('../db.connection/connection.php');
 
 if (isset($_GET['event_id'])) {
     $eventId = intval($_GET['event_id']);
-      
+
     $deleteAttendanceSql = "DELETE FROM attendance WHERE participant_id IN (SELECT participant_id FROM eventparticipants WHERE event_id = ?)";
-    
+
     if ($stmt = $conn->prepare($deleteAttendanceSql)) {
         $stmt->bind_param("i", $eventId);
         if (!$stmt->execute()) {
@@ -17,7 +17,7 @@ if (isset($_GET['event_id'])) {
     }
 
     $deleteParticipantsSql = "DELETE FROM eventparticipants WHERE event_id = ?";
-    
+
     if ($stmt = $conn->prepare($deleteParticipantsSql)) {
         $stmt->bind_param("i", $eventId);
         if (!$stmt->execute()) {
@@ -26,15 +26,25 @@ if (isset($_GET['event_id'])) {
         }
         $stmt->close();
     }
-
+    // Delete sponsors
+    $deletePendingSponsorsSql = "DELETE FROM sponsor WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deletePendingSponsorsSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending sponsors!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
     $deleteEventSql = "DELETE FROM Events WHERE event_id = ?";
-    
+
     if ($stmt = $conn->prepare($deleteEventSql)) {
         $stmt->bind_param("i", $eventId);
         if ($stmt->execute()) {
             $_SESSION['success'] = 'Deleted successfully!';
-            header('Location: landingPage2.php'); 
-            exit; 
+            header('Location: landingPage2.php');
+            exit;
         } else {
             echo "<script>alert('Error deleting event!'); window.location.href='landingPage2.php';</script>";
         }

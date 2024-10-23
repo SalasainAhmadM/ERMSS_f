@@ -1,9 +1,10 @@
 <?php
-    include('../function/F.editEvent.php');
+include('../function/F.editEvent.php');
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
@@ -12,87 +13,92 @@
 
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
     <link rel="stylesheet" href="css/main.css">
-</head> 
+</head>
+<style>
+
+</style>
+
 <body>
     <?php
-        session_start();
-        require_once('../db.connection/connection.php');
+    session_start();
+    require_once('../db.connection/connection.php');
 
-        function countPendingUsers($conn)
-        {
-            $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
-            $result = $conn->query($sqls);
+    function countPendingUsers($conn)
+    {
+        $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
+        $result = $conn->query($sqls);
 
-            if ($result) {
-                $row = $result->fetch_assoc();
-                return $row['totalPendingUsers'];
-            } else {
-                return 0; // Return 0 if there is an error or no pending users
-            }
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['totalPendingUsers'];
+        } else {
+            return 0; // Return 0 if there is an error or no pending users
         }
-        function countPendingEvents($conn)
-        {
-            $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-            $result = $conn->query($sqls);
-        
-            if ($result) {
-                $row = $result->fetch_assoc();
-                return $row['totalPendingEvents'];
-            } else {
-                return 0; 
-            }
+    }
+    function countPendingEvents($conn)
+    {
+        $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+        $result = $conn->query($sqls);
+
+        if ($result) {
+            $row = $result->fetch_assoc();
+            return $row['totalPendingEvents'];
+        } else {
+            return 0;
         }
-        
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            // Check if AdminID is set in the session
-            if (isset($_SESSION['AdminID'])) {
-                $AdminID = $_SESSION['AdminID'];
+    }
 
-                // Prepare and execute a query to fetch the specific admin's data
-                $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-                $stmtAdmin = $conn->prepare($sqlAdmin);
-                $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
-                $stmtAdmin->execute();
-                $resultAdmin = $stmtAdmin->get_result();
 
-                if ($resultAdmin->num_rows > 0) {
-                    while ($row = $resultAdmin->fetch_assoc()) {
-                        $LastName = $row['LastName'];
-                        $FirstName = $row['FirstName'];
-                        $MI = $row['MI'];
-                        $Email = $row['Email'];
-                        $ContactNo = $row['ContactNo'];
-                        $Position = $row['Position']; // Corrected the column name
-                        $Affiliation = $row['Affiliation'];
-                        $Image = $row['Image'];
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        // Check if AdminID is set in the session
+        if (isset($_SESSION['AdminID'])) {
+            $AdminID = $_SESSION['AdminID'];
 
-                        // Now, you have the specific admin's data
-                    }
-                } else {
-                    echo "No records found";
+            // Prepare and execute a query to fetch the specific admin's data
+            $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
+            $stmtAdmin = $conn->prepare($sqlAdmin);
+            $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
+            $stmtAdmin->execute();
+            $resultAdmin = $stmtAdmin->get_result();
+
+            if ($resultAdmin->num_rows > 0) {
+                while ($row = $resultAdmin->fetch_assoc()) {
+                    $LastName = $row['LastName'];
+                    $FirstName = $row['FirstName'];
+                    $MI = $row['MI'];
+                    $Email = $row['Email'];
+                    $ContactNo = $row['ContactNo'];
+                    $Position = $row['Position']; // Corrected the column name
+                    $Affiliation = $row['Affiliation'];
+                    $Image = $row['Image'];
+
+                    // Now, you have the specific admin's data
                 }
-
-                $stmtAdmin->close();
-
-                // Example usage of the countPendingUsers function
-                $pendingUsersCount = countPendingUsers($conn);
-                $pendingEventsCount = countPendingEvents($conn);
-            
+            } else {
+                echo "No records found";
             }
-        }
 
-        
+            $stmtAdmin->close();
+
+            // Example usage of the countPendingUsers function
+            $pendingUsersCount = countPendingUsers($conn);
+            $pendingEventsCount = countPendingEvents($conn);
+
+        }
+    }
+
+
     ?>
- <?php
-if (isset($_SESSION['success'])) {
-    echo "<script>
+    <?php
+    if (isset($_SESSION['success'])) {
+        echo "<script>
     Swal.fire({
       title: 'Success!',
       text: '" . $_SESSION['success'] . "',
@@ -103,9 +109,9 @@ if (isset($_SESSION['success'])) {
       }
     });
     </script>";
-    unset($_SESSION['success']);
-}
-?>
+        unset($_SESSION['success']);
+    }
+    ?>
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
         <div class="top">
@@ -128,7 +134,7 @@ if (isset($_SESSION['success'])) {
             </div>
         </div>
 
-        
+
         <ul>
             <li class="nav-sidebar">
                 <a href="adminDashboard.php">
@@ -137,7 +143,7 @@ if (isset($_SESSION['success'])) {
                 </a>
                 <span class="tooltip">Dashboard</span>
             </li>
-            
+
             <li class="events-side2 nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-archive'></i>
@@ -147,14 +153,15 @@ if (isset($_SESSION['success'])) {
                 <span class="tooltip">Events</span>
                 <div class="uno">
                     <ul>
-                         <?php if ($_SESSION['Role'] === 'superadmin') { ?>
-                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
-                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } ?>
-                            <a href="landingPage.php">Events</a>
+                        <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                            <a href="eventsValidation.php">Events Validation
+                                <span><?php echo $pendingEventsCount; ?></span></a>
+                        <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                            <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                        <?php } ?>
+                        <a href="landingPage.php">Events</a>
                         <a href="addEvent.php">Add Event</a>
-                            <a href="addEventTypeMode.php">Event Settings</a>
+                        <a href="addEventTypeMode.php">Event Settings</a>
                         <a href="history.php">History</a>
                         <a href="cancelEvent.php">Cancelled</a>
                     </ul>
@@ -171,7 +178,7 @@ if (isset($_SESSION['success'])) {
                 <div class="uno">
                     <ul>
                         <a href="profile.php">My Profile</a>
-                        <a href="validation.php">User Validation <span><?php echo $pendingUsersCount;  ?></span></a>
+                        <a href="validation.php">User Validation <span><?php echo $pendingUsersCount; ?></span></a>
                         <a href="newAccount.php">Create Account</a>
                         <a href="allUser.php">All Users</a>
                         <!-- <a href="accountSettings.php">Account Settings</a> -->
@@ -193,16 +200,17 @@ if (isset($_SESSION['success'])) {
     <div class="main-content">
         <div class="containerr">
             <!-- <h3 class="dashboard">EVENTS</h3> -->
-            
+
 
             <div class="wrapper">
                 <div class="title">
                     Edit Event
                 </div>
                 <!-- <form method="POST" action="editEvent.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   -->
-                <form method="POST" action="editEvent.php?event_id=<?php echo $eventId; ?>" enctype="multipart/form-data">   
-                <input type="hidden" name="event_cancel_reason" value="">
-                <input type="hidden" name="event_cancel" value="Cancelled">
+                <form method="POST" action="editEvent.php?event_id=<?php echo $eventId; ?>"
+                    enctype="multipart/form-data">
+                    <input type="hidden" name="event_cancel_reason" value="">
+                    <input type="hidden" name="event_cancel" value="Cancelled">
                     <div class="input_field">
                         <label>Event Title</label>
                         <input type="text" class="input" name="event_title" value="<?php echo $eventTitle; ?>" required>
@@ -223,7 +231,8 @@ if (isset($_SESSION['success'])) {
                                 <option value="Specialized Seminars" <?php echo ($eventType === 'Specialized Seminars') ? 'selected' : ''; ?>>Specialized Seminars</option>
                                 <option value="Cluster-specific gathering" <?php echo ($eventType === 'Cluster-specific gathering') ? 'selected' : ''; ?>>Cluster-specific gathering</option>
                                 <option value="General Assembly" <?php echo ($eventType === 'General Assembly') ? 'selected' : ''; ?>>General Assembly</option>
-                                <option value="Workshop" <?php echo ($eventType === 'Workshop') ? 'selected' : ''; ?>>Workshop</option>
+                                <option value="Workshop" <?php echo ($eventType === 'Workshop') ? 'selected' : ''; ?>>
+                                    Workshop</option>
                             </select>
                         </div>
                     </div>
@@ -234,8 +243,10 @@ if (isset($_SESSION['success'])) {
                             <select name="event_mode" required>
                                 <option value="">Select</option>
                                 <option value="Face-to-Face" <?php echo ($eventMode === 'Face-to-Face') ? 'selected' : ''; ?>>Face-to-Face</option>
-                                <option value="Online" <?php echo ($eventMode === 'Online') ? 'selected' : ''; ?>>Online</option>
-                                <option value="Hybrid" <?php echo ($eventMode === 'Hybrid') ? 'selected' : ''; ?>>Hybrid</option>
+                                <option value="Online" <?php echo ($eventMode === 'Online') ? 'selected' : ''; ?>>Online
+                                </option>
+                                <option value="Hybrid" <?php echo ($eventMode === 'Hybrid') ? 'selected' : ''; ?>>Hybrid
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -253,17 +264,18 @@ if (isset($_SESSION['success'])) {
 
                     <div class="input_field" id="participantLimitField">
                         <label>Participant Limit</label>
-                        <input type="number" class="input" name="participant_limit" value="<?php echo $eventDetails['participant_limit']; ?>">
+                        <input type="number" class="input" name="participant_limit"
+                            value="<?php echo $eventDetails['participant_limit']; ?>">
                     </div>
 
                     <div class="input_field" id="locationField">
                         <label>Location</label>
                         <input type="text" class="input" name="location" value="<?php echo $eventLocation; ?>" required>
                     </div>
-
                     <div class="input_field">
                         <label>Date Start</label>
-                        <input type="date" class="input" name="date_start" value="<?php echo $eventDateStart; ?>" required>
+                        <input type="date" class="input" name="date_start" value="<?php echo $eventDateStart; ?>"
+                            required>
                     </div>
 
                     <div class="input_field">
@@ -273,7 +285,8 @@ if (isset($_SESSION['success'])) {
 
                     <div class="input_field">
                         <label>Time Start</label>
-                        <input type="time" class="input" name="time_start" value="<?php echo $eventTimeStart; ?>" required>
+                        <input type="time" class="input" name="time_start" value="<?php echo $eventTimeStart; ?>"
+                            required>
                     </div>
 
                     <div class="input_field">
@@ -283,6 +296,75 @@ if (isset($_SESSION['success'])) {
 
 
                     <div class="input_field">
+                        <label>Sponsors</label>
+                        <button type="button" id="addSponsorBtn" onclick="addSponsorField()">Add Sponsor</button>
+                    </div>
+
+                    <div class="sponsor_fields_container">
+                        <?php
+                        $maxSponsors = 5; // Limit to 5 sponsor fields
+                        
+                        // Loop through the number of sponsors and render input fields
+                        for ($i = 0; $i < $maxSponsors; $i++) {
+                            // Check if there's a sponsor at the current index
+                            if (isset($sponsors[$i])) {
+                                $sponsorFirstName = $sponsors[$i]['sponsor_firstName'];
+                                $sponsorMI = $sponsors[$i]['sponsor_MI'];
+                                $sponsorLastName = $sponsors[$i]['sponsor_lastName'];
+                            } else {
+                                $sponsorFirstName = '';
+                                $sponsorMI = '';
+                                $sponsorLastName = '';
+                            }
+
+                            // Only show the field if there's data or if we're below the number of sponsors
+                            $displayStyle = ($i < count($sponsors)) ? 'flex' : 'none';
+                            ?>
+                            <div class="input_field sponsor_row" id="sponsorField<?= $i + 1 ?>"
+                                style="display: <?= $displayStyle ?>;">
+                                <label>Sponsor <?= $i + 1 ?></label>
+                                <div class="sponsorRow">
+                                    <input type="text" class="input sponsor_firstName" name="sponsor<?= $i + 1 ?>_firstName"
+                                        placeholder="First Name" value="<?= $sponsorFirstName ?>">
+                                    <input type="text" class="input sponsor_MI" name="sponsor<?= $i + 1 ?>_MI"
+                                        placeholder="MI" value="<?= $sponsorMI ?>">
+                                    <input type="text" class="input sponsor_lastName" name="sponsor<?= $i + 1 ?>_lastName"
+                                        placeholder="Last Name" value="<?= $sponsorLastName ?>">
+                                </div>
+                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(<?= $i + 1 ?>)"
+                                    title="Delete Sponsor"></i>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <script>let currentSponsorCount = <?= count($sponsors) ?>; // Set the initial sponsor count
+                        const maxSponsors = 5; // Maximum number of sponsor fields
+
+                        function addSponsorField() {
+                            if (currentSponsorCount < maxSponsors) {
+                                currentSponsorCount++;
+                                const sponsorField = document.getElementById('sponsorField' + currentSponsorCount);
+                                sponsorField.style.display = 'flex'; // Show the next hidden sponsor field
+                            }
+                            if (currentSponsorCount >= maxSponsors) {
+                                document.getElementById('addSponsorBtn').style.display = 'none'; // Hide 'Add Sponsor' button when limit reached
+                            }
+                        }
+
+                        function deleteSponsorField(index) {
+                            const sponsorField = document.getElementById('sponsorField' + index);
+                            sponsorField.style.display = 'none'; // Hide the selected sponsor field
+                            sponsorField.querySelectorAll('input').forEach(input => input.value = ''); // Clear the input values
+
+                            currentSponsorCount--;
+                            if (currentSponsorCount < maxSponsors) {
+                                document.getElementById('addSponsorBtn').style.display = 'inline-block'; // Show 'Add Sponsor' button
+                            }
+                        }
+                    </script>
+
+                    <div class="input_field">
                         <input type="submit" value="Save" class="createBtn" id="saveEventButton">
                         <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
                     </div>
@@ -290,78 +372,78 @@ if (isset($_SESSION['success'])) {
 
                 </form>
             </div>
-        </div>        
+        </div>
     </div>
 
-<!--CONFIRMATION===========-->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    function confirmSaveChanges(event) {
-        event.preventDefault(); 
+    <!--CONFIRMATION===========-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function confirmSaveChanges(event) {
+                event.preventDefault();
 
-        Swal.fire({
-            title: 'Save Changes?',
-            text: 'Are you sure you want to save the changes to this event?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, save it!',
-            cancelButtonText: 'No, cancel',
-            padding: '3rem',
-            customClass: {
-                popup: 'larger-swal'
+                Swal.fire({
+                    title: 'Save Changes?',
+                    text: 'Are you sure you want to save the changes to this event?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, save it!',
+                    cancelButtonText: 'No, cancel',
+                    padding: '3rem',
+                    customClass: {
+                        popup: 'larger-swal'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        event.target.submit();
+                    }
+                });
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.target.submit();
+
+            function confirmCancelEvent(event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Cancel Event?',
+                    text: 'Please provide a reason for canceling the event:',
+                    icon: 'question',
+                    input: 'text',
+                    inputPlaceholder: 'Enter reason for cancellation',
+                    inputAttributes: {
+                        'aria-label': 'Reason for cancellation'
+                    },
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it',
+                    padding: '3rem',
+                    customClass: {
+                        popup: 'larger-swal'
+                    },
+                    preConfirm: (cancelReason) => {
+                        if (!cancelReason) {
+                            Swal.showValidationMessage('Cancellation reason is required!');
+                        }
+                        return cancelReason;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var cancelReason = result.value;
+
+                        document.querySelector("input[name='event_cancel_reason']").value = cancelReason;
+                        document.querySelector('form').submit();
+                    }
+                });
             }
+
+            document.querySelector('form').addEventListener('submit', confirmSaveChanges);
+
+            document.getElementById('cancelEventButton').addEventListener('click', confirmCancelEvent);
         });
-    }
+    </script>
 
-    function confirmCancelEvent(event) {
-        event.preventDefault();
-
-        Swal.fire({
-            title: 'Cancel Event?',
-            text: 'Please provide a reason for canceling the event:',
-            icon: 'question',
-            input: 'text',
-            inputPlaceholder: 'Enter reason for cancellation',
-            inputAttributes: {
-                'aria-label': 'Reason for cancellation'
-            },
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'No, keep it',
-            padding: '3rem',
-            customClass: {
-                popup: 'larger-swal'
-            },
-            preConfirm: (cancelReason) => {
-                if (!cancelReason) {
-                    Swal.showValidationMessage('Cancellation reason is required!');
-                }
-                return cancelReason;
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var cancelReason = result.value;
-                
-                document.querySelector("input[name='event_cancel_reason']").value = cancelReason;
-                document.querySelector('form').submit(); 
-            }
-        });
-    }
-
-    document.querySelector('form').addEventListener('submit', confirmSaveChanges);
-
-    document.getElementById('cancelEventButton').addEventListener('click', confirmCancelEvent);
-});
-</script>
-    
 
 
     <!--JS -->
@@ -415,15 +497,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    
+
 
 
     <script>
 
         let dropdown_items = document.querySelectorAll('.job-filter form .dropdown-container .dropdown .lists .items');
 
-        dropdown_items.forEach(items =>{
-            items.onclick = () =>{
+        dropdown_items.forEach(items => {
+            items.onclick = () => {
                 items_parent = items.parentElement.parentElement;
                 let output = items_parent.querySelector('.output');
                 output.value = items.innerText;

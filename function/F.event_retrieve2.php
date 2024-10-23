@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $eventTitle = $row['event_title'];
                 $eventDesc = $row['event_description'];
                 $eventLocation = $row['location'];
-                $eventDateStart = date('F j, Y', strtotime($row['date_start'])); 
-                $eventDateEnd = date('F j, Y', strtotime($row['date_end'])); 
-                $eventTimeStart = date('h:ia', strtotime($row['time_start'])); 
-                $eventTimeEnd = date('h:ia', strtotime($row['time_end'])); 
+                $eventDateStart = date('F j, Y', strtotime($row['date_start']));
+                $eventDateEnd = date('F j, Y', strtotime($row['date_end']));
+                $eventTimeStart = date('h:ia', strtotime($row['time_start']));
+                $eventTimeEnd = date('h:ia', strtotime($row['time_end']));
                 $eventMode = $row['event_mode'];
                 $eventLink = $row['event_link'];
                 $eventType = $row['event_type'];
@@ -67,6 +67,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'eventStatus' => $eventStatus,
                     'cancelReason' => $cancelReason, // Include cancel reason in session data
                 );
+            }
+            // Query to get sponsors for the event
+            $sponsorSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName 
+                           FROM pendingsponsor 
+                           WHERE event_id = $event_id";
+            $sponsorResult = $conn->query($sponsorSql);
+
+            if ($sponsorResult->num_rows > 0) {
+                // Store sponsor data in session
+                $sponsors = array();
+                while ($sponsorRow = $sponsorResult->fetch_assoc()) {
+                    $sponsors[] = $sponsorRow;
+                }
+                $_SESSION['event_data']['sponsors'] = $sponsors;
+            } else {
+                $_SESSION['event_data']['sponsors'] = [];
             }
         } else {
             echo "No records found for the specified event_id";

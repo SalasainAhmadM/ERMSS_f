@@ -182,7 +182,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link rel="stylesheet" href="css/table.css">
 </head>
+<style>
+    .parent-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    height: 100vh; 
+}
 
+</style>
 <body>
 
     <?php
