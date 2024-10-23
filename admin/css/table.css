@@ -170,6 +170,47 @@ html{
 .sidebar.active .top .logo{
   opacity: 1;
 }
+.events-side , .events-side2{
+  transition: all 0.5s ease;
+}
+
+.events-side .a-events .hide , .events-side2 .a-events .hide{
+  visibility: hidden;
+}
+
+.sidebar.active .events-side .a-events .hide , .sidebar.active .events-side2 .a-events .hide{
+  visibility: visible;
+}
+.sidebar.active .events-side:hover{
+  height: 250px; 
+} 
+.sidebar.active .events-side2:hover {
+  height: 335px; 
+}
+.sidebar.active .events-side:hover, .sidebar.active .events-side2:hover {
+  background-color: var(--first-color-alt);
+  border-radius: 12px;
+  transition: all 0.5s ease;
+}
+
+.sidebar.active .first:hover{  /*for events sidebar*/
+  height: 290px;
+}
+
+
+.sidebar.active .events-side:hover .a-events , .sidebar.active .events-side2:hover .a-events{
+  background-color: var(--body-color);
+  color: var(--first-color);
+}
+
+.sidebar.active .events-side:hover .uno , .sidebar.active .events-side2:hover .uno{
+  visibility: visible;
+}
+
+.sidebar.active .events-side:hover .uno span , .sidebar.active .events-side2:hover .uno span{
+  margin-left: 2rem;
+  color: red;
+}
 
 .user{
   display: flex;
