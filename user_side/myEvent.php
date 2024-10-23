@@ -32,48 +32,6 @@ $participantLimit = $participantLimitRow['participant_limit'];
 // Calculate the ratio of total participants to participant limit
 $participantRatio = $totalParticipants . "/" . $participantLimit;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
-    require_once('../db.connection/connection.php');
-
-    $eventId = $_POST['event_id'];
-    $cancelReason = $_POST['event_cancel_reason'];
-
-    if (isset($_SESSION['UserID'])) {
-        $userID = $_SESSION['UserID'];
-
-        // Update the event to store the cancellation reason and set it as cancelled
-        $sqlUpdate = "UPDATE Events SET event_cancel = ? WHERE event_id = ?";
-        $stmtUpdate = $conn->prepare($sqlUpdate);
-        $stmtUpdate->bind_param("si", $cancelReason, $eventId);
-
-        if ($stmtUpdate->execute()) {
-            echo "
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.10/dist/sweetalert2.all.min.js'></script>
-            <script>
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Event has been successfully cancelled.',
-                    icon: 'success',
-                    customClass: {
-                        popup: 'larger-swal'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'userDashboard.php'; 
-                    }
-                });
-            </script>";
-        } else {
-            echo "<script>alert('Failed to cancel the event. Please try again.'); window.location.href='userDashboard.php';</script>";
-        }
-
-        $stmtUpdate->close();
-    } else {
-        header("Location: login.php");
-        exit();
-    }
-}
-
 
 ?>
 <?php
@@ -174,6 +132,7 @@ if (isset($_SESSION['error'])) {
             header("Location: login.php");
             exit();
         }
+        $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
     }
     ?>
 
@@ -327,7 +286,7 @@ if (isset($_SESSION['error'])) {
                     <?php endif; ?>
                     <script>
                         function confirmCancelEvent(event) {
-                            event.preventDefault(); // Prevent default form submission
+                            event.preventDefault();
 
                             Swal.fire({
                                 title: 'Cancel Event?',
@@ -357,14 +316,54 @@ if (isset($_SESSION['error'])) {
                                 if (result.isConfirmed) {
                                     const cancelReason = result.value;
 
-                                    document.querySelector("input[name='event_cancel_reason']").value = cancelReason;
-                                    document.querySelector('#cancelEventForm').submit(); // Submit the form
+                                    const formData = new FormData();
+                                    formData.append('event_id', document.querySelector("input[name='event_id']").value);
+                                    formData.append('event_cancel_reason', cancelReason);
+
+                                    fetch('cancel_event.php', {
+                                        method: 'POST',
+                                        body: formData
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                Swal.fire({
+                                                    title: 'Cancelled!',
+                                                    text: 'The event has been cancelled.',
+                                                    icon: 'success',
+                                                    customClass: {
+                                                        popup: 'larger-swal'
+                                                    }
+                                                }).then(() => {
+                                                    window.location.href = 'userDashboard.php';
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Something went wrong. Please try again.',
+                                                    icon: 'error',
+                                                    customClass: {
+                                                        popup: 'larger-swal'
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .catch(error => {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: 'Something went wrong. Please try again.',
+                                                icon: 'error',
+                                                customClass: {
+                                                    popup: 'larger-swal'
+                                                }
+                                            });
+                                        });
                                 }
                             });
                         }
 
-
                     </script>
+
 
                 </div>
 

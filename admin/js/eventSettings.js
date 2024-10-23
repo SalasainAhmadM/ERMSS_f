@@ -103,106 +103,142 @@ function addEventMode(eventModeName) {
           }
       });
 }
-
 // Edit
 function editEventType(eventTypeId, eventTypeName) {
-Swal.fire({
-    title: 'Edit Event Type',
-    input: 'text',
-    inputValue: eventTypeName,
-    inputLabel: 'Enter New Event Type',
-    showCancelButton: true,
-    confirmButtonText: 'Update',
-    customClass: {
-        popup: 'larger-swal'
+    const originalEventTypes = [
+        "Training Sessions",
+        "Specialized Seminars",
+        "Cluster-specific gathering",
+        "General Assembly",
+        "Workshop"
+    ];
+
+    if (originalEventTypes.includes(eventTypeName)) {
+        Swal.fire({
+            title: 'Cannot Edit',
+            text: `cannot edit origin event type: ${eventTypeName}`,
+            icon: 'warning',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Edit Event Type',
+            input: 'text',
+            inputValue: eventTypeName,
+            inputLabel: 'Enter New Event Type',
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('edit_event_type.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        event_type_id: eventTypeId,
+                        event_type_name: result.value
+                    })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Event Type has been updated.',
+                            icon: 'success',
+                            customClass: {
+                                popup: 'larger-swal'
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            customClass: {
+                                popup: 'larger-swal'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
-}).then((result) => {
-    if (result.isConfirmed) {
-        fetch('edit_event_type.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                event_type_id: eventTypeId,
-                event_type_name: result.value
-            })
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  Swal.fire({
-                      title: 'Success!',
-                      text: 'Event Type has been updated.',
-                      icon: 'success',
-                      customClass: {
-                          popup: 'larger-swal'
-                      }
-                  }).then(() => {
-                      window.location.reload();
-                  });
-              } else {
-                  Swal.fire({
-                      title: 'Error!',
-                      text: data.message,
-                      icon: 'error',
-                      customClass: {
-                          popup: 'larger-swal'
-                      }
-                  });
-              }
-          });
-    }
-});
 }
 function editEventMode(eventModeId, eventModeName) {
-Swal.fire({
-    title: 'Edit Event Mode',
-    input: 'text',
-    inputValue: eventModeName,
-    inputLabel: 'Enter New Event Mode',
-    showCancelButton: true,
-    confirmButtonText: 'Update',
-    customClass: {
-        popup: 'larger-swal'
+    const originalEventModes = [
+        "Face-to-Face",
+        "Online",
+        "Hybrid"
+    ];
+
+    if (originalEventModes.includes(eventModeName)) {
+        Swal.fire({
+            title: 'Cannot Edit',
+            text: `cannot edit origin event mode: ${eventModeName}`,
+            icon: 'warning',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Edit Event Mode',
+            input: 'text',
+            inputValue: eventModeName,
+            inputLabel: 'Enter New Event Mode',
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('edit_event_mode.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Mode': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        event_mode_id: eventModeId,
+                        event_mode_name: result.value
+                    })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Event Mode has been updated.',
+                            icon: 'success',
+                            customClass: {
+                                popup: 'larger-swal'
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            customClass: {
+                                popup: 'larger-swal'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
-}).then((result) => {
-    if (result.isConfirmed) {
-        fetch('edit_event_mode.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                event_mode_id: eventModeId,
-                event_mode_name: result.value
-            })
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  Swal.fire({
-                      title: 'Success!',
-                      text: 'Event Mode has been updated.',
-                      icon: 'success',
-                      customClass: {
-                          popup: 'larger-swal'
-                      }
-                  }).then(() => {
-                      window.location.reload();
-                  });
-              } else {
-                  Swal.fire({
-                      title: 'Error!',
-                      text: data.message,
-                      icon: 'error',
-                      customClass: {
-                          popup: 'larger-swal'
-                      }
-                  });
-              }
-          });
-    }
-});
 }
+
 function confirmDeleteEventType(eventTypeId) {
 Swal.fire({
     title: 'Are you sure?',

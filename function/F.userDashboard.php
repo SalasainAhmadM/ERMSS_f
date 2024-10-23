@@ -91,11 +91,16 @@ if (isset($_SESSION['UserID'])) {
             <td data-label="Event Type"><?php echo $eventType; ?></td>
             <td data-label="Event Mode"><?php echo $eventMode; ?></td>
             <td data-label="Event Location"><?php echo $eventLocation; ?></td>
-            <td data-label="Event Date"><?php echo date('F j, Y', strtotime($eventDateStart)) . ' - ' . date('F j, Y', strtotime($eventDateEnd)); ?></td>
-            <td data-label="Event Time"><?php echo date('h:ia', strtotime($eventTimeStart)) . ' - ' . date('h:ia', strtotime($eventTimeEnd)); ?></td>
+            <td data-label="Event Date">
+                <?php echo date('F j, Y', strtotime($eventDateStart)) . ' - ' . date('F j, Y', strtotime($eventDateEnd)); ?>
+            </td>
+            <td data-label="Event Time">
+                <?php echo date('h:ia', strtotime($eventTimeStart)) . ' - ' . date('h:ia', strtotime($eventTimeEnd)); ?>
+            </td>
             <td data-label="Status"><?php echo $eventStatus; ?></td>
             <td data-label="Attendance" class="pad">
-                <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i class="fa-solid fa-eye"></i></button></a>
+                <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i
+                            class="fa-solid fa-eye"></i></button></a>
             </td>
             <?php
             echo '</tr>';
