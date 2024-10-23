@@ -109,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $selectedDay = $_POST['event_day']; // Get the selected day
         $attendance_date = date('Y-m-d', strtotime($dateStart . ' +' . ($selectedDay - 1) . ' days')); // Calculate attendance date
         $status = $_POST['status']; // 'present' or 'absent'
+        
+        $timeIn = isset($_POST['timeIn']) ? $_POST['timeIn'] : "00:00";
+        $timeOut = isset($_POST['timeOut']) ? $_POST['timeOut'] : "00:00";
 
         // Check if a record already exists for the participant_id, event_id, and day
         $existingRecordSql = "SELECT * FROM attendance WHERE participant_id = ? AND event_id = ? AND day = ?";
@@ -125,9 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('Attendance already recorded.');</script>";
             } else {
                 // The status is different, so update the existing record for that specific day
-                $updateSql = "UPDATE attendance SET status = ? WHERE participant_id = ? AND event_id = ? AND day = ?";
+                $updateSql = "UPDATE attendance SET status = ?, time_in = ?, time_out = ? WHERE participant_id = ? AND event_id = ? AND day = ?";
                 $updateStmt = $conn->prepare($updateSql);
-                $updateStmt->bind_param("siii", $status, $participant_id, $event_id, $selectedDay);
+                $updateStmt->bind_param("ssiiis", $status, $timeIn, $timeOut, $participant_id, $event_id, $selectedDay);
 
                 if ($updateStmt->execute()) {
                     echo "<script>alert('Attendance updated successfully.'); window.location.reload();</script>";
@@ -139,9 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // No record exists for that day, so insert a new record
-            $insertSql = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, day) VALUES (?, ?, ?, ?, ?)";
+            $insertSql = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, day, time_in, time_out) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertSql);
-            $insertStmt->bind_param("iissi", $participant_id, $event_id, $attendance_date, $status, $selectedDay);
+            $insertStmt->bind_param("iississ", $participant_id, $event_id, $attendance_date, $status, $selectedDay, $timeIn, $timeOut);
             if ($insertStmt->execute()) {
                 echo "<script>alert('Attendance marked successfully.'); window.location.reload();</script>";
             } else {
@@ -155,11 +158,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existingRecordStmt->close();
         $existingRecordResult->close();
     }
+
+
 }
 
-
-
 ?>
+
+
+<?php
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve values from the POST request
+    $participant_id = $_POST['participant_id'];
+    $event_id = $_POST['event_id'];
+    $timeIn = isset($_POST['timeIn']) ? $_POST['timeIn'] : null; // Use null if undefined
+    $timeOut = isset($_POST['timeOut']) ? $_POST['timeOut'] : null; // Use null if undefined
+    $attendanceDay = isset($_POST['attendance_day']) ? $_POST['attendance_day'] : null; // Use null if undefined
+
+    // Check if timeIn, timeOut, and attendanceDay are all defined and not empty
+    if (empty($timeIn) || empty($timeOut) || empty($attendanceDay)) {
+        // Redirect back to the previous page
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit; // Stop further execution
+    }
+
+    // SQL update statement to update only time_in and time_out for the specific day
+    $sql = "UPDATE attendance 
+            SET time_in = ?, time_out = ? 
+            WHERE participant_id = ? AND event_id = ? AND day = ?";
+
+    // Prepare and execute the statement
+    $stmt = $conn->prepare($sql);
+    
+    // Check if the statement was prepared successfully
+    if ($stmt) {
+        // Ensure the parameters are bound correctly
+        $stmt->bind_param("ssisi", $timeIn, $timeOut, $participant_id, $event_id, $attendanceDay);
+
+        // Execute the statement and check for success
+        if ($stmt->execute()) {
+            // Optionally, you can redirect to a success page or back with a success flag
+            header("Location: " . $_SERVER['HTTP_REFERER']); // Redirect back
+        } else {
+            // Handle the error here if needed (e.g., log it)
+            header("Location: " . $_SERVER['HTTP_REFERER']); // Redirect back even on error
+        }
+
+        $stmt->close();
+    } else {
+        // Handle the error here if needed (e.g., log it)
+        header("Location: " . $_SERVER['HTTP_REFERER']); // Redirect back
+    }
+
+    exit; // Ensure no further output after 
+}
+?>
+
+
+
+
 
 
 <!DOCTYPE html>
@@ -404,8 +461,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <h3>All Days Present</h3>
                         </div>
                     </a> 
-
-
                 </div>
             </section>
 
@@ -437,7 +492,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="phone" style="display: none;">
                                         <span>DAY</span>
                                     </div>
+                                </div>
 
+                                <div class="attendance-details" style="display: none;">
+                                    <div class="phone" style="margin-bottom:0.25rem;">
+                                        <span>TIME IN/OUT</span>
+                                    </div>
+                                </div>
+
+                                <div class="attendance-details" style="display: none;">
                                     <div class="phone">
                                         <span>STATUS</span>
                                     </div>
@@ -519,6 +582,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </select>
                                             </div>
 
+
+
                                             <div class="status" style="margin-bottom: 0.75rem;">
                                                <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
                                                 <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
@@ -546,16 +611,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-                <div class="table_body" style="Display:none;" id="table">
+                <div class="table_body" style="display:none;" id="table">
                     <?php
                     $sql = "SELECT user.FirstName, user.LastName, user.Affiliation, user.Position, user.Email, user.ContactNo, 
-                    attendance.day, attendance.status, eventParticipants.participant_id, eventParticipants.event_id
-                    FROM eventParticipants 
-                    INNER JOIN user ON eventParticipants.UserID = user.UserID
-                    LEFT JOIN attendance ON attendance.participant_id = eventParticipants.participant_id 
-                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)
-                    ORDER BY user.FirstName, user.LastName, attendance.day";
-     
+                            attendance.day, attendance.status, attendance.time_in, attendance.time_out, 
+                            eventParticipants.participant_id, eventParticipants.event_id
+                            FROM eventParticipants 
+                            INNER JOIN user ON eventParticipants.UserID = user.UserID
+                            LEFT JOIN attendance ON attendance.participant_id = eventParticipants.participant_id 
+                            WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)
+                            ORDER BY user.FirstName, user.LastName, attendance.day";
+
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $eventTitle);
                     $stmt->execute();
@@ -571,10 +637,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
                             $attendanceDay = htmlspecialchars($row['day']); 
-                            $attendanceStatus = htmlspecialchars($row['status']); 
-
+                            $attendanceStatus = htmlspecialchars($row['status']);
+                            $timeIn = htmlspecialchars($row['time_in']) ?: '09:00'; // Default value if null
+                            $timeOut = htmlspecialchars($row['time_out']) ?: '10:00'; // Default value if null
                     ?>
-                            
+                    
                             <form action='' method='POST' onsubmit="return confirmAttendance(this);">
                                 <ul>
                                     <li>
@@ -599,24 +666,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <span><?php echo $contactNo . ' ' ?></span>
                                             </div>
 
-                                        <!-- Elements to be hidden by default -->
-                                        <div class="attendance-details" style="display: none;">
-
-                                            <div class="day_present">
-                                                <?php if (!empty($attendanceDay)) : ?>
-                                                    <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
-                                                    <span>(Day: <?php echo $attendanceDay; ?>)</span>
-                                                <?php endif; ?>
+                                            <div class="attendance-details" style="display: none;">
+                                                <?php if ($attendanceStatus != "absent") : // Check if attendanceStatus is not "absent" ?>
+                                                    <div class="time_in_out">
+                                                        <div class="phone">
+                                                            <input type="time" id="timeIn_<?php echo $row['participant_id']; ?>" name="timeIn" value="<?php echo $timeIn; ?>" required onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
+                                                            <br>
+                                                            <input type="time" id="timeOut_<?php echo $row['participant_id']; ?>" name="timeOut" value="<?php echo $timeOut; ?>" required onchange="updateAttendance(<?php echo $row['participant_id']; ?>, '<?php echo $row['event_id']; ?>', '<?php echo $attendanceDay; ?>');">
+                                                        </div>
+                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                    </div>
+                                                <?php else: // If attendanceStatus is "absent" ?>
+                                                    <div class="time_in_out">
+                                                        <div class="phone">
+                                                            <h4 style="padding: 3.5rem;">N/A</h4> <!-- Display "No time" if absent -->
+                                                        </div>
+                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                    </div>
+                                                <?php endif; // End of check ?>
                                             </div>
 
-                                            <div class="phone">
-                                                <span><?php echo $attendanceStatus . ' ' ?></span>
-                                            </div>
-                                        </div>
 
-                                        <div class="action" id="action">
+                                            <div class="attendance-details" style="display: none;">
+
+                                                <div class="day_present">
+                                                    <?php if (!empty($attendanceDay)) : ?>
+                                                        <input type="hidden" name="attendance_day" value="<?php echo $attendanceDay; ?>">
+                                                        <span>(Day: <?php echo $attendanceDay; ?>)</span>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <div class="phone">
+                                                    <span><?php echo $attendanceStatus . ' ' ?></span>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="action" id="action">
+                                                <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
+                                                <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                                 <div class="days">
-                                                    <input type="hidden" name="attendance_date" id="attendance_date">
                                                     <select name="event_day" id="event_day">
                                                         <?php for ($i = 1; $i <= $numDays; $i++) : ?>
                                                             <option value="<?php echo $i; ?>">Day <?php echo $i; ?></option>
@@ -625,19 +714,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </div>
 
                                                 <div class="status">
-                                                    <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
-                                                    <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                                     <button type="submit" name="status" value="present" 
                                                         class="approve att <?php echo ($row['status'] == 'present' ? 'active' : ''); ?>">Present</button>
                                                 </div>
 
                                                 <div class="status">
-                                                    <input type="hidden" name="participant_id" value="<?php echo $row['participant_id']; ?>">
-                                                    <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                                     <button type="submit" name="status" value="absent" 
                                                         class="approve att <?php echo ($row['status'] == 'absent' ? 'active' : ''); ?>">Absent</button>
                                                 </div>
-                                        </div>
+                                            </div>
 
                                         </div>
                                     </li>
@@ -650,6 +735,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     ?>
                 </div>
+
 
 
                 <div class="table_body" style="Display:none;" id="table_present_all_days">
@@ -745,6 +831,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
 
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                function updateAttendance(participantId, eventId, attendanceDay) {
+                    var timeIn = $('#timeIn_' + participantId).val();
+                    var timeOut = $('#timeOut_' + participantId).val();
+
+                    $.ajax({
+                        url: '', // Same page, since we're handling both PHP and HTML here
+                        type: 'POST',
+                        data: {
+                            participant_id: participantId,
+                            event_id: eventId,
+                            timeIn: timeIn,
+                            timeOut: timeOut,
+                            attendance_day: attendanceDay // Include attendance_day in the data sent
+                        },
+                        success: function(response) {
+                            var result = JSON.parse(response);
+                            alert(result.message);
+                            if (result.status === 'success') {
+                                // Optionally update UI or perform any other action
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error updating attendance:", error);
+                        }
+                    });
+                }
+            </script>
+
+
+
+
             <script>
                 // Function to hide attendance details when the "Participants" button is clicked
                 document.getElementById("viewParticipants").addEventListener("click", function() {
@@ -826,6 +945,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById("absent_day_filter").addEventListener("change", toggleAttendanceDetails);
 
             </script>
+
+
+
 
             <script>
         function filterByDay() {
