@@ -38,7 +38,9 @@ if (isset($_POST['submit'])) {
                         title: 'Error!',
                         text: 'This email is pending approval. Please wait for confirmation.',
                         icon: 'warning'
-                    });
+                    }).then(() => {
+            hideLoaderAfterAlert();
+        });
                 </script>
             ";
         } else {
@@ -94,7 +96,9 @@ if (isset($_POST['submit'])) {
                             title: 'Success!',
                             text: 'Password reset link has been sent to your email.',
                             icon: 'success'
-                        });
+                        }).then(() => {
+            hideLoaderAfterAlert();
+        });
                     </script>
                 ";
             } catch (mysqli_sql_exception $e) {
@@ -106,7 +110,9 @@ if (isset($_POST['submit'])) {
                                 title: 'Error!',
                                 text: 'A reset link has already been generated for this email. Please check your inbox.',
                                 icon: 'error'
-                            });
+                            }).then(() => {
+            hideLoaderAfterAlert();
+        });
                         </script>
                     ";
                 } else {
@@ -117,7 +123,9 @@ if (isset($_POST['submit'])) {
                                 title: 'Error!',
                                 text: 'An error occurred: " . $e->getMessage() . "',
                                 icon: 'error'
-                            });
+                            }).then(() => {
+            hideLoaderAfterAlert();
+        });
                         </script>
                     ";
                 }
@@ -129,7 +137,9 @@ if (isset($_POST['submit'])) {
                             title: 'Error!',
                             text: 'Message could not be sent. Mailer Error: " . $mail->ErrorInfo . "',
                             icon: 'error'
-                        });
+                        }).then(() => {
+            hideLoaderAfterAlert();
+        });
                     </script>
                 ";
             }
@@ -142,7 +152,9 @@ if (isset($_POST['submit'])) {
                     title: 'Error!',
                     text: 'Email does not exist.',
                     icon: 'error'
-                });
+                }).then(() => {
+            hideLoaderAfterAlert();
+        });
             </script>
         ";
     }
@@ -173,14 +185,13 @@ if (isset($_POST['submit'])) {
     <title>Forget Password | Event Record Management</title>
 </head>
 <style>
+    /* HTML: <div class="loader"></div> */
     .loader {
         width: 90px;
         height: 14px;
         box-shadow: 0 3px 0 #fff;
+        /* display: grid; */
         display: none;
-        /* Initially hidden */
-        margin: 10px auto;
-        grid-area: 1/1;
     }
 
     .loader:before,
@@ -200,7 +211,7 @@ if (isset($_POST['submit'])) {
 
     @keyframes l4 {
         100% {
-            background-position: calc(100%/3) 0;
+            background-position: calc(100%/3) 0
         }
     }
 </style>
@@ -209,7 +220,7 @@ if (isset($_POST['submit'])) {
     <div class="container">
         <div class="forms-container">
             <div class="signin-signup">
-                <form action="forgetPass.php" class="sign-in-form" method="POST">
+                <form id="forgetPassForm" action="forgetPass.php" class="sign-in-form" method="POST">
                     <h2 class="title">Forget Password</h2>
 
                     <div class="input-field">
@@ -248,7 +259,20 @@ if (isset($_POST['submit'])) {
     </div>
 
     <?php echo $alertMessage; ?>
+    <script>
+        const form = document.getElementById('forgetPassForm');
+        const loader = document.getElementById('loader');
 
+        form.addEventListener('submit', function (e) {
+            loader.style.display = 'grid';
+        });
+
+        function hideLoaderAfterAlert() {
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
+    </script>
     <!-- SIGNIN-SIGNUP JS-->
     <script src="assets/js/signin-signup.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

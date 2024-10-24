@@ -26,18 +26,18 @@ if (isset($_POST["submitAccept"])) {
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt_insert = $conn->prepare($sql_insert);
             $stmt_insert->bind_param(
-                'ssssssssssss', 
-                $row['LastName'], 
-                $row['FirstName'], 
-                $row['MI'], 
-                $row['Gender'], 
-                $row['Email'], 
-                $row['Password'], 
-                $row['ContactNo'], 
-                $row['Address'], 
-                $row['Affiliation'], 
-                $row['Position'], 
-                $row['Image'], 
+                'ssssssssssss',
+                $row['LastName'],
+                $row['FirstName'],
+                $row['MI'],
+                $row['Gender'],
+                $row['Email'],
+                $row['Password'],
+                $row['ContactNo'],
+                $row['Address'],
+                $row['Affiliation'],
+                $row['Position'],
+                $row['Image'],
                 $row['Role']
             );
             $stmt_insert->execute();
@@ -66,7 +66,7 @@ if (isset($_POST["submitAccept"])) {
                 )
             );
 
-            $mail->setFrom('eventmanagement917@gmail.com', 'Management System');
+            $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
