@@ -372,7 +372,19 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                         <div class="department"><span><?php echo $position; ?></span></div>
                                         <div class="info"><span><?php echo $email; ?></span></div>
                                         <div class="phone"><span><?php echo $contactNo; ?></span></div>
-                                        <div class="status"><span><?php echo $status; ?></span></div>
+                                        <div class="status">
+                                            <span>
+                                                <?php
+                                                if ($status === 'present') {
+                                                    echo 'Present';
+                                                } elseif ($status === 'absent') {
+                                                    echo 'Absent';
+                                                } else {
+                                                    echo 'Not Marked';
+                                                }
+                                                ?>
+                                            </span>
+                                        </div>
                                         <div class="status">
                                             <input type="hidden" name="participant_id"
                                                 value="<?php echo $row['participant_id']; ?>">
@@ -397,113 +409,40 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     ?>
 
                 </div>
-
                 <script>
-                    function triggerAttendance(participant_id) {
-                        Swal.fire({
-                            title: 'Mark Attendance',
-                            text: 'Select the attendance status for this participant:',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonText: 'Present',
-                            cancelButtonText: 'Absent',
-                            reverseButtons: true,
-                            customClass: {
-                                popup: 'larger-swal',
-                                confirmButton: 'swal-confirm',
-                                cancelButton: 'swal-cancel'
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                updateAttendance(participant_id, 'present');
-                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                updateAttendance(participant_id, 'absent');
-                            }
-                        });
-                    }
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const presentDayItems = document.querySelectorAll(".present_day_filter");
+                        const absentDayItems = document.querySelectorAll(".absent_day_filter");
 
-                    function updateAttendance(participant_id, status) {
-                        const event_id = $('input[name="event_id"]').val();
-                        const attendance_date = getStoredDate();  // Get date from sessionStorage
+                        presentDayItems.forEach(item => {
+                            item.addEventListener("click", function () {
+                                const selectedDate = this.getAttribute("data-day");
+                                const filter = 'present';
 
-                        if (!attendance_date || attendance_date === "") {
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Please select a date before marking attendance.',
-                                icon: 'error',
-                                customClass: {
-                                    popup: 'larger-swal'
-                                }
+                                fetchParticipantsByDateAndStatus(selectedDate, filter);
                             });
-                            return;
-                        }
-
-                        $.ajax({
-                            url: 'update_attendance.php',
-                            type: 'POST',
-                            data: {
-                                participant_id: participant_id,
-                                event_id: event_id,
-                                attendance_date: attendance_date,
-                                status: status
-                            },
-                            success: function (response) {
-                                let statusMessage = status === 'present' ? 'Participant marked as Present' : 'Participant marked as Absent';
-                                Swal.fire({
-                                    title: 'Success',
-                                    text: statusMessage,
-                                    icon: 'success',
-                                    customClass: {
-                                        popup: 'larger-swal'
-                                    }
-                                });
-                            },
-                            error: function () {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: 'There was an issue updating the attendance.',
-                                    icon: 'error',
-                                    customClass: {
-                                        popup: 'larger-swal'
-                                    }
-                                });
-                            }
                         });
-                    }
 
-                </script>
+                        absentDayItems.forEach(item => {
+                            item.addEventListener("click", function () {
+                                const selectedDate = this.getAttribute("data-day");
+                                const filter = 'absent';
 
+                                fetchParticipantsByDateAndStatus(selectedDate, filter);
+                            });
+                        });
 
+                        function fetchParticipantsByDateAndStatus(selectedDate, filter) {
+                            const eventTitle = "<?php echo $eventTitle; ?>";
 
-
-
-
-                <script>
-                    function updateTable() {
-                        const selectedDate = document.getElementById('event_day-filter').value;
-
-                        // Save the selected date in sessionStorage
-                        sessionStorage.setItem('selectedDate', selectedDate);
-
-                        const urlParams = new URLSearchParams(window.location.search);
-                        urlParams.set('selectedDate', selectedDate);
-
-                        // Reload the page with the updated query parameter
-                        window.location.search = urlParams.toString();
-                    }
-
-                    function getStoredDate() {
-                        return sessionStorage.getItem('selectedDate') || '';
-                    }
-
-                    // Automatically select the stored date on page load
-                    window.onload = function () {
-                        const storedDate = getStoredDate();
-                        if (storedDate) {
-                            document.getElementById('event_day-filter').value = storedDate;
+                            fetch(`filter_participants.php?selectedDate=${selectedDate}&eventTitle=${eventTitle}&status=${filter}`)
+                                .then(response => response.text())
+                                .then(data => {
+                                    document.querySelector('.table_body').innerHTML = data;
+                                })
+                                .catch(error => console.error('Error:', error));
                         }
-                    };
-
+                    });
 
                 </script>
 
