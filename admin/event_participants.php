@@ -257,13 +257,17 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     </a>
 
 
-
                     <!-- Present Participants -->
                     <a href="#" class="box" id="viewPresentParticipants">
                         <i class="fa-solid fa-user-check"></i>
                         <h3>Present</h3>
                         <div class="day-hover-menu red-palette">
-                            <label class="filter-label">Present</label>
+                            <label class="filter-label">
+                                Present
+                                <!-- Filter All Days Button -->
+                                <button class="filter-all-btn" onclick="filterAllDays('present')">Perfect
+                                    Attendance</button>
+                            </label>
                             <div class="days-list">
                                 <?php
                                 foreach ($eventDates as $date) {
@@ -280,7 +284,12 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                         <i class="fa-solid fa-user-xmark"></i>
                         <h3>Absent</h3>
                         <div class="day-hover-menu red-palette">
-                            <label class="filter-label">Absent</label>
+                            <label class="filter-label">
+                                Absent
+                                <!-- Filter All Days Button -->
+                                <button class="filter-all-btn" onclick="filterAllDays('absent')">Complete
+                                    Absences</button>
+                            </label>
                             <div class="days-list">
                                 <?php
                                 foreach ($eventDates as $date) {
@@ -291,6 +300,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             </div>
                         </div>
                     </a>
+
 
                     <a href="#" class="box">
                         <i class="fa-solid fa-calendar-days"></i>
@@ -443,6 +453,16 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                 .catch(error => console.error('Error:', error));
                         }
                     });
+                    function filterAllDays(status) {
+                        const eventTitle = "<?php echo $eventTitle; ?>";
+
+                        fetch(`filter_complete_present_and_absent.php?eventTitle=${eventTitle}&status=${status}`)
+                            .then(response => response.text())
+                            .then(data => {
+                                document.querySelector('.table_body').innerHTML = data;
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
 
                 </script>
 

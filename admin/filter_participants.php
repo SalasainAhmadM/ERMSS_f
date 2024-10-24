@@ -66,7 +66,7 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
         echo "</ul>";
     } else {
         echo "<div class='no-participants-container'>
-                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No '$status' participants found for the specified event and date.</p>
+                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participant found for the specified event and date.</p>
               </div>";
     }
 }

@@ -2,7 +2,8 @@
 session_start();
 require_once('../db.connection/connection.php');
 
-function showProfileModal($message) {
+function showProfileModal($message)
+{
     echo "<script>
               showModal('$message');
           </script>";
@@ -22,20 +23,21 @@ function countPendingUsers($conn)
 
 $pendingUsersCount = countPendingUsers($conn);
 function countPendingEvents($conn)
-            {
-                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-                $result = $conn->query($sqls);
-            
-                if ($result) {
-                    $row = $result->fetch_assoc();
-                    return $row['totalPendingEvents'];
-                } else {
-                    return 0; 
-                }
-            }
-            
-            $pendingEventsCount = countPendingEvents($conn);
-function getAdminData($conn, $AdminID) {
+{
+    $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+    $result = $conn->query($sqls);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalPendingEvents'];
+    } else {
+        return 0;
+    }
+}
+
+$pendingEventsCount = countPendingEvents($conn);
+function getAdminData($conn, $AdminID)
+{
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $AdminID);
@@ -51,6 +53,8 @@ function getAdminData($conn, $AdminID) {
         return false;
     }
 }
+
+$alertMessage = '';
 
 $AdminID = $_SESSION['AdminID']; // Retrieve AdminID from the session
 $adminData = getAdminData($conn, $AdminID);
@@ -165,12 +169,41 @@ function changeAdminPassword($adminID, $newPassword)
 
     // Execute the SQL statement
     if ($conn->query($sql) === TRUE) {
-        // If the update is successful, redirect to the profile page or display a success message
-        header("Location: profile.php");
-        exit();
+        // Set success SweetAlert message
+        echo "
+        <script>
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your password has been successfully reset.',
+                icon: 'success',
+                customClass: {
+                    popup: 'larger-swal' 
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'profile.php';
+                }
+            });
+        </script>
+    ";
     } else {
-        // If an error occurs, display an error message
-        echo "Error updating password: " . $conn->error;
+        // Trigger SweetAlert error for incorrect current password
+        echo "
+        <script>
+            Swal.fire({
+                title: 'Incorrect Password!',
+                text: 'The current password you entered is incorrect.',
+                icon: 'error',
+                customClass: {
+                    popup: 'larger-swal' 
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'profile.php';
+                }
+            });
+        </script>
+    ";
     }
 }
 
@@ -189,12 +222,41 @@ if (isset($_POST['submitp'])) {
             // Call the function to change the admin password
             changeAdminPassword($adminID, $newPassword);
         } else {
-            // Display an error message if the current password is incorrect
-            echo "Current password is incorrect.";
+            // Trigger SweetAlert error for incorrect current password
+            $alertMessage = "
+                <script>
+                    Swal.fire({
+                        title: 'Incorrect Password!',
+                        text: 'The current password you entered is incorrect.',
+                        icon: 'error',
+                        customClass: {
+                            popup: 'larger-swal' 
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'profile.php';
+                        }
+                    });
+                </script>
+            ";
         }
     } else {
-        // Display an error message if the new password and confirm new password do not match
-        echo "New password and confirm password do not match.";
+        $alertMessage = "
+            <script>
+                Swal.fire({
+                    title: 'Password Mismatch!',
+                    text: 'New password and confirmation do not match.',
+                    icon: 'error',
+                    customClass: {
+                        popup: 'larger-swal' 
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'profile.php';
+                    }
+                });
+            </script>
+        ";
     }
 }
 
