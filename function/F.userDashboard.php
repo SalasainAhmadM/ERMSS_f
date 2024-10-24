@@ -56,55 +56,57 @@ if (isset($_SESSION['UserID'])) {
 
     $_SESSION['eventsJoined'] = $eventsJoined;
 
-   
+    if ($eventsJoined > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $eventTitle = htmlspecialchars($row['event_title']);
+            $eventLocation = htmlspecialchars($row['location']);
+            $eventDateStart = $row['date_start'];
+            $eventDateEnd = $row['date_end'];
+            $eventTimeStart = $row['time_start'];
+            $eventTimeEnd = $row['time_end'];
+            $eventMode = htmlspecialchars($row['event_mode']);
+            $eventType = htmlspecialchars($row['event_type']);
+            $eventId = $row['event_id'];
 
-    while ($row = mysqli_fetch_assoc($result)) {
-        $eventTitle = htmlspecialchars($row['event_title']);
-        $eventLocation = htmlspecialchars($row['location']);
-        $eventDateStart = $row['date_start'];
-        $eventDateEnd = $row['date_end'];
-        $eventTimeStart = $row['time_start'];
-        $eventTimeEnd = $row['time_end'];
-        $eventMode = htmlspecialchars($row['event_mode']);
-        $eventType = htmlspecialchars($row['event_type']);
-        $eventId = $row['event_id'];
+            $eventTimeZone = new DateTimeZone('Asia/Manila');
+            $currentDateTime = new DateTime('now', $eventTimeZone);
+            $eventStartDateTime = new DateTime($row['date_start'] . ' ' . $row['time_start'], $eventTimeZone);
+            $eventEndDateTime = new DateTime($row['date_end'] . ' ' . $row['time_end'], $eventTimeZone);
 
-        $eventTimeZone = new DateTimeZone('Asia/Manila');
-        $currentDateTime = new DateTime('now', $eventTimeZone);
-        $eventStartDateTime = new DateTime($row['date_start'] . ' ' . $row['time_start'], $eventTimeZone);
-        $eventEndDateTime = new DateTime($row['date_end'] . ' ' . $row['time_end'], $eventTimeZone);
+            $eventStatus = '';
 
-        $eventStatus = '';
+            if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
+                $eventStatus = 'ongoing';
+            } elseif ($currentDateTime < $eventStartDateTime) {
+                $eventStatus = 'upcoming';
+            } elseif ($currentDateTime > $eventEndDateTime) {
+                $eventStatus = 'ended';
+            }
 
-        if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
-            $eventStatus = 'ongoing';
-        } elseif ($currentDateTime < $eventStartDateTime) {
-            $eventStatus = 'upcoming';
-        } elseif ($currentDateTime > $eventEndDateTime) {
-            $eventStatus = 'ended';
+            if ($eventStatus === 'ongoing' || $eventStatus === 'upcoming') {
+                echo '<tr data-start-date="' . $row['date_start'] . '" data-end-date="' . $row['date_end'] . '">';
+                ?>
+                <td data-label="Event Title"><?php echo $eventTitle; ?></td>
+                <td data-label="Event Type"><?php echo $eventType; ?></td>
+                <td data-label="Event Mode"><?php echo $eventMode; ?></td>
+                <td data-label="Event Location"><?php echo $eventLocation; ?></td>
+                <td data-label="Event Date">
+                    <?php echo date('F j, Y', strtotime($eventDateStart)) . ' - ' . date('F j, Y', strtotime($eventDateEnd)); ?>
+                </td>
+                <td data-label="Event Time">
+                    <?php echo date('h:ia', strtotime($eventTimeStart)) . ' - ' . date('h:ia', strtotime($eventTimeEnd)); ?>
+                </td>
+                <td data-label="Status"><?php echo $eventStatus; ?></td>
+                <td data-label="Attendance" class="pad">
+                    <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i
+                                class="fa-solid fa-eye"></i></button></a>
+                </td>
+                <?php
+                echo '</tr>';
+            }
         }
-
-        if ($eventStatus === 'ongoing' || $eventStatus === 'upcoming') {
-            echo '<tr data-start-date="' . $row['date_start'] . '" data-end-date="' . $row['date_end'] . '">';
-            ?>
-            <td data-label="Event Title"><?php echo $eventTitle; ?></td>
-            <td data-label="Event Type"><?php echo $eventType; ?></td>
-            <td data-label="Event Mode"><?php echo $eventMode; ?></td>
-            <td data-label="Event Location"><?php echo $eventLocation; ?></td>
-            <td data-label="Event Date">
-                <?php echo date('F j, Y', strtotime($eventDateStart)) . ' - ' . date('F j, Y', strtotime($eventDateEnd)); ?>
-            </td>
-            <td data-label="Event Time">
-                <?php echo date('h:ia', strtotime($eventTimeStart)) . ' - ' . date('h:ia', strtotime($eventTimeEnd)); ?>
-            </td>
-            <td data-label="Status"><?php echo $eventStatus; ?></td>
-            <td data-label="Attendance" class="pad">
-                <a href="myEvent.php?event_id=<?php echo $eventId; ?>"><button class="btn_edit"><i
-                            class="fa-solid fa-eye"></i></button></a>
-            </td>
-            <?php
-            echo '</tr>';
-        }
+    } else {
+        echo "<tr><td colspan='8' style='text-align: center;'>No Events Currently Joined!</td></tr>";
     }
 
     mysqli_free_result($result);
@@ -116,5 +118,4 @@ if (isset($_SESSION['UserID'])) {
     header("Location: login.php");
     exit();
 }
-
 ?>
