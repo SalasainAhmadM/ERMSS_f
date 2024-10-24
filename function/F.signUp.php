@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $hashedPassword = password_hash($Password, PASSWORD_BCRYPT); 
+    $hashedPassword = password_hash($Password, PASSWORD_BCRYPT);
 
 
     $checkEmailQuery = "SELECT COUNT(*) as count FROM pendinguser WHERE Email = '$Email'";
@@ -60,11 +60,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $checkResult->close();
     $conn->close();
-    
+
     echo json_encode($response);
 }
 
-function endsWith($haystack, $needle) {
+function endsWith($haystack, $needle)
+{
     return substr($haystack, -strlen($needle)) === $needle;
 }
 ?>

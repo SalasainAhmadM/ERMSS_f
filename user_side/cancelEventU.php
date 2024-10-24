@@ -68,14 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit();
     }
 }
-function countCanceledEvents($conn)
+function countCanceledEvents($conn, $UserID)
 {
     $sql = "
-            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
-            FROM events e
-            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+        SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+        FROM events e
+        INNER JOIN cancel_reason cr ON e.event_id = cr.event_id
+        WHERE cr.UserID = ?"; // Ensure that the UserID matches
 
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $UserID); // Bind the UserID as a parameter
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result) {
         $row = $result->fetch_assoc();
@@ -86,7 +90,7 @@ function countCanceledEvents($conn)
 }
 
 // Call the function to get the number of canceled events
-$canceledEventsCount = countCanceledEvents($conn);
+$canceledEventsCount = countCanceledEvents($conn, $UserID);
 ?>
 
 

@@ -15,7 +15,6 @@ if (isset($_POST['Submit'])) {
     $gender = $_POST['Gender'];
     $age = $_POST['Age'];
     $email = $_POST['Email'];
-    $password = $_POST['Password'];
     $contactNo = $_POST['ContactNo'];
     $address = $_POST['Address'];
     $position = $_POST['Position'];
@@ -56,7 +55,6 @@ if (isset($_POST['Submit'])) {
                     Gender = '$gender', 
                     Age = '$age', 
                     Email = '$email', 
-                    Password = '$password', 
                     ContactNo = '$contactNo', 
                     Address = '$address', 
                     Affiliation = '$affiliation', 

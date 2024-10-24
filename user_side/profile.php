@@ -19,14 +19,18 @@ $eventsJoinedStmt->execute();
 $eventsJoinedResult = $eventsJoinedStmt->get_result();
 $eventsJoinedRow = mysqli_fetch_assoc($eventsJoinedResult);
 $totalEventsJoined = $eventsJoinedRow['totalEventsJoined'];
-function countCanceledEvents($conn)
+function countCanceledEvents($conn, $UserID)
 {
     $sql = "
-            SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
-            FROM events e
-            INNER JOIN cancel_reason cr ON e.event_id = cr.event_id";
+        SELECT COUNT(DISTINCT e.event_id) AS totalCanceledEvents 
+        FROM events e
+        INNER JOIN cancel_reason cr ON e.event_id = cr.event_id
+        WHERE cr.UserID = ?"; // Ensure that the UserID matches
 
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $UserID); // Bind the UserID as a parameter
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result) {
         $row = $result->fetch_assoc();
@@ -37,7 +41,8 @@ function countCanceledEvents($conn)
 }
 
 // Call the function to get the number of canceled events
-$canceledEventsCount = countCanceledEvents($conn);
+$canceledEventsCount = countCanceledEvents($conn, $UserID);
+
 ?>
 
 <!DOCTYPE html>
@@ -157,24 +162,31 @@ $canceledEventsCount = countCanceledEvents($conn);
                                 <input type="text" name="MI" style="display: none;" value="<?php echo $MI; ?>">
                                 <input type="text" name="Gender" style="display: none;" value="<?php echo $Gender; ?>">
                                 <input type="text" name="Email" style="display: none;" value="<?php echo $Email; ?>">
-                                <input type="password" name="Password" style="display: none;"
-                                    value="<?php echo $Password; ?>">
 
                                 <input type="text" name="ContactNo" placeholder="Phone" class="form__input"
                                     value="<?php echo $ContactNo; ?>">
-
                                 <input type="text" name="Address" placeholder="Address" class="form__input"
                                     value="<?php echo $Address; ?>">
-
                                 <input type="number" name="Age" placeholder="Age" class="form__input"
                                     value="<?php echo $Age; ?>" required>
-
                                 <input type="text" name="Position" placeholder="Occupation" class="form__input"
                                     value="<?php echo $Position; ?>">
-
                                 <input type="text" name="Affiliation" placeholder="Affiliation" class="form__input"
                                     value="<?php echo $Affiliation; ?>">
 
+                                <script>
+                                    window.onload = function () {
+                                        // Select all input fields in the form
+                                        const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+
+                                        // Iterate over each input field and check if the value is "N/A"
+                                        inputs.forEach(input => {
+                                            if (input.value === "N/A") {
+                                                input.value = ""; // Set the value to empty so the placeholder is displayed
+                                            }
+                                        });
+                                    };
+                                </script>
                                 <label for="EducationalAttainment">Educational Attainment</label>
                                 <select name="EducationalAttainment" class="form__input">
                                     <option value="" disabled selected>Select your educational attainment</option>
