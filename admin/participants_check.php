@@ -24,7 +24,7 @@ function dateRange($start, $end)
 $eventTitle = isset($_GET['eventTitle']) ? urldecode($_GET['eventTitle']) : null;
 
 // Fetch event details (including type and mode)
-$eventDetailsSql = "SELECT event_type, event_mode, date_start, date_end FROM events WHERE event_title = ?";
+$eventDetailsSql = "SELECT event_id, event_type, event_mode, date_start, date_end FROM events WHERE event_title = ?";
 $eventDetailsStmt = $conn->prepare($eventDetailsSql);
 $eventDetailsStmt->bind_param("s", $eventTitle);
 $eventDetailsStmt->execute();
@@ -32,6 +32,7 @@ $eventDetailsResult = $eventDetailsStmt->get_result();
 $eventDetailsRow = $eventDetailsResult->fetch_assoc();
 
 if ($eventDetailsRow) {
+    $eventId = $eventDetailsRow['event_id'];
     $dateStart = $eventDetailsRow['date_start'];
     $dateEnd = $eventDetailsRow['date_end'];
     $eventType = $eventDetailsRow['event_type'];
@@ -47,25 +48,32 @@ $numDays = dateRange($dateStart, $dateEnd);
 $eventDetailsStmt->close();
 
 // Fetch total participants for the specified event title
-$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
-                         WHERE event_id = (SELECT event_id FROM Events WHERE event_title = ? LIMIT 1)";
+$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants WHERE event_id = ?";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
-$totalParticipantsStmt->bind_param("s", $eventTitle);
+$totalParticipantsStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
 $totalParticipantsStmt->execute();
 $totalParticipantsResult = $totalParticipantsStmt->get_result();
 $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
 $totalParticipants = $totalParticipantsRow['totalParticipants'];
 
 // Fetch and display participants for the specified event title
-$participantsSql = "SELECT user.FirstName, user.LastName, user.Age, user.Gender, user.Email, user.Affiliation, user.Position, user.Image, user.ContactNo, user.EducationalAttainment, eventParticipants.UserID
-                    FROM eventParticipants
-                    INNER JOIN user ON eventParticipants.UserID = user.UserID
-                    WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ? LIMIT 1)";
-
+$participantsSql = "SELECT user.FirstName, user.LastName, user.Age, user.Gender, user.Email, user.Affiliation, user.Position, user.Image, user.ContactNo, user.EducationalAttainment, eventParticipants.UserID FROM eventParticipants INNER JOIN user ON eventParticipants.UserID = user.UserID WHERE eventParticipants.event_id = ?";
 $participantsStmt = $conn->prepare($participantsSql);
-$participantsStmt->bind_param("s", $eventTitle);
+$participantsStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
 $participantsStmt->execute();
 $participantsResult = $participantsStmt->get_result();
+
+// Fetch attendance data for participants
+$attendanceData = []; 
+$attendanceSql = "SELECT participant_id, attendance_date, status FROM attendance WHERE event_id = ?";
+$attendanceStmt = $conn->prepare($attendanceSql);
+$attendanceStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+$attendanceStmt->execute();
+$attendanceResult = $attendanceStmt->get_result();
+
+while ($attendanceRow = $attendanceResult->fetch_assoc()) {
+    $attendanceData[$attendanceRow['participant_id']][$attendanceRow['attendance_date']] = $attendanceRow['status'];
+}
 
 require('../fpdf186/fpdf.php'); // Include the FPDF library
 
@@ -117,33 +125,31 @@ if (isset($_GET['download'])) {
     $pdf->Ln();
 
     $participantCount = 1;
-    $attendanceData = []; 
 
     while ($row = $participantsResult->fetch_assoc()) {
         $participantId = $row['UserID'];
         $pdf->Cell(22, 10, $participantCount++, 1, 0, 'C');
-    
+
         // Add MultiCell for Participants to handle long names
         $currentY = $pdf->GetY();
         $pdf->MultiCell($participantColumnWidth, 10, htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']), 1);
         
         $multiCellHeight = $pdf->GetY() - $currentY; 
-    
+
         // Move cursor back to the right position after MultiCell
         $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY);
-    
+
         // Check attendance for each day
         for ($day = 0; $day < $numDays; $day++) {
             $currentDate = (new DateTime($dateStart))->modify("+$day day")->format('Y-m-d');
-            $status = isset($attendanceData[$participantId][$currentDate]) ? $attendanceData[$participantId][$currentDate] : 'X'; // Default to 'X' (absent)
-            $symbol = $status === 'present' ? '/' : 'X';
-            
+            $status = isset($attendanceData[$participantId][$currentDate]) ? $attendanceData[$participantId][$currentDate] : 'absent'; // Default to 'absent'
+            $symbol = ($status === 'present') ? '/' : 'X'; // Use '/' for present, 'X' for absent
+
             // Ensure that the height for the attendance cell matches the MultiCell height
             $pdf->Cell(22, $multiCellHeight, $symbol, 1, 0, 'C');
         }
         $pdf->Ln(); // Move to the next line for the next participant
     }
-    
 
     // Adding a note about attendance symbols
     $pdf->SetFont("Arial", 'I', 10);
@@ -158,40 +164,39 @@ if (isset($_GET['download'])) {
     $pdf->Cell(22, 10, "#", 1);
     $pdf->Cell(0, 10, "Sponsors", 1, 1);
 
-    // Sample sponsors data (replace with actual data if available)
-    $sponsors_data = [
-        [1, "Sponsor 1"],
-        [2, "Sponsor 2"],
-        [3, "Sponsor 3"],
-    ];
+    // Fetch sponsors related to the event from the database
+    $sponsors_query = "SELECT sponsor_id, sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
+    $stmt = $conn->prepare($sponsors_query);
+    $stmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+    $stmt->execute();
+    $sponsors_result = $stmt->get_result();
 
-    foreach ($sponsors_data as $sponsor) {
-        $pdf->Cell(22, 10, strval($sponsor[0]), 1);
-        $pdf->Cell(0, 10, $sponsor[1], 1, 1);
+    // Initialize sponsor count
+    $sponsor_count = 1;
+
+    // Fetch and display each sponsor
+    while ($sponsor_row = $sponsors_result->fetch_assoc()) {
+        $sponsor_full_name = trim($sponsor_row['sponsor_firstName'] . ' ' . $sponsor_row['sponsor_MI'] . ' ' . $sponsor_row['sponsor_lastName']);
+        $pdf->Cell(22, 10, strval($sponsor_count++), 1);
+        $pdf->Cell(0, 10, $sponsor_full_name, 1, 1);
     }
+
+    // Close statement
+    $stmt->close();
 
     // Output the PDF to a string
     $pdf_output = $pdf->Output('event_details.pdf', 'S');
 
     // Prepare to download the PDF
-    header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="event_details.pdf"');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
-    header('Content-Length: ' . strlen($pdf_output));
-
-    // Clear output buffer and flush
-    ob_clean();
-    flush();
-
-    // Output the PDF file
     echo $pdf_output;
-    exit;
-}
 
+    // Close database connections
+    $conn->close();
+}
 ?>
+
 
 
 
