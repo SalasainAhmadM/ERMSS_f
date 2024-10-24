@@ -29,14 +29,16 @@ include('../function/F.userValidation.php');
 
 <body>
     <style>
+        /* HTML: <div class="loader"></div> */
         .loader {
             width: 90px;
             height: 14px;
             box-shadow: 0 3px 0 #fff;
+            /* display: grid; */
             display: none;
-            /* Initially hidden */
-            margin: 10px auto;
-            grid-area: 1/1;
+            position: fixed;
+            top: 50%;
+            left: 50%;
         }
 
         .loader:before,
@@ -56,44 +58,12 @@ include('../function/F.userValidation.php');
 
         @keyframes l4 {
             100% {
-                background-position: calc(100%/3) 0;
+                background-position: calc(100%/3) 0
             }
         }
     </style>
-    <?php
-    if (isset($_SESSION['success'])) {
-        echo "<script>
-    Swal.fire({
-      title: 'Approved!',
-      text: 'Email Confirmation has been sent successfully!',
-      icon: 'success'
-    });
-    </script>";
-        unset($_SESSION['success']);
-    }
 
-    if (isset($_SESSION['decline'])) {
-        echo "<script>
-    Swal.fire({
-      title: 'Declined!',
-      text: 'The account has been declined.',
-      icon: 'info' 
-    });
-    </script>";
-        unset($_SESSION['decline']);
-    }
 
-    if (isset($_SESSION['error'])) {
-        echo "<script>
-    Swal.fire({
-      title: 'Error!',
-      text: '" . $_SESSION['error'] . "',
-      icon: 'error'
-    });
-    </script>";
-        unset($_SESSION['error']);
-    }
-    ?>
     <!--=========== SIDEBAR =============-->
     <div class="sidebar">
         <div class="top">
@@ -260,7 +230,7 @@ include('../function/F.userValidation.php');
                                             </div>
 
                                             <div class="status">
-                                                <button type="submit" name="submitAccept" class="approve"
+                                                <button id="approve" type="submit" name="submitAccept" class="approve"
                                                     value="<?php echo $Email; ?>">Approve</button>
                                                 <input type="hidden" name="Email" value="<?php echo $Email; ?>">
                                                 <input type="hidden" name="PendingUserID" value="<?php echo $PendingUserID; ?>">
@@ -268,7 +238,8 @@ include('../function/F.userValidation.php');
                                             </div>
 
                                             <div class="status">
-                                                <button type="submit" name="submitDecline" class="approve">Decline</button>
+                                                <button id="decline" type="submit" name="submitDecline"
+                                                    class="approve">Decline</button>
                                                 <input type="hidden" name="PendingUserID" value="<?php echo $PendingUserID; ?>">
                                             </div>
                                         </div>
@@ -281,45 +252,80 @@ include('../function/F.userValidation.php');
                         echo "No records found";
                     }
                     ?>
-                    <?php
-                    // Check if status is set in the URL
-                    if (isset($_GET['status'])) {
-                        $status = $_GET['status'];
 
-                        // Generate SweetAlert based on the status
-                        if ($status == 'success') {
-                            echo "<script>
-            Swal.fire({
-                title: 'Success!',
-                text: 'Account has been approved and confirmation email sent.',
-                icon: 'success'
-            });
-        </script>";
-                        } elseif ($status == 'declined') {
-                            echo "<script>
-            Swal.fire({
-                title: 'Declined!',
-                text: 'Account request has been declined and email sent.',
-                icon: 'info'
-            });
-        </script>";
-                        } elseif ($status == 'error') {
-                            echo "<script>
-            Swal.fire({
-                title: 'Error!',
-                text: 'An error occurred while sending the email. Please try again.',
-                icon: 'error'
-            });
-        </script>";
-                        }
-                    }
-                    ?>
+
                 </div>
+                <!-- Loader -->
+                <div class="loader" id="loader"></div>
             </div>
             <script src="js/attendanceScript.js"></script>
 
         </div>
     </div>
+    <?php
+    if (isset($_SESSION['success'])) {
+        echo "<script>
+    Swal.fire({
+      title: 'Approved!',
+      text: 'Email Confirmation has been sent successfully!',
+      icon: 'success',
+      customClass: {
+        popup: 'larger-swal', 
+      }
+    });
+    </script>";
+        unset($_SESSION['success']);
+    }
+
+    if (isset($_SESSION['decline'])) {
+        echo "<script>
+    Swal.fire({
+      title: 'Declined!',
+      text: 'The account has been declined.',
+      icon: 'info',
+      customClass: {
+        popup: 'larger-swal',
+      }
+    });
+    </script>";
+        unset($_SESSION['decline']);
+    }
+
+    if (isset($_SESSION['error'])) {
+        echo "<script>
+    Swal.fire({
+      title: 'Error!',
+      text: '" . $_SESSION['error'] . "',
+      icon: 'error',
+      customClass: {
+        popup: 'larger-swal',
+      }
+    });
+    </script>";
+        unset($_SESSION['error']);
+    }
+    ?>
+
+    <script>
+        const approveButton = document.getElementById('approve');
+        const declineButton = document.getElementById('decline');
+        const loader = document.getElementById('loader');
+
+        approveButton.addEventListener('click', function () {
+            loader.style.display = 'grid';
+        });
+
+        declineButton.addEventListener('click', function () {
+            loader.style.display = 'grid';
+        });
+
+        function hideLoaderAfterAlert() {
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
+    </script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--sidebar functionality-->
