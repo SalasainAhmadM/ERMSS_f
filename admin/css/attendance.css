@@ -55,16 +55,28 @@
     border-radius: 3px;
     text-align: center;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    min-width: 60px;  /* Ensures minimum width for consistency */
+    min-width: 60px; 
 }
 
 .days-list span:hover {
     background-color: #cc0000;
     color: white;
-    transform: scale(1.05);  /* Slight scaling for a more dynamic hover effect */
-    padding: 7px 12px; /* Slightly increased padding on hover for emphasis */
+}
+.filter-all-btn {
+    background-color: #cc0000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
 }
 
+.filter-all-btn:hover {
+    background-color: #ff6666;
+}
 /* filter end */
 .swal-confirm {
     background-color: #28a745 !important;
