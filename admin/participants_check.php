@@ -105,18 +105,6 @@ $participantsResult = $participantsStmt->get_result();
             return 0; // Return 0 if there is an error or no pending users
         }
     }
-    function countPendingEvents($conn)
-    {
-        $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-        $result = $conn->query($sqls);
-
-        if ($result) {
-            $row = $result->fetch_assoc();
-            return $row['totalPendingEvents'];
-        } else {
-            return 0;
-        }
-    }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Check if AdminID is set in the session
@@ -151,7 +139,6 @@ $participantsResult = $participantsStmt->get_result();
 
             // Example usage of the countPendingUsers function
             $pendingUsersCount = countPendingUsers($conn);
-            $pendingEventsCount = countPendingEvents($conn);
         }
     }
     ?>

@@ -1,0 +1,125 @@
+.parent-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.red-palette {
+    background-color: #ffcccc;
+    border: 1px solid #cc0000;
+    box-shadow: 0px 8px 16px rgba(204, 0, 0, 0.2);
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+    color: #cc0000;
+    font-weight: bold;
+}
+
+.day-hover-menu {
+    display: none;
+    position: absolute;
+    background-color: #ffcccc;
+    box-shadow: 0px 8px 16px rgba(204, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1;
+    width: 220px;
+}
+
+.box:hover .day-hover-menu {
+    display: block;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #cc0000;
+}
+
+.days-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.days-list span {
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #ffe6e6;
+    border: 1px solid #cc0000;
+    border-radius: 3px;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    min-width: 60px;  /* Ensures minimum width for consistency */
+}
+
+.days-list span:hover {
+    background-color: #cc0000;
+    color: white;
+    transform: scale(1.05);  /* Slight scaling for a more dynamic hover effect */
+    padding: 7px 12px; /* Slightly increased padding on hover for emphasis */
+}
+
+/* filter end */
+.swal-confirm {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.swal-cancel {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.attendance-btn {
+    background-color: var(--first-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.attendance-btn i {
+    font-size: 18px;
+}
+
+.attendance-btn:hover {
+    background-color: #c82333;
+}
+
+.no-participants-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.no-participants-message {
+    font-size: 18px;
+    font-weight: 500;
+    color: #6c757d;
+    text-align: center;
+}
+
+.no-participants-message i {
+    margin-right: 8px;
+    color: #ff6b6b;
+}

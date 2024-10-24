@@ -241,53 +241,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
                 <div class="table_section">
-                    <table id="userTable" class="tb_eco">
-                        <thead class="tb_head">
-                            <tr>
-                                <!-- <th style="width: 7%">ID</th> -->
-                                <th>Name</th>
-                                <th style="width: 7%">Age</th>
-                                <th style="width: 10%">Gender</th>
-                                <th>Email</th>
-                                <th>Occupation</th>
-                                <th>Affiliation</th>
-                                <th style="width: 9%">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($allUsers as $user): ?>
+                    <div class="table_section">
+                        <table id="userTable" class="tb_eco">
+                            <thead class="tb_head">
                                 <tr>
-                                    <!-- <td><?php echo $user['UserID']; ?></td> -->
-                                    <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
-                                    <td><?php echo $user['Age']; ?></td>
-                                    <td><?php echo $user['Gender']; ?></td>
-                                    <td><?php echo $user['Email']; ?></td>
-                                    <td><?php echo $user['Position']; ?></td>
-                                    <td><?php echo $user['Affiliation']; ?></td>
-                                    <td>
-                                        <!-- Ensure the event_id is dynamically set here -->
-                                        <form action="" method="post">
-                                            <button type="submit" class="action-button"><i
-                                                    class="fa-solid fa-plus"></i></button>
-                                            <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
-                                            <!-- Pass the correct event ID here -->
-                                            <input type="hidden" name="user_id" value="<?php echo $user['UserID']; ?>">
-                                            <!-- Pass the user ID to the form -->
-
-                                        </form>
-                                    </td>
+                                    <th>Name</th>
+                                    <th style="width: 7%">Age</th>
+                                    <th style="width: 10%">Gender</th>
+                                    <th>Email</th>
+                                    <th>Occupation</th>
+                                    <th>Affiliation</th>
+                                    <th style="width: 9%">Action</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($allUsers as $user): ?>
+                                    <tr>
+                                        <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
+                                        <td><?php echo $user['Age']; ?></td>
+                                        <td><?php echo $user['Gender']; ?></td>
+                                        <td><?php echo $user['Email']; ?></td>
+                                        <td><?php echo $user['Position']; ?></td>
+                                        <td><?php echo $user['Affiliation']; ?></td>
+                                        <td>
+                                            <form class="confirmationForm" action="" method="post">
+                                                <button type="button" class="confirmBtn action-button">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                                <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
+                                                <input type="hidden" name="user_id" value="<?php echo $user['UserID']; ?>">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <script>
+                        // Select all confirm buttons
+                        const confirmButtons = document.querySelectorAll('.confirmBtn');
+
+                        confirmButtons.forEach(button => {
+                            button.addEventListener('click', function (e) {
+                                e.preventDefault(); // Prevent default button action
+
+                                const form = this.closest('.confirmationForm'); // Get the associated form
+
+                                Swal.fire({
+                                    title: 'Are you sure?',
+                                    text: "Do you want to proceed with this action?",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, proceed!',
+                                    cancelButtonText: 'No, cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        form.submit(); // Submit the form
+                                    } else {
+                                        Swal.fire('Cancelled', 'Your action has been canceled.', 'error');
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
                 </div>
             </div>
         </div>
         <tbody>
 
     </div>
-
-
 
 
     <!--FILTER TABLE ROW-->
