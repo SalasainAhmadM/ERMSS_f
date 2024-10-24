@@ -100,48 +100,50 @@ if (isset($_GET['download'])) {
 
     // Adding Participants
     $pdf->SetFont("Arial", 'B', 12);
-    $pdf->Cell(0, 10, 'Participants', 0, 1);
+    $pdf->Cell(0, 5, 'Participants', 0, 1);
     $pdf->SetFont("Arial", '', 12);
 
     // Table header for participants
     $headers = ["#", "Participants"];
-    $participantColumnWidth = 60; // Adjust width as needed
+    $participantColumnWidth = 120; // Adjust width as needed
     for ($i = 1; $i <= $numDays; $i++) {
         $headers[] = "Day $i";
     }
 
     // Add headers to the table
     foreach ($headers as $header) {
-        $pdf->Cell($header === "Participants" ? $participantColumnWidth : 22, 10, $header, 1);
+        $pdf->Cell($header === "Participants" ? $participantColumnWidth : 22, 10, $header, 1, 0, 'C');
     }
     $pdf->Ln();
 
-    // Sample participants data with attendance symbols
-    $participants_data = [];
     $participantCount = 1;
-
-    // Fetch attendance data here (implement your logic)
-    $attendanceData = []; // You need to populate this array with actual attendance data
+    $attendanceData = []; 
 
     while ($row = $participantsResult->fetch_assoc()) {
-        $participantId = $row['UserID']; // Assuming UserID is used as participant_id
-        $pdf->Cell(22, 10, $participantCount++, 1);
-        
+        $participantId = $row['UserID'];
+        $pdf->Cell(22, 10, $participantCount++, 1, 0, 'C');
+    
         // Add MultiCell for Participants to handle long names
+        $currentY = $pdf->GetY();
         $pdf->MultiCell($participantColumnWidth, 10, htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']), 1);
         
-        // Move cursor back to the right position
-        $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $pdf->GetY() - 10); // Adjust the position
-
+        $multiCellHeight = $pdf->GetY() - $currentY; 
+    
+        // Move cursor back to the right position after MultiCell
+        $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY);
+    
         // Check attendance for each day
         for ($day = 0; $day < $numDays; $day++) {
             $currentDate = (new DateTime($dateStart))->modify("+$day day")->format('Y-m-d');
             $status = isset($attendanceData[$participantId][$currentDate]) ? $attendanceData[$participantId][$currentDate] : 'X'; // Default to 'X' (absent)
             $symbol = $status === 'present' ? '/' : 'X';
-            $pdf->Cell(22, 10, $symbol, 1);
+            
+            // Ensure that the height for the attendance cell matches the MultiCell height
+            $pdf->Cell(22, $multiCellHeight, $symbol, 1, 0, 'C');
         }
-        $pdf->Ln();
+        $pdf->Ln(); // Move to the next line for the next participant
     }
+    
 
     // Adding a note about attendance symbols
     $pdf->SetFont("Arial", 'I', 10);
@@ -188,6 +190,7 @@ if (isset($_GET['download'])) {
     echo $pdf_output;
     exit;
 }
+
 ?>
 
 
