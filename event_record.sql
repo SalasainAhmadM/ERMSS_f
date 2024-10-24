@@ -85,7 +85,9 @@ CREATE TABLE `attendance` (
   `attendance_date` date DEFAULT NULL,
   `status` enum('present','absent') DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `day` int(11) DEFAULT NULL
+  `day` int(11) DEFAULT NULL,
+  `time_in` time DEFAULT NULL,
+  `time_out` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -93,10 +95,10 @@ CREATE TABLE `attendance` (
 --
 
 INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`, `day`) VALUES
-(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL),
-(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL),
-(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL),
-(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19', NULL);
+(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL, NULL, NULL),
+(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL, NULL, NULL),
+(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL, NULL, NULL),
+(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 

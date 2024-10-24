@@ -4,6 +4,27 @@ include('../function/F.participants_retrieve.php');
 // Check if the event title is set
 $eventTitle = isset($_GET['eventTitle']) ? urldecode($_GET['eventTitle']) : null;
 $eventId = isset($eventId) ? $eventId : '';
+
+if ($eventTitle) {
+    // Prepare and execute a query to fetch the event ID using the event title
+    $sqlEventId = "SELECT event_id FROM Events WHERE event_title = ?";
+    $stmtEventId = $conn->prepare($sqlEventId);
+    $stmtEventId->bind_param("s", $eventTitle);
+    $stmtEventId->execute();
+    $resultEventId = $stmtEventId->get_result();
+
+    // If the event ID is found, store it in $eventId
+    if ($resultEventId->num_rows > 0) {
+        $rowEventId = $resultEventId->fetch_assoc();
+        $eventId = $rowEventId['event_id'];
+    } else {
+        // If no event is found with the given title, set $eventId to null or handle error
+        $eventId = null;
+    }
+} else {
+    // If eventTitle is not set, set eventId to null or empty
+    $eventId = '';
+}
 // Fetch total participants for the specified event title
 $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
                           WHERE event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
@@ -226,8 +247,8 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
 
                 <div class="box-container">
 
-                    <a href="event_participants.php?eventTitle=<?php echo urlencode($eventTitle); ?>&event_id=<?php echo $eventId; ?>"
-                        class="box" id="viewParticipants">
+                    <a href="event_participants.php?eventTitle=<?php echo urlencode($eventTitle); ?>" class="box"
+                        id="viewParticipants">
                         <i class="fa-solid fa-users"></i>
                         <div>
                             <h3>Participants</h3>
@@ -246,7 +267,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             <div class="days-list">
                                 <?php
                                 foreach ($eventDates as $date) {
-                                    $formattedDate = date('M j, Y', strtotime($date)); // Format: Oct 20, 2020
+                                    $formattedDate = date('M j, Y', strtotime($date));
                                     echo "<span class='present_day_filter day-item' data-day='$date' data-filter='present'>$formattedDate</span>";
                                 }
                                 ?>
@@ -263,7 +284,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             <div class="days-list">
                                 <?php
                                 foreach ($eventDates as $date) {
-                                    $formattedDate = date('M j, Y', strtotime($date)); // Format: Oct 20, 2020
+                                    $formattedDate = date('M j, Y', strtotime($date));
                                     echo "<span class='absent_day_filter day-item' data-day='$date' data-filter='absent'>$formattedDate</span>";
                                 }
                                 ?>
@@ -274,17 +295,18 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     <a href="#" class="box">
                         <i class="fa-solid fa-calendar-days"></i>
                         <div>
-                            <select class="" name="event_day-filter" id="event_day-filter">
+                            <select name="event_day-filter" id="event_day-filter" onchange="updateTable()">
                                 <option value="">Select Day</option>
                                 <?php
                                 foreach ($eventDates as $date) {
-                                    $formattedDate = date('M j, Y', strtotime($date)); // Format: Oct 20, 2020
+                                    $formattedDate = date('M j, Y', strtotime($date));
                                     echo "<option value=\"$date\">$formattedDate</option>";
                                 }
                                 ?>
                             </select>
                         </div>
                     </a>
+
                 </div>
             </section>
             <div class="table_wrap">
@@ -292,11 +314,13 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     <ul>
                         <li>
                             <div class="item">
+                                <div class="name"><span>Date</span></div>
                                 <div class="name"><span>Full Name</span></div>
                                 <div class="department"><span>Affiliation</span></div>
                                 <div class="department"><span>Position</span></div>
                                 <div class="info"><span>Email</span></div>
                                 <div class="phone"><span>Phone#</span></div>
+                                <div class="phone"><span>Status</span></div>
                                 <div class="status"><span>Action</span></div>
                             </div>
                         </li>
@@ -305,12 +329,22 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
 
                 <div class="table_body">
                     <?php
-                    // Fetch and display participants for the specified event title
-                    $sql = "SELECT * FROM eventParticipants 
-        INNER JOIN user ON eventParticipants.UserID = user.UserID
-        WHERE eventParticipants.event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
+                    $selectedDate = isset($_GET['selectedDate']) ? $_GET['selectedDate'] : '';
+
+                    $sql = "SELECT user.FirstName, user.MI, user.LastName, user.Affiliation, 
+                                   user.Position, user.Email, user.ContactNo, 
+                                   eventParticipants.participant_id, eventParticipants.event_id,
+                                   attendance.status
+                            FROM eventParticipants
+                            INNER JOIN user ON eventParticipants.UserID = user.UserID
+                            LEFT JOIN attendance ON eventParticipants.participant_id = attendance.participant_id 
+                                                  AND eventParticipants.event_id = attendance.event_id 
+                                                  AND attendance.attendance_date = ?
+                            WHERE eventParticipants.event_id = 
+                                  (SELECT event_id FROM Events WHERE event_title = ?)";
+
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("s", $eventTitle);
+                    $stmt->bind_param("ss", $selectedDate, $eventTitle);  // Bind the date and event title
                     $stmt->execute();
                     $result = $stmt->get_result();
 
@@ -325,16 +359,20 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             $position = htmlspecialchars($row['Position']);
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
+                            $status = htmlspecialchars($row['status']) ?: 'Not Marked';  // Handle NULL status
                             ?>
-
                             <form action='' method='POST'>
                                 <li class="participant_item">
                                     <div class="item">
+                                        <div class="name">
+                                            <span><?php echo $selectedDate ? date('M j, Y', strtotime($selectedDate)) : 'No Date Selected'; ?></span>
+                                        </div>
                                         <div class="name"><span><?php echo $fullName; ?></span></div>
                                         <div class="department"><span><?php echo $affiliation; ?></span></div>
                                         <div class="department"><span><?php echo $position; ?></span></div>
                                         <div class="info"><span><?php echo $email; ?></span></div>
                                         <div class="phone"><span><?php echo $contactNo; ?></span></div>
+                                        <div class="status"><span><?php echo $status; ?></span></div>
                                         <div class="status">
                                             <input type="hidden" name="participant_id"
                                                 value="<?php echo $row['participant_id']; ?>">
@@ -348,38 +386,18 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                     </div>
                                 </li>
                             </form>
-
                             <?php
                         }
                         echo "</ul>";
                     } else {
                         echo "<div class='no-participants-container'>
-                        <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participants found for the specified event.</p>
-                      </div>";
+                                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participants found for the specified event.</p>
+                              </div>";
                     }
                     ?>
+
                 </div>
 
-                <script>
-                    function filterParticipants() {
-                        var input, filter, ul, li, nameSpan, i, txtValue;
-                        input = document.getElementById('search_input');
-                        filter = input.value.toLowerCase();
-                        ul = document.getElementById('participant_list');
-                        li = ul.getElementsByClassName('participant_item');
-
-                        for (i = 0; i < li.length; i++) {
-                            nameSpan = li[i].getElementsByClassName('name')[0].getElementsByTagName('span')[0];
-                            txtValue = nameSpan.textContent || nameSpan.innerText;
-
-                            if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                                li[i].style.display = '';
-                            } else {
-                                li[i].style.display = 'none';
-                            }
-                        }
-                    }
-                </script>
                 <script>
                     function triggerAttendance(participant_id) {
                         Swal.fire({
@@ -391,33 +409,49 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             cancelButtonText: 'Absent',
                             reverseButtons: true,
                             customClass: {
-                                popup: 'larger-swal',  // Apply larger size
+                                popup: 'larger-swal',
                                 confirmButton: 'swal-confirm',
                                 cancelButton: 'swal-cancel'
                             }
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Mark as present
                                 updateAttendance(participant_id, 'present');
                             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                // Mark as absent
                                 updateAttendance(participant_id, 'absent');
                             }
                         });
                     }
 
                     function updateAttendance(participant_id, status) {
+                        const event_id = $('input[name="event_id"]').val();
+                        const attendance_date = getStoredDate();  // Get date from sessionStorage
+
+                        if (!attendance_date || attendance_date === "") {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Please select a date before marking attendance.',
+                                icon: 'error',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                }
+                            });
+                            return;
+                        }
+
                         $.ajax({
                             url: 'update_attendance.php',
                             type: 'POST',
                             data: {
                                 participant_id: participant_id,
+                                event_id: event_id,
+                                attendance_date: attendance_date,
                                 status: status
                             },
                             success: function (response) {
+                                let statusMessage = status === 'present' ? 'Participant marked as Present' : 'Participant marked as Absent';
                                 Swal.fire({
                                     title: 'Success',
-                                    text: 'Attendance updated successfully!',
+                                    text: statusMessage,
                                     icon: 'success',
                                     customClass: {
                                         popup: 'larger-swal'
@@ -436,29 +470,44 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             }
                         });
                     }
+
                 </script>
 
-                <style>
-                    .larger-swal {
-                        width: 400px !important;
-                        height: 300px !important;
-                        font-size: 1.3em;
+
+
+
+
+
+                <script>
+                    function updateTable() {
+                        const selectedDate = document.getElementById('event_day-filter').value;
+
+                        // Save the selected date in sessionStorage
+                        sessionStorage.setItem('selectedDate', selectedDate);
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        urlParams.set('selectedDate', selectedDate);
+
+                        // Reload the page with the updated query parameter
+                        window.location.search = urlParams.toString();
                     }
 
-                    .swal-confirm {
-                        background-color: #4CAF50;
-                        width: 100px !important;
-                        height: 40px !important;
-                        color: white;
+                    function getStoredDate() {
+                        return sessionStorage.getItem('selectedDate') || '';
                     }
 
-                    .swal-cancel {
-                        background-color: #f44336;
-                        width: 100px !important;
-                        height: 40px !important;
-                        color: white;
-                    }
-                </style>
+                    // Automatically select the stored date on page load
+                    window.onload = function () {
+                        const storedDate = getStoredDate();
+                        if (storedDate) {
+                            document.getElementById('event_day-filter').value = storedDate;
+                        }
+                    };
+
+
+                </script>
+
+                <script src="js/eventsparticipants.js"></script>
                 <!--sidebar functionality-->
                 <script src="js/sidebar.js"></script>
                 <!-- Include FontAwesome for icons -->

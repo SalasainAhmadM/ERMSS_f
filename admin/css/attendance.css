@@ -123,3 +123,22 @@
     margin-right: 8px;
     color: #ff6b6b;
 }
+.larger-swal {
+    width: 400px !important;
+    height: 300px !important;
+    font-size: 1.3em;
+}
+
+.swal-confirm {
+    background-color: #4CAF50;
+    width: 100px !important;
+    height: 40px !important;
+    color: white;
+}
+
+.swal-cancel {
+    background-color: #f44336;
+    width: 100px !important;
+    height: 40px !important;
+    color: white;
+}
