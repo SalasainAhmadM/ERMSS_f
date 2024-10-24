@@ -1794,3 +1794,19 @@ table.tb_eco tr:hover td{
     width: calc(33.33% - 10px);
     box-sizing: border-box;
 }
+
+
+.download-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 2rem;
+}
+.download-button:hover {
+    background-color: #0056b3;
+}
