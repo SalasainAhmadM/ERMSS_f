@@ -1,14 +1,13 @@
 <?php
 include('../function/F.participants_retrieve.php');
 
-// Function to calculate the number of days between two dates
 function dateRange($start, $end)
 {
     $start = new DateTime($start);
     $end = new DateTime($end);
-    // Adjust the end date to include it in the counting
+
     $end->modify('+1 day');
-    $interval = new DateInterval('P1D'); // 1 Day interval
+    $interval = new DateInterval('P1D'); 
     $dateRange = new DatePeriod($start, $interval, $end);
 
     // Count each day individually
@@ -50,7 +49,7 @@ $eventDetailsStmt->close();
 // Fetch total participants for the specified event title
 $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants WHERE event_id = ?";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
-$totalParticipantsStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+$totalParticipantsStmt->bind_param("i", $eventId); 
 $totalParticipantsStmt->execute();
 $totalParticipantsResult = $totalParticipantsStmt->get_result();
 $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
@@ -59,7 +58,7 @@ $totalParticipants = $totalParticipantsRow['totalParticipants'];
 // Fetch and display participants for the specified event title
 $participantsSql = "SELECT user.FirstName, user.LastName, user.Age, user.Gender, user.Email, user.Affiliation, user.Position, user.Image, user.ContactNo, user.EducationalAttainment, eventParticipants.UserID FROM eventParticipants INNER JOIN user ON eventParticipants.UserID = user.UserID WHERE eventParticipants.event_id = ?";
 $participantsStmt = $conn->prepare($participantsSql);
-$participantsStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+$participantsStmt->bind_param("i", $eventId); 
 $participantsStmt->execute();
 $participantsResult = $participantsStmt->get_result();
 
@@ -67,7 +66,7 @@ $participantsResult = $participantsStmt->get_result();
 $attendanceData = []; 
 $attendanceSql = "SELECT participant_id, attendance_date, status FROM attendance WHERE event_id = ?";
 $attendanceStmt = $conn->prepare($attendanceSql);
-$attendanceStmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+$attendanceStmt->bind_param("i", $eventId); 
 $attendanceStmt->execute();
 $attendanceResult = $attendanceStmt->get_result();
 
@@ -75,22 +74,22 @@ while ($attendanceRow = $attendanceResult->fetch_assoc()) {
     $attendanceData[$attendanceRow['participant_id']][$attendanceRow['attendance_date']] = $attendanceRow['status'];
 }
 
-require('../fpdf186/fpdf.php'); // Include the FPDF library
+require('../fpdf186/fpdf.php'); 
 
 if (isset($_GET['download'])) {
-    // Create instance of FPDF class
-    $pdf = new FPDF();
+    $pdf = new FPDF('P'); 
     $pdf->SetAutoPageBreak(TRUE, 15);
     $pdf->AddPage();
 
     // Title
     $pdf->SetFont("Arial", 'B', 16);
     $pdf->Cell(0, 10, 'Event Details', 0, 1, 'C');
+    $pdf->Ln(10);
 
     // Adding Event Information
-    $pdf->SetFont("Arial", 'B', 12);
+    $pdf->SetFont("Arial", 'B', 10);
     $pdf->Cell(0, 10, 'Event Information', 0, 1);
-    $pdf->SetFont("Arial", '', 12);
+    $pdf->SetFont("Arial", '', 10);
 
     // Event Information
     $event_info = [
@@ -98,103 +97,166 @@ if (isset($_GET['download'])) {
         "Event Type: " . htmlspecialchars($eventType),
         "Event Mode: " . htmlspecialchars($eventMode),
         "Start Date: " . htmlspecialchars($dateStart),
-        "End Date: " . htmlspecialchars($dateEnd),
-        "Number of Days: " . $numDays,
+        "End Date: " . htmlspecialchars($dateEnd)
     ];
 
     foreach ($event_info as $item) {
-        $pdf->Cell(0, 10, $item, 0, 1); // Adding event details
+        $pdf->Cell(0, 8, $item, 0, 1);
     }
 
-    // Adding Participants
-    $pdf->SetFont("Arial", 'B', 12);
+    $pdf->Ln(5);
+
+    // Participants Section
+    $pdf->SetFont("Arial", 'B', 10);
     $pdf->Cell(0, 5, 'Participants', 0, 1);
-    $pdf->SetFont("Arial", '', 12);
+    $pdf->SetFont("Arial", '', 10);
 
     // Table header for participants
     $headers = ["#", "Participants"];
-    $participantColumnWidth = 120; // Adjust width as needed
-    for ($i = 1; $i <= $numDays; $i++) {
-        $headers[] = "Day $i";
+    $maxParticipantWidth = 0;
+
+    // Calculate maximum width for the participants column
+    while ($row = $participantsResult->fetch_assoc()) {
+        $fullName = htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']);
+        $nameWidth = $pdf->GetStringWidth($fullName);
+        $maxParticipantWidth = max($maxParticipantWidth, $nameWidth);
     }
 
-    // Add headers to the table
-    foreach ($headers as $header) {
-        $pdf->Cell($header === "Participants" ? $participantColumnWidth : 22, 10, $header, 1, 0, 'C');
-    }
+    $minWidth = 50; 
+    $participantColumnWidth = max($minWidth, $maxParticipantWidth + 10);
+
     $pdf->Ln();
 
     $participantCount = 1;
+    $participantsResult->data_seek(0); 
+    $totalDays = $numDays;
 
-    while ($row = $participantsResult->fetch_assoc()) {
-        $participantId = $row['UserID'];
-        $pdf->Cell(22, 10, $participantCount++, 1, 0, 'C');
+    for ($startDay = 0; $startDay < $totalDays; $startDay += 7) {
+        if ($startDay > 0) {
+            $pdf->AddPage();
+            $pdf->SetFont("Arial", 'B', 10);
+            $pdf->SetFont("Arial", '', 10);          
+            
+            foreach ($headers as $header) {
+                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
+            }
+            
+            $pdf->SetFont("Arial", 'B', 10);
+            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
+                $currentDay = $startDay + $dayOffset;
 
-        // Add MultiCell for Participants to handle long names
-        $currentY = $pdf->GetY();
-        $pdf->MultiCell($participantColumnWidth, 10, htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']), 1);
-        
-        $multiCellHeight = $pdf->GetY() - $currentY; 
+                if ($currentDay >= $totalDays) {
+                    break;
+                }
 
-        // Move cursor back to the right position after MultiCell
-        $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY);
+                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('m-d');
+                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
+            }
+            $pdf->Ln();
+        } else {
+            // This part is added to handle the first set of dates
+            $pdf->SetFont("Arial", 'B', 10);
+            foreach ($headers as $header) {
+                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
+            }
 
-        // Check attendance for each day
-        for ($day = 0; $day < $numDays; $day++) {
-            $currentDate = (new DateTime($dateStart))->modify("+$day day")->format('Y-m-d');
-            $status = isset($attendanceData[$participantId][$currentDate]) ? $attendanceData[$participantId][$currentDate] : 'absent'; // Default to 'absent'
-            $symbol = ($status === 'present') ? '/' : 'X'; // Use '/' for present, 'X' for absent
-
-            // Ensure that the height for the attendance cell matches the MultiCell height
-            $pdf->Cell(22, $multiCellHeight, $symbol, 1, 0, 'C');
+            $pdf->SetFont("Arial", 'B', 10);
+            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
+                $currentDate = (new DateTime($dateStart))->modify("+$dayOffset day")->format('m-d');
+                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
+            }
+            $pdf->Ln(); 
         }
-        $pdf->Ln(); // Move to the next line for the next participant
+
+        $participantsResult->data_seek(0);
+        while ($row = $participantsResult->fetch_assoc()) {
+            $participantId = $row['UserID'];
+        
+            // Fetch participant ID
+            $participantInfoSql = "SELECT participant_id FROM eventParticipants WHERE UserID = ? AND event_id = ?";
+            $participantInfoStmt = $conn->prepare($participantInfoSql);
+            $participantInfoStmt->bind_param("ii", $participantId, $eventId);
+            $participantInfoStmt->execute();
+            $participantInfoResult = $participantInfoStmt->get_result();
+            $participantInfoRow = $participantInfoResult->fetch_assoc();
+            $actualParticipantId = $participantInfoRow['participant_id'];
+        
+            $pdf->Cell(15, 8, $participantCount++, 1, 0, 'C');
+        
+            $currentY = $pdf->GetY();
+            $pdf->SetXY($pdf->GetX(), $currentY);
+            $participantName = htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']);
+
+            $pdf->Cell($participantColumnWidth, 8, $participantName, 1, 'C'); 
+
+            $multiCellHeight = $pdf->GetY() - $currentY; 
+        
+            $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY); 
+        
+            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
+                $currentDay = $startDay + $dayOffset;
+        
+                if ($currentDay >= $totalDays) {
+                    break;
+                }
+        
+                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('Y-m-d');
+        
+                // Check attendance status
+                $status = isset($attendanceData[$actualParticipantId][$currentDate]) ? $attendanceData[$actualParticipantId][$currentDate] : 'absent';
+                $symbol = ($status === 'present') ? '/' : 'X';
+
+                $pdf->Cell(15, 8, $symbol, 1, 0, 'C'); 
+
+            }
+            $pdf->Ln(); 
+        }
+     
+        // Legend
+        $pdf->SetFont("Arial", 'B', 12);
+        $pdf->Ln(5); 
+        $pdf->SetFont("Arial", 'I', 8);
+        $pdf->Cell(0, 8, '* X = Absent, / = Present', 0, 1);
+        $pdf->Ln(5);
     }
 
-    // Adding a note about attendance symbols
-    $pdf->SetFont("Arial", 'I', 10);
-    $pdf->Cell(0, 10, '* X = Absent, / = Present', 0, 1);
 
-    // Adding Sponsors
-    $pdf->SetFont("Arial", 'B', 12);
+
+
+    // Sponsors Section
+    $pdf->SetFont("Arial", 'B', 10);
     $pdf->Cell(0, 10, 'Sponsors', 0, 1);
-    $pdf->SetFont("Arial", '', 12);
+    $pdf->SetFont("Arial", 'B', 10);
+    $pdf->Cell(15, 8, "#", 1, 0, 'C');
+    $pdf->Cell(0, 8, "Name", 1, 1);
+    $pdf->SetFont("Arial", '', 10); 
 
-    // Table header for sponsors
-    $pdf->Cell(22, 10, "#", 1);
-    $pdf->Cell(0, 10, "Sponsors", 1, 1);
-
-    // Fetch sponsors related to the event from the database
     $sponsors_query = "SELECT sponsor_id, sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
     $stmt = $conn->prepare($sponsors_query);
-    $stmt->bind_param("i", $eventId); // Use the eventId retrieved earlier
+    $stmt->bind_param("i", $eventId);
     $stmt->execute();
     $sponsors_result = $stmt->get_result();
 
-    // Initialize sponsor count
     $sponsor_count = 1;
-
-    // Fetch and display each sponsor
     while ($sponsor_row = $sponsors_result->fetch_assoc()) {
         $sponsor_full_name = trim($sponsor_row['sponsor_firstName'] . ' ' . $sponsor_row['sponsor_MI'] . ' ' . $sponsor_row['sponsor_lastName']);
-        $pdf->Cell(22, 10, strval($sponsor_count++), 1);
-        $pdf->Cell(0, 10, $sponsor_full_name, 1, 1);
+        $pdf->Cell(15, 8, strval($sponsor_count++), 1, 0, 'C');
+        $pdf->Cell(0, 8, $sponsor_full_name, 1, 1);
     }
 
-    // Close statement
     $stmt->close();
 
-    // Output the PDF to a string
+    // Output PDF
     $pdf_output = $pdf->Output('event_details.pdf', 'S');
 
     // Prepare to download the PDF
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="event_details.pdf"');
     echo $pdf_output;
-
-    // Close database connections
+    
     $conn->close();
 }
+
 ?>
 
 
