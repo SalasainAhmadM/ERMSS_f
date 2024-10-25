@@ -25,7 +25,7 @@ $rowDates = $resultDates->fetch_assoc();
 $startDate = $rowDates['date_start'];
 $endDate = $rowDates['date_end'];
 
-// Fetch participants who have the specified status (present/absent) for all event dates
+// Fetch participants who have either perfect attendance or complete absences for all event dates
 $sqlParticipants = "
     SELECT u.FirstName, u.MI, u.LastName, u.Affiliation, u.Position, u.Email, u.ContactNo, ep.participant_id
     FROM eventParticipants ep
@@ -55,6 +55,9 @@ if ($resultParticipants->num_rows > 0) {
         $email = htmlspecialchars($row['Email']);
         $contactNo = htmlspecialchars($row['ContactNo']);
 
+        // Modify the status text based on the requested status
+        $statusText = $status === 'present' ? 'For Evaluation' : ($status === 'absent' ? "Didn't Attend Event" : '');
+
         echo "<li class='participant_item'>
                 <div class='item'>
                     <div class='name'><span>$fullName</span></div>
@@ -62,6 +65,7 @@ if ($resultParticipants->num_rows > 0) {
                     <div class='department'><span>$position</span></div>
                     <div class='info'><span>$email</span></div>
                     <div class='phone'><span>$contactNo</span></div>
+                    <div class='status'><span>$statusText</span></div>
                 </div>
               </li>";
     }

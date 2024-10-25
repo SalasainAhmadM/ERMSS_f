@@ -303,7 +303,13 @@ function hasCanceledEvent($conn, $eventId, $UserID)
             </li>
         </ul>
     </div>
-
+    <style>
+        @media only screen and (max-width: 768px) {
+            .details {
+                width: 200px;
+            }
+        }
+    </style>
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
@@ -376,19 +382,6 @@ function hasCanceledEvent($conn, $eventId, $UserID)
             <!-- view event ends-->
 
         </div>
-
-        <!-- <section class="category">
-                <div class="box-container">
-                <a href="landingPageU.php" class="box">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <div>
-                    <h3>Go Back</h3>
-                    <span>Click to go back</span>
-                    </div>
-                </a>
-        
-                </div>
-            </section> -->
 
 
     </div>

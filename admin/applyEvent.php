@@ -35,83 +35,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $participantId = isset($_POST['user_id']) ? $_POST['user_id'] : null;
 
         if ($eventId && $participantId) {
-            // Check if the participant is already enrolled
-            $checkParticipantQuery = "SELECT COUNT(*) AS participant_count FROM EventParticipants WHERE event_id = ? AND UserID = ?";
-            $stmtCheckParticipant = $conn->prepare($checkParticipantQuery);
-            $stmtCheckParticipant->bind_param("ii", $eventId, $participantId);
-            $stmtCheckParticipant->execute();
-            $resultCheckParticipant = $stmtCheckParticipant->get_result();
-            $participantData = $resultCheckParticipant->fetch_assoc();
+            // Function to add participant to EventParticipants
+            function addParticipant($conn, $eventId, $participantId)
+            {
+                $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
+                $stmtInsert = $conn->prepare($sqlInsert);
+                $stmtInsert->bind_param("ii", $eventId, $participantId);
+                return $stmtInsert->execute();
+            }
 
-            if ($participantData['participant_count'] > 0) {
-                // Participant already enrolled
+            // Check if participant has canceled before
+            $checkCancelQuery = "SELECT COUNT(*) AS cancel_count FROM cancel_reason WHERE event_id = ? AND UserID = ?";
+            $stmtCheckCancel = $conn->prepare($checkCancelQuery);
+            $stmtCheckCancel->bind_param("ii", $eventId, $participantId);
+            $stmtCheckCancel->execute();
+            $resultCheckCancel = $stmtCheckCancel->get_result();
+            $cancelData = $resultCheckCancel->fetch_assoc();
+
+            if ($cancelData['cancel_count'] > 0) {
+                // Participant has canceled before, ask to rejoin
                 $alertMessage = "
-        <script>
-            Swal.fire({
-                title: 'Error!',
-                text: 'The participant is already added to the event.',
-                icon: 'error'
-            }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '';
-                            }
-                        });
-        </script>
-    ";
-            } else {
-                // Check the participant limit
-                $checkLimitQuery = "SELECT participant_limit, 
-                                        (SELECT COUNT(*) FROM EventParticipants WHERE event_id = ?) AS current_participants 
-                                        FROM Events WHERE event_id = ?";
-                $stmtLimit = $conn->prepare($checkLimitQuery);
-                $stmtLimit->bind_param("ii", $eventId, $eventId);
-                $stmtLimit->execute();
-                $resultLimit = $stmtLimit->get_result();
-                $eventData = $resultLimit->fetch_assoc();
-
-                if ($eventData['current_participants'] < $eventData['participant_limit']) {
-                    // If participant limit is not reached, proceed with insertion
-                    $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
-                    $stmtInsert = $conn->prepare($sqlInsert);
-                    $stmtInsert->bind_param("ii", $eventId, $participantId);
-
-                    if ($stmtInsert->execute()) {
-                        // Success message
-                        $alertMessage = "
                     <script>
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'Successfully joined the event!',
-                            icon: 'success'
+                            title: 'Notice!',
+                            text: 'This participant already cancelled. Rejoin?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, rejoin!',
+                            cancelButtonText: 'No, cancel'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = '';
+                                document.getElementById('rejoinForm').submit();
+                            } else {
+                                Swal.fire('Cancelled', 'Action cancelled.', 'error');
                             }
                         });
                     </script>
                 ";
-                    } else {
-                        echo "<script>alert('Failed to join the event. Please try again.'); window.location.href='';</script>";
-                    }
 
-                    $stmtInsert->close();
-                } else {
-                    // Participant limit reached
+                echo '
+                <form id="rejoinForm" action="" method="post" style="display:none;">
+                    <input type="hidden" name="event_id" value="' . $eventId . '">
+                    <input type="hidden" name="user_id" value="' . $participantId . '">
+                    <input type="hidden" name="rejoin_action" value="1">
+                </form>';
+            } else {
+                // Check if participant is already enrolled
+                $checkParticipantQuery = "SELECT COUNT(*) AS participant_count FROM EventParticipants WHERE event_id = ? AND UserID = ?";
+                $stmtCheckParticipant = $conn->prepare($checkParticipantQuery);
+                $stmtCheckParticipant->bind_param("ii", $eventId, $participantId);
+                $stmtCheckParticipant->execute();
+                $resultCheckParticipant = $stmtCheckParticipant->get_result();
+                $participantData = $resultCheckParticipant->fetch_assoc();
+
+                if ($participantData['participant_count'] > 0) {
+                    // Participant already added
                     $alertMessage = "
-        <script>
-            Swal.fire({
-                title: 'Error!',
-                text: 'This event has reached its participant limit.',
-                icon: 'error'
-            });
-        </script>
-    ";
+                        <script>
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'The participant is already added to the event.',
+                                icon: 'error'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '';
+                                }
+                            });
+                        </script>
+                    ";
+                } else {
+                    // Add new participant
+                    if (addParticipant($conn, $eventId, $participantId)) {
+                        $alertMessage = "
+                            <script>
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Participant added successfully!',
+                                    icon: 'success'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '';
+                                    }
+                                });
+                            </script>
+                        ";
+                    }
                 }
-
-                $stmtLimit->close();
+                $stmtCheckParticipant->close();
             }
 
-            $stmtCheckParticipant->close();
+            // If rejoin is confirmed
+            if (isset($_POST['rejoin_action']) && $_POST['rejoin_action'] == 1) {
+                if (addParticipant($conn, $eventId, $participantId)) {
+                    // Delete from cancel_reason
+                    $deleteCancelQuery = "DELETE FROM cancel_reason WHERE event_id = ? AND UserID = ?";
+                    $stmtDeleteCancel = $conn->prepare($deleteCancelQuery);
+                    $stmtDeleteCancel->bind_param("ii", $eventId, $participantId);
+                    $stmtDeleteCancel->execute();
+
+                    $alertMessage = "
+                        <script>
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Rejoined the event successfully!',
+                                icon: 'success'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '';
+                                }
+                            });
+                        </script>
+                    ";
+                }
+            }
+
+            $stmtCheckCancel->close();
         }
     } else {
         header("Location: ../login.php");

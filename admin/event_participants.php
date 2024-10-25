@@ -248,7 +248,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                 <div class="box-container">
 
                     <a href="event_participants.php?eventTitle=<?php echo urlencode($eventTitle); ?>" class="box"
-                        id="viewParticipants">
+                        id="viewParticipants" onclick="clearSelectedDate()">
                         <i class="fa-solid fa-users"></i>
                         <div>
                             <h3>Participants</h3>
@@ -256,6 +256,15 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                         </div>
                     </a>
 
+                    <script>
+                        function clearSelectedDate() {
+                            sessionStorage.removeItem('selectedDate');
+
+                            const urlParams = new URLSearchParams(window.location.search);
+                            urlParams.delete('selectedDate');
+                            window.location.search = urlParams.toString();
+                        }
+                    </script>
 
                     <!-- Present Participants -->
                     <a href="#" class="box" id="viewPresentParticipants">
@@ -268,11 +277,11 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                 <button class="filter-all-btn" onclick="filterAllDays('present')">Perfect
                                     Attendance</button>
                             </label>
-                            <div class="days-list">
+                            <div class="days-list" id="presentDaysList">
                                 <?php
                                 foreach ($eventDates as $date) {
                                     $formattedDate = date('M j, Y', strtotime($date));
-                                    echo "<span class='present_day_filter day-item' data-day='$date' data-filter='present'>$formattedDate</span>";
+                                    echo "<span class='present_day_filter day-item' data-day='$date' data-filter='present' onclick=\"filterByDate('$date')\">$formattedDate</span>";
                                 }
                                 ?>
                             </div>
@@ -290,11 +299,11 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                 <button class="filter-all-btn" onclick="filterAllDays('absent')">Complete
                                     Absences</button>
                             </label>
-                            <div class="days-list">
+                            <div class="days-list" id="absentDaysList">
                                 <?php
                                 foreach ($eventDates as $date) {
                                     $formattedDate = date('M j, Y', strtotime($date));
-                                    echo "<span class='absent_day_filter day-item' data-day='$date' data-filter='absent'>$formattedDate</span>";
+                                    echo "<span class='absent_day_filter day-item' data-day='$date' data-filter='absent' onclick=\"filterByDate('$date')\">$formattedDate</span>";
                                 }
                                 ?>
                             </div>
@@ -302,6 +311,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     </a>
 
 
+                    <!-- Select Day Dropdown -->
                     <a href="#" class="box">
                         <i class="fa-solid fa-calendar-days"></i>
                         <div>
@@ -376,6 +386,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                     <div class="item">
                                         <div class="name">
                                             <span><?php echo $selectedDate ? date('M j, Y', strtotime($selectedDate)) : 'No Date Selected'; ?></span>
+                                            <span style="display: none"><?php echo $fullName; ?></span>
                                         </div>
                                         <div class="name"><span><?php echo $fullName; ?></span></div>
                                         <div class="department"><span><?php echo $affiliation; ?></span></div>
@@ -399,11 +410,24 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                             <input type="hidden" name="participant_id"
                                                 value="<?php echo $row['participant_id']; ?>">
                                             <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
-                                            <button type="button"
-                                                onclick="triggerAttendance('<?php echo $row['participant_id']; ?>')"
-                                                class="attendance-btn">
-                                                <i class="fas fa-user-check"></i> Attendance
-                                            </button>
+                                            <div class="status attendance-btn-container">
+                                                <input type="hidden" name="participant_id"
+                                                    value="<?php echo $row['participant_id']; ?>">
+                                                <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
+
+                                                <button type="button"
+                                                    onclick="triggerAttendance('<?php echo $row['participant_id']; ?>')"
+                                                    class="attendance-btn">
+                                                    <i class="fas fa-user-check"></i>
+                                                </button>
+
+                                                <button type="button"
+                                                    onclick="resetAttendance('<?php echo $row['participant_id']; ?>', '<?php echo $row['event_id']; ?>')"
+                                                    class="attendance-btn">
+                                                    <i class="fa-solid fa-file-pen"></i>
+                                                </button>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </li>
@@ -419,16 +443,101 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     ?>
 
                 </div>
+
+
                 <script>
+                    function resetAttendance(participant_id, event_id) {
+                        var selectedDate = "<?php echo $selectedDate; ?>"; // Get selected date from PHP
+                        const attendance_date = getStoredDate();  // Get date from sessionStorage
+
+                        if (!attendance_date || attendance_date === "") {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Please select a date before marking attendance.',
+                                icon: 'error',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                }
+                            });
+                            return;
+                        }
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to reset this participant's attendance?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Reset!',
+                            customClass: {
+                                popup: 'larger-swal',
+                                confirmButton: 'swal-confirm',
+                                cancelButton: 'swal-cancel'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: 'reset_attendance.php',
+                                    type: 'POST',
+                                    data: {
+                                        participant_id: participant_id,
+                                        event_id: event_id,
+                                        selectedDate: selectedDate
+                                    },
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        if (response.status === 'success') {
+                                            Swal.fire({
+                                                title: 'Reset!',
+                                                text: response.message,
+                                                icon: 'success',
+                                                customClass: {
+                                                    popup: 'larger-swal',
+                                                    confirmButton: 'swal-confirm',
+                                                }
+                                            });
+                                            // Optionally, refresh the page or update the UI
+                                            setTimeout(() => {
+                                                location.reload();
+                                            }, 1500);
+                                        } else if (response.status === 'error') {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: response.message,
+                                                icon: 'error',
+                                                customClass: {
+                                                    popup: 'larger-swal',
+                                                    confirmButton: 'swal-confirm',
+                                                }
+                                            });
+                                        }
+                                    },
+                                    error: function () {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: 'There was an error processing your request.',
+                                            icon: 'error',
+                                            customClass: {
+                                                popup: 'larger-swal',
+                                                confirmButton: 'swal-confirm',
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
                     document.addEventListener("DOMContentLoaded", function () {
                         const presentDayItems = document.querySelectorAll(".present_day_filter");
                         const absentDayItems = document.querySelectorAll(".absent_day_filter");
+                        const dayFilterDropdown = document.getElementById('event_day-filter'); // Dropdown reference
 
                         presentDayItems.forEach(item => {
                             item.addEventListener("click", function () {
                                 const selectedDate = this.getAttribute("data-day");
                                 const filter = 'present';
-
+                                updateURL(selectedDate); // Update URL based on click
+                                updateDropdownAndSession(selectedDate); // Update dropdown and store date
                                 fetchParticipantsByDateAndStatus(selectedDate, filter);
                             });
                         });
@@ -437,7 +546,8 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             item.addEventListener("click", function () {
                                 const selectedDate = this.getAttribute("data-day");
                                 const filter = 'absent';
-
+                                updateURL(selectedDate); // Update URL based on click
+                                updateDropdownAndSession(selectedDate);
                                 fetchParticipantsByDateAndStatus(selectedDate, filter);
                             });
                         });
@@ -452,7 +562,50 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                 })
                                 .catch(error => console.error('Error:', error));
                         }
+
+                        function updateDropdownAndSession(selectedDate) {
+                            dayFilterDropdown.value = selectedDate;
+                            sessionStorage.setItem('selectedDate', selectedDate);
+                        }
+
+                        function getStoredDate() {
+                            return sessionStorage.getItem('selectedDate') || '';
+                        }
+
+                        window.onload = function () {
+                            const storedDate = getStoredDate();
+                            if (storedDate) {
+                                dayFilterDropdown.value = storedDate;
+                            }
+                        };
+
+                        function updateTable() {
+                            const selectedDate = dayFilterDropdown.value;
+                            sessionStorage.setItem('selectedDate', selectedDate);
+
+                            const urlParams = new URLSearchParams(window.location.search);
+                            urlParams.set('selectedDate', selectedDate);
+
+                            window.location.search = urlParams.toString();
+                        }
+
+                        dayFilterDropdown.addEventListener('change', updateTable);
+
+                        // New function to update the URL based on the clicked date
+                        function updateURL(selectedDate) {
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const eventTitle = "<?php echo $eventTitle; ?>"; // Get event title
+
+                            urlParams.set('selectedDate', selectedDate); // Set the selected date
+                            urlParams.set('eventTitle', eventTitle); // Ensure event title stays
+
+                            const newURL = `${window.location.pathname}?${urlParams.toString()}`;
+                            window.history.pushState({ path: newURL }, '', newURL); // Update URL without reloading
+                        }
                     });
+
+
+
                     function filterAllDays(status) {
                         const eventTitle = "<?php echo $eventTitle; ?>";
 
@@ -462,11 +615,32 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                 document.querySelector('.table_body').innerHTML = data;
                             })
                             .catch(error => console.error('Error:', error));
+                        console.log(`Filtering all ${type} days.`);
+                    }
+                    function filterParticipants() {
+                        var input, filter, ul, li, nameSpan, i, txtValue;
+                        input = document.getElementById('search_input');
+                        filter = input.value.toLowerCase();
+                        ul = document.getElementById('participant_list'); // Target the correct list
+                        li = ul ? ul.getElementsByClassName('participant_item') : []; // Handle null gracefully
+
+                        for (i = 0; i < li.length; i++) {
+                            // Correct span targeting for participant name
+                            nameSpan = li[i].querySelector('.name span:nth-child(2)');
+                            txtValue = nameSpan ? nameSpan.textContent || nameSpan.innerText : '';
+
+                            // Show or hide participants based on matching the search input
+                            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                                li[i].style.display = '';
+                            } else {
+                                li[i].style.display = 'none';
+                            }
+                        }
                     }
 
                 </script>
 
-                <script src="js/eventsparticipants.js"></script>
+                <script src="js/eventsParticipant.js"></script>
                 <!--sidebar functionality-->
                 <script src="js/sidebar.js"></script>
                 <!-- Include FontAwesome for icons -->
