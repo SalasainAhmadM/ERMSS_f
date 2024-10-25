@@ -91,6 +91,7 @@ if (isset($_GET['download'])) {
     } else {
         // Table Content
         $pdf->SetFont('helvetica', '', 12);
+<<<<<<< HEAD
 
         date_default_timezone_set('Asia/Manila'); // Set timezone to Manila
         $currentDate = date('Y-m-d');
@@ -110,12 +111,83 @@ if (isset($_GET['download'])) {
                 $status = 'Ended'; // Ended event
             } else {
                 $status = 'Upcoming'; // Upcoming event
+=======
+        $pdf->Ln(10);
+    
+        // Display selected filters
+        $pdf->Cell(0, 10, 'Year: ' . $selectedYear, 0, 1);
+        if ($selectedMonth) {
+            $pdf->Cell(0, 10, 'Month: ' . date('F', mktime(0, 0, 0, $selectedMonth, 10)), 0, 1);
+        }
+        $pdf->Ln(10);
+    
+        // Table Header
+        $pdf->SetFont('helvetica', 'B', 12);
+        $header = [
+            'Event Name' => 60,
+            'Start Date' => 30,
+            'End Date' => 30,
+            'Status' => 30
+        ];
+    
+        // Print header
+        foreach ($header as $title => $width) {
+            $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
+        }
+        $pdf->Ln();
+    
+        // Check if there are events and output content accordingly
+        if (empty($events)) {
+            // No events found
+            $pdf->SetFont('helvetica', 'I', 12);
+            $pdf->Cell(0, 10, 'No events found!', 0, 1, 'C');
+        } else {
+            // Table Content
+            $pdf->SetFont('helvetica', '', 12);
+            
+            date_default_timezone_set('Asia/Manila'); // Set timezone to Manila
+            $currentDate = date('Y-m-d');
+    
+            $eventCount = 0; // Initialize event counter
+            foreach ($events as $event) {
+                // Add a new page if the count exceeds 20
+                if ($eventCount == 20) {
+                    $pdf->AddPage();
+                    // Print header again on the new page
+                    foreach ($header as $title => $width) {
+                        $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
+                    }
+                    $pdf->Ln();
+                    $eventCount = 0; // Reset counter
+                }
+    
+                $eventTitleWidth = max(60, $pdf->GetStringWidth($event['event_title']) + 4); // +4 for padding
+                $pdf->Cell($eventTitleWidth, 10, $event['event_title'], 1);
+                $pdf->Cell(30, 10, $event['date_start'], 1, 0, 'C'); // Center content
+                $pdf->Cell(30, 10, $event['date_end'], 1, 0, 'C'); // Center content
+    
+                // Determine event status
+                if ($event['event_cancel'] !== null && $event['event_cancel'] !== '') {
+                    $status = 'Cancelled'; // Event is cancelled
+                } elseif ($event['date_start'] <= $currentDate && $event['date_end'] >= $currentDate) {
+                    $status = 'Ongoing'; // Ongoing event
+                } elseif ($event['date_end'] < $currentDate) {
+                    $status = 'Ended'; // Ended event
+                } else {
+                    $status = 'Upcoming'; // Upcoming event
+                }
+    
+                $pdf->Cell(30, 10, $status, 1, 0, 'C'); // Center content
+                $pdf->Ln();
+                $eventCount++; // Increment the event counter
+>>>>>>> 565f654fc6f6b5d52b04ea022ac95b098bc48873
             }
 
             $pdf->Cell(30, 10, $status, 1, 0, 'C'); // Center content
             $pdf->Ln();
         }
     }
+<<<<<<< HEAD
 
     // Output PDF
     $pdf->Output('events_report.pdf', 'D');
@@ -124,6 +196,9 @@ if (isset($_GET['download'])) {
 
 
 
+=======
+      
+>>>>>>> 565f654fc6f6b5d52b04ea022ac95b098bc48873
 ?>
 
 
