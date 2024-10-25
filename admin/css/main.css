@@ -1819,13 +1819,6 @@ table.tb_eco tr:hover td{
     box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-    .box-container > div {
-        width: auto; /* or you can set it to another value */
-    }
-}
-
-
 
 .download-button {
     padding: 10px 20px;
