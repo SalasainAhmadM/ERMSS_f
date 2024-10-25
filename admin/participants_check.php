@@ -436,7 +436,7 @@ if (isset($_GET['download'])) {
                 <div class="table_header">
                     <p>
                         <?php echo isset($eventTitle) ? htmlspecialchars($eventTitle) . ' Participants' : 'Event Title Here'; ?>
-                        <a style="margin-left:2rem;" href="?download=true&eventTitle=<?php echo urlencode($eventTitle); ?>" class="download-button">
+                        <a style="margin-left:2rem;" href="#" class="download-button" onclick="confirmDownload('<?php echo urlencode($eventTitle); ?>')">
                             <i class="fa fa-print" aria-hidden="true"></i> Download Event Report
                         </a>
 
@@ -578,6 +578,29 @@ if (isset($_GET['download'])) {
                     }
                 }
             }
+        }
+    </script>
+
+
+
+    <script>
+        function confirmDownload(eventTitle) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to download the event report?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, download it!',
+                customClass: {
+                    popup: 'larger-swal'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `?download=true&eventTitle=${eventTitle}`;
+                }
+            });
         }
     </script>
 

@@ -139,6 +139,8 @@
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -434,14 +436,56 @@
                 const selectedMonth = document.getElementById('monthSelect').value;
 
                 if (selectedYear && selectedMonth === 'all') {
-                    window.location.href = `?download=true&year=${selectedYear}`; // Only pass year
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you want to download the report for the selected year?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, download it!',
+                        customClass: {
+                            popup: 'larger-swal'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `?download=true&year=${selectedYear}`; 
+                        }
+                    });
                 } else if (selectedYear && selectedMonth) {
-                    window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you want to download the report for the selected year and month?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, download it!',
+                        customClass: {
+                            popup: 'larger-swal'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
+                        }
+                    });
                 } else {
-                    alert('Please select a year and month.');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: "Please select a year/month.",
+                        icon: 'warning',
+                        customClass: {
+                            popup: 'larger-swal'
+                        }
+                    });
                 }
             }
         </script>
+
+
+
+
+
 
 
 
