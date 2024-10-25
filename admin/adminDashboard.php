@@ -354,8 +354,25 @@
                     </div>
                 </section>
                 
+                <!--charts-->
+                <div class="graphBox">
+                    <div class="box">
+                        <div>
+                            <select name="selectedYear" id="selectedYear">
+                                <?php foreach ($years as $year): ?>
+                                    <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <canvas id="myChart" width="400" height="300"></canvas> <!--change the size by adjusting the width and height-->
+                        </div>
+                    </div>
+                    <div class="box">
+                        <canvas id="eventsYear"></canvas>
+                    </div>
+                </div>
 
-            <div class="graphBox_alt">
+
+                <div class="graphBox_alt">
                 <?php
                 $query = "SELECT DISTINCT YEAR(date_start) AS year FROM events ORDER BY year DESC";
                 $result = $conn->query($query);
@@ -403,28 +420,6 @@
                 </div>
 
             </div>
-
-
-
-
-
-
-                <!--charts-->
-                <div class="graphBox">
-                    <div class="box">
-                        <div>
-                            <select name="selectedYear" id="selectedYear">
-                                <?php foreach ($years as $year): ?>
-                                    <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <canvas id="myChart" width="400" height="300"></canvas> <!--change the size by adjusting the width and height-->
-                        </div>
-                    </div>
-                    <div class="box">
-                        <canvas id="eventsYear"></canvas>
-                    </div>
-                </div>
 
             </div>
 

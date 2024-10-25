@@ -74,24 +74,23 @@ while ($attendanceRow = $attendanceResult->fetch_assoc()) {
     $attendanceData[$attendanceRow['participant_id']][$attendanceRow['attendance_date']] = $attendanceRow['status'];
 }
 
-require('../fpdf186/fpdf.php');
+
+
+require('../fpdf186/fpdf.php'); 
 
 if (isset($_GET['download'])) {
-    $pdf = new FPDF('P');
+    $pdf = new FPDF('P'); 
     $pdf->SetAutoPageBreak(TRUE, 15);
     $pdf->AddPage();
 
-    // Title
     $pdf->SetFont("Arial", 'B', 16);
     $pdf->Cell(0, 10, 'Event Details', 0, 1, 'C');
     $pdf->Ln(10);
 
-    // Adding Event Information
     $pdf->SetFont("Arial", 'B', 10);
     $pdf->Cell(0, 10, 'Event Information', 0, 1);
     $pdf->SetFont("Arial", '', 10);
 
-    // Event Information
     $event_info = [
         "Event Title: " . htmlspecialchars($eventTitle),
         "Event Type: " . htmlspecialchars($eventType),
@@ -122,13 +121,13 @@ if (isset($_GET['download'])) {
         $maxParticipantWidth = max($maxParticipantWidth, $nameWidth);
     }
 
-    $minWidth = 50;
+    $minWidth = 50; 
     $participantColumnWidth = max($minWidth, $maxParticipantWidth + 10);
 
     $pdf->Ln();
 
     $participantCount = 1;
-    $participantsResult->data_seek(0);
+    $participantsResult->data_seek(0); 
     $totalDays = $numDays;
 
     for ($startDay = 0; $startDay < $totalDays; $startDay += 7) {
@@ -136,43 +135,24 @@ if (isset($_GET['download'])) {
             $pdf->AddPage();
             $pdf->SetFont("Arial", 'B', 10);
             $pdf->SetFont("Arial", '', 10);          
-            
-            foreach ($headers as $header) {
-                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
-            }
-            
-            $pdf->SetFont("Arial", 'B', 10);
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDay = $startDay + $dayOffset;
-
-                if ($currentDay >= $totalDays) {
-                    break;
-                }
-
-                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('m-d');
-                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
-            }
-            $pdf->Ln();
-        } else {
-            // This part is added to handle the first set of dates
-            $pdf->SetFont("Arial", 'B', 10);
-            foreach ($headers as $header) {
-                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
-            }
-
-            $pdf->SetFont("Arial", 'B', 10);
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDate = (new DateTime($dateStart))->modify("+$dayOffset day")->format('m-d');
-                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
-            }
-            $pdf->Ln(); 
         }
 
-        // Participant rows
+        // Print headers
+        $pdf->SetFont("Arial", 'B', 10);
+        foreach ($headers as $header) {
+            $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
+        }
+
+        for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
+            $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('m-d');
+            $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
+        }
+        $pdf->Ln();
+
         $participantsResult->data_seek(0);
         while ($row = $participantsResult->fetch_assoc()) {
             $participantId = $row['UserID'];
-
+        
             // Fetch participant ID
             $participantInfoSql = "SELECT participant_id FROM eventParticipants WHERE UserID = ? AND event_id = ?";
             $participantInfoStmt = $conn->prepare($participantInfoSql);
@@ -181,41 +161,33 @@ if (isset($_GET['download'])) {
             $participantInfoResult = $participantInfoStmt->get_result();
             $participantInfoRow = $participantInfoResult->fetch_assoc();
             $actualParticipantId = $participantInfoRow['participant_id'];
-
+        
             $pdf->Cell(15, 8, $participantCount++, 1, 0, 'C');
-
+        
             $currentY = $pdf->GetY();
             $pdf->SetXY($pdf->GetX(), $currentY);
             $participantName = htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']);
 
-            $pdf->Cell($participantColumnWidth, 8, $participantName, 1, 'C');
+            $pdf->Cell($participantColumnWidth, 8, $participantName, 1, 'C'); 
 
             $multiCellHeight = $pdf->GetY() - $currentY; 
         
             $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY); 
         
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDay = $startDay + $dayOffset;
+            for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
+                $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('Y-m-d');
         
-                if ($currentDay >= $totalDays) {
-                    break;
-                }
-        
-                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('Y-m-d');
-        
-                // Check attendance status
                 $status = isset($attendanceData[$actualParticipantId][$currentDate]) ? $attendanceData[$actualParticipantId][$currentDate] : 'absent';
                 $symbol = ($status === 'present') ? '/' : 'X';
 
                 $pdf->Cell(15, 8, $symbol, 1, 0, 'C'); 
-
             }
-            $pdf->Ln();
+            $pdf->Ln(); 
         }
-
+     
         // Legend
         $pdf->SetFont("Arial", 'B', 12);
-        $pdf->Ln(5);
+        $pdf->Ln(5); 
         $pdf->SetFont("Arial", 'I', 8);
         $pdf->Cell(0, 8, '* X = Absent, / = Present', 0, 1);
         $pdf->Ln(5);
@@ -227,7 +199,7 @@ if (isset($_GET['download'])) {
     $pdf->SetFont("Arial", 'B', 10);
     $pdf->Cell(15, 8, "#", 1, 0, 'C');
     $pdf->Cell(0, 8, "Name", 1, 1);
-    $pdf->SetFont("Arial", '', 10);
+    $pdf->SetFont("Arial", '', 10); 
 
     $sponsors_query = "SELECT sponsor_id, sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
     $stmt = $conn->prepare($sponsors_query);
@@ -251,7 +223,7 @@ if (isset($_GET['download'])) {
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="event_details.pdf"');
     echo $pdf_output;
-
+    
     $conn->close();
 }
 
