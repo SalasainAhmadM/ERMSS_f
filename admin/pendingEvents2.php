@@ -207,6 +207,35 @@
             margin: 0;
             background-color: var(--light-bg);
             font-size: 1.8rem;
+
+        }
+
+        .flex2 {
+            display: flex;
+        }
+
+        /* Add this CSS */
+
+        @media (max-width: 768px) {
+            .event-filter {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .event-filter form {
+                width: 100%;
+            }
+
+            .dropdown-container,
+            .flex {
+                width: 100%;
+            }
+
+            .flex2 {
+                display: flex;
+                flex-direction: column;
+            }
+
         }
     </style>
     <!-- ============ CONTENT ============-->
@@ -220,7 +249,8 @@
                 <h1 class="heading"></h1>
                 <h1 class="heading">filter events</h1>
 
-                <div style="display: flex; gap: 10px; margin-bottom:10px">
+                <div class="flex2" style=" gap: 10px; margin-bottom:10px">
+
 
                     <form action="" method="post" style="margin-bottom:1rem; height:10%">
 
