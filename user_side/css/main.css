@@ -733,8 +733,14 @@ section{
 }
 
 .box-container > div {
-    width: calc(33.33% - 10px); /* Ensure 3 blocks per line */
+    width: calc(33.33% - 10px);
     box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .box-container > div {
+        width: auto; /* or you can set it to another value */
+    }
 }
 
 
