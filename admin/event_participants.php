@@ -446,10 +446,85 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
 
 
                 <script>
-                    function resetAttendance(participant_id, event_id) {
-                        var selectedDate = "<?php echo $selectedDate; ?>"; // Get selected date from PHP
-                        const attendance_date = getStoredDate();  // Get date from sessionStorage
+                    function fetchAttendance(participantId, eventId, fullName, eventName) {
+                        // Make an AJAX call to fetch attendance details
+                        fetch(`fetch_attendance_details.php?participant_id=${participantId}&event_id=${eventId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data && data.length > 0) {
+                                    let attendanceDetails = `
+                        <div style="text-align: center; padding: 2.5rem;">
+                            <h2 style="margin-bottom: 1rem;">${eventName}</h2>
+                            <h3 style="margin-bottom: 1rem; font-weight: bold;">${fullName}</h3>
+                    `;
 
+                                    // Function to convert 24-hour time to 12-hour format with AM/PM
+                                    function formatTime(time) {
+                                        if (!time) return 'N/A';
+                                        let [hours, minutes] = time.split(':');
+                                        let ampm = hours >= 12 ? 'PM' : 'AM';
+                                        hours = hours % 12 || 12; // Convert to 12-hour format, setting 12 for midnight/noon
+                                        return `${hours}:${minutes} ${ampm}`;
+                                    }
+
+                                    // Loop through each day and create formatted attendance details
+                                    data.forEach((day, index) => {
+                                        let formattedStatus = day.status.charAt(0).toUpperCase() + day.status.slice(1).toLowerCase();
+                                        let statusColor = formattedStatus === 'Present' ? 'green' : 'red';
+
+                                        attendanceDetails += `
+                            <div style="margin-bottom: 1rem; text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Day ${index + 1} - ${new Date(day.attendance_date).toLocaleDateString('en-US', {
+                                            month: 'short', day: 'numeric', year: 'numeric'
+                                        })} - <span style="color: ${statusColor};">${formattedStatus}</span></h4>
+                                <p><strong>Time-in:</strong> ${formatTime(day.time_in)} &nbsp;&nbsp;&nbsp;
+                                <strong>Time-out:</strong> ${formatTime(day.time_out)}</p>
+                            </div>
+                        `;
+                                    });
+
+                                    attendanceDetails += `</div>`;
+
+                                    Swal.fire({
+                                        title: '',
+                                        html: attendanceDetails,
+                                        showConfirmButton: true,
+                                        confirmButtonText: 'Confirm',
+                                        cancelButtonText: 'Cancel',
+                                        showCancelButton: true,
+                                        customClass: {
+                                            popup: 'larger-swal'
+                                        },
+                                        width: '600px',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'No Attendance Records',
+                                        text: `No attendance details found for ${fullName}.`,
+                                        icon: 'warning',
+                                        showCloseButton: true,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching attendance details:', error);
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'There was an issue fetching attendance details. Please try again.',
+                                    icon: 'error',
+                                    showCloseButton: true,
+                                    showConfirmButton: false
+                                });
+                            });
+                    }
+                </script>
+
+
+                <script>
+                    function resetAttendance(participant_id, event_id) {
+                        var selectedDate = "<?php echo $selectedDate; ?>";
+                        const attendance_date = getStoredDate();
                         if (!attendance_date || attendance_date === "") {
                             Swal.fire({
                                 title: 'Error',
@@ -496,7 +571,6 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                                     confirmButton: 'swal-confirm',
                                                 }
                                             });
-                                            // Optionally, refresh the page or update the UI
                                             setTimeout(() => {
                                                 location.reload();
                                             }, 1500);

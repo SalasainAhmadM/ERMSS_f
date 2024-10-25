@@ -27,7 +27,7 @@ $endDate = $rowDates['date_end'];
 
 // Fetch participants who have either perfect attendance or complete absences for all event dates
 $sqlParticipants = "
-    SELECT u.FirstName, u.MI, u.LastName, u.Affiliation, u.Position, u.Email, u.ContactNo, ep.participant_id
+    SELECT u.FirstName, u.MI, u.LastName, u.Affiliation, u.Position, u.Email, u.ContactNo, ep.participant_id, ep.event_id
     FROM eventParticipants ep
     INNER JOIN user u ON ep.UserID = u.UserID
     LEFT JOIN attendance a ON ep.participant_id = a.participant_id
@@ -54,9 +54,15 @@ if ($resultParticipants->num_rows > 0) {
         $position = htmlspecialchars($row['Position']);
         $email = htmlspecialchars($row['Email']);
         $contactNo = htmlspecialchars($row['ContactNo']);
-
         // Modify the status text based on the requested status
         $statusText = $status === 'present' ? 'For Evaluation' : ($status === 'absent' ? "Didn't Attend Event" : '');
+
+        // Create an "evaluate" button for participants with perfect attendance
+        $evaluateButton = $status === 'present' ?
+            "<button type='button' onclick=\"fetchAttendance('{$row['participant_id']}', '{$row['event_id']}', '{$fullName}', '{$eventTitle}')\" class='attendance-btn'>
+        <i class='fa-solid fa-clipboard-check'></i>
+    </button>"
+            : ($status === 'absent' ? "<span>Not Approved</span>" : '');
 
         echo "<li class='participant_item'>
                 <div class='item'>
@@ -66,6 +72,7 @@ if ($resultParticipants->num_rows > 0) {
                     <div class='info'><span>$email</span></div>
                     <div class='phone'><span>$contactNo</span></div>
                     <div class='status'><span>$statusText</span></div>
+                    <div class='status'>$evaluateButton</div>
                 </div>
               </li>";
     }
