@@ -120,13 +120,40 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                         </ul>
                     </div>
 
+                    <style>
+                        .participants-links {
+                            display: flex;
+                            gap: 10px;
+                            justify-content: center;
+                            align-items: center;
+                        }
 
+                        .participants-links a {
+                            text-decoration: none;
+                            display: flex;
+                            align-items: center;
+                            padding: 10px 15px;
+                            border-radius: 5px;
+                            background-color: #4caf50;
+                            color: white;
+                            transition: background-color 0.3s ease;
+                        }
+
+                        .participants-links a:hover {
+                            background-color: #45a049;
+                        }
+                    </style>
 
                     <div class="flex-btn">
                         <a href="applyEvent.php?event_id=<?php echo $eventId; ?>" class="btn">Add Participant</a>
 
-                        <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>"
-                            class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>
+                        <div class="participants-links">
+                            <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>"
+                                class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>
+                            <a href="participants_cancelled.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>"
+                                class="save"><i class='bx bx-body'></i> <span>Cancelled Participants</span></a>
+                        </div>
+
                     </div>
 
                 </div>
