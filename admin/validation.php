@@ -249,7 +249,9 @@ include('../function/F.userValidation.php');
                             <?php
                         }
                     } else {
-                        echo "No records found";
+                        echo "<div class='no-participants-container'>
+                                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No Records Found.</p>
+                              </div>";
                     }
                     ?>
 
