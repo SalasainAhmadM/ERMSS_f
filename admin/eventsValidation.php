@@ -196,7 +196,16 @@
             </li>
         </ul>
     </div>
-
+    <style>
+        .event-filter form .flex .box .input {
+            width: 100%;
+            border-radius: .5rem;
+            color: var(--first-color-alt);
+            margin: 0;
+            background-color: var(--light-bg);
+            font-size: 1.8rem;
+        }
+    </style>
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
@@ -228,35 +237,20 @@
 
                     </form>
 
-                    <form action="" method="post" style="width:65%">
+                    <!-- -->
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+
                         <div class="flex">
                             <div class="box">
-                                <p>Event Title <span>*</span></p>
-                                <input type="text" id="eventTitleInput" placeholder="Filter event title" class="input">
+                                <input type="text" id="eventTitleInput" placeholder="Filter Event title" class="input">
                             </div>
 
-                            <!-- <div class="dropdown-container">
-                                <div class="dropdown">
-                                    <p>Display <span>*</span></p>
-                                    <input type="text" readonly name="eventDisplay" placeholder="Grid" maxlength="20" class="output">
-                                    <div class="lists">
-                                        <a href="landingPageU.php"><p class="items">List</p></a>
-                                        <a href="landingPage2.php"><p class="items">Grid</p></a>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
 
+                    </form>
+
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
                         <div class="dropdown-container">
-                            <!-- <div class="dropdown">
-                                <input type="text" readonly name="eventMode" placeholder="event mode" maxlength="20" class="output">
-                                <div class="lists">
-                                    <p class="items">Face-to-Face</p>
-                                    <p class="items">Online</p>
-                                    <p class="items">Hybrid</p>
-                                    <p class="items"><i class="fa-solid fa-rotate"></i></i></p>
-                                </div>
-                            </div> -->
 
                             <div class="dropdown">
                                 <input type="text" readonly name="eventType" placeholder="event type" maxlength="20"
@@ -266,7 +260,7 @@
                                         <p class="items">All</p>
                                     </a>
                                     <?php
-                                    $sqlEventType = "SELECT DISTINCT event_type FROM pendingevents";
+                                    $sqlEventType = "SELECT DISTINCT event_type FROM events";
                                     $resultEventType = $conn->query($sqlEventType);
 
                                     if ($resultEventType->num_rows > 0) {

@@ -17,10 +17,10 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
                                   AND attendance.attendance_date = ?
             WHERE eventParticipants.event_id = 
                   (SELECT event_id FROM Events WHERE event_title = ?)
-              AND attendance.status = ?";  // Filter by status (present or absent)
+              AND attendance.status = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $selectedDate, $eventTitle, $status);  // Bind the date, event title, and status
+    $stmt->bind_param("sss", $selectedDate, $eventTitle, $status);  // Bind the selected date, event title, and status
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -35,39 +35,38 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
             $position = htmlspecialchars($row['Position']);
             $email = htmlspecialchars($row['Email']);
             $contactNo = htmlspecialchars($row['ContactNo']);
-            $statusText = $status === 'present' ? 'Present' : 'Absent';  // Status label
+            $statusText = ucfirst(htmlspecialchars($row['status'])) ?: 'Not Marked';  // Capitalize status
 
             echo "
-                <form action='' method='POST'>
-                    <li class='participant_item'>
-                        <div class='item'>
-                            <div class='name'>
-                                <span>" . date('M j, Y', strtotime($selectedDate)) . "</span>
-                            </div>
-                            <div class='name'><span>$fullName</span></div>
-                            <div class='department'><span>$affiliation</span></div>
-                            <div class='department'><span>$position</span></div>
-                            <div class='info'><span>$email</span></div>
-                            <div class='phone'><span>$contactNo</span></div>
-                            <div class='status'>
-                                <span>$statusText</span>
-                            </div>
-                            <div class='status'>
-                                <input type='hidden' name='participant_id' value='{$row['participant_id']}'>
-                                <input type='hidden' name='event_id' value='{$row['event_id']}'>
-                                <button type='button' onclick='triggerAttendance(\"{$row['participant_id']}\")' class='attendance-btn'>
-                                    <i class='fas fa-user-check'></i> Attendance
-                                </button>
-                            </div>
-                        </div>
-                    </li>
-                </form>";
+            <li class='participant_item'>
+                <div class='item'>
+                    <div class='name'>
+                        <span>" . date('M j, Y', strtotime($selectedDate)) . "</span>
+                    </div>
+                    <div class='name'><span>$fullName</span></div>
+                    <div class='department'><span>$affiliation</span></div>
+                    <div class='department'><span>$position</span></div>
+                    <div class='info'><span>$email</span></div>
+                    <div class='phone'><span>$contactNo</span></div>
+                    <div class='status'><span>$statusText</span></div>
+                    <div class='status attendance-btn-container'>
+                       
+                        <button type='button' onclick='resetAttendance(\"{$row['participant_id']}\", \"{$row['event_id']}\", \"{$row['event_id']}\")' class='attendance-btn'>
+                            <i class='fa-solid fa-file-pen'></i>
+                        </button>
+                    </div>
+                </div>
+            </li>";
         }
         echo "</ul>";
     } else {
         echo "<div class='no-participants-container'>
-                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participant found for the specified event and date.</p>
+                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participants found for the specified event and date.</p>
               </div>";
     }
+} else {
+    echo "<div class='no-participants-container'>
+            <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participants found for the specified event and date.!</p>
+          </div>";
 }
 ?>

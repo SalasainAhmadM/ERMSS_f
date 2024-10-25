@@ -1,35 +1,73 @@
 <?php
-// Include your database connection code here
+session_start();
 require_once('../db.connection/connection.php');
 
-// Initialize the response array
-$response = array();
+if (isset($_GET['event_id'])) {
+    $eventId = intval($_GET['event_id']);
 
-// Check if eventId is set and not empty
-if (isset($_GET['eventId']) && !empty($_GET['eventId'])) {
-    $eventId = $_GET['eventId'];
+    $deleteAttendanceSql = "DELETE FROM attendance WHERE participant_id IN (SELECT participant_id FROM eventparticipants WHERE event_id = ?)";
 
-    // Perform deletion from the database
-    $deleteQuery = "DELETE FROM Events WHERE event_id = $eventId";
+    if ($stmt = $conn->prepare($deleteAttendanceSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            echo "<script>alert('Error deleting attendance records!'); window.location.href='../admin/cancelEvent.php';</script>";
+            exit;
+        }
+        $stmt->close();
+    }
 
-    if (mysqli_query($conn, $deleteQuery)) {
-        // Set success message in response
-        $response['success'] = true;
+    $deleteParticipantsSql = "DELETE FROM eventparticipants WHERE event_id = ?";
+
+    if ($stmt = $conn->prepare($deleteParticipantsSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            echo "<script>alert('Error deleting participants!'); window.location.href='../admin/cancelEvent.php';</script>";
+            exit;
+        }
+        $stmt->close();
+    }
+
+    // Delete sponsors
+    $deletePendingSponsorsSql = "DELETE FROM sponsor WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deletePendingSponsorsSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending sponsors!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
+    // Delete cancel_reason
+    $deleteCancelReasonSql = "DELETE FROM cancel_reason WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deleteCancelReasonSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending sponsors!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
+    $deleteEventSql = "DELETE FROM Events WHERE event_id = ?";
+
+    if ($stmt = $conn->prepare($deleteEventSql)) {
+        $stmt->bind_param("i", $eventId);
+        if ($stmt->execute()) {
+            $_SESSION['success'] = 'Deleted successfully!';
+            header('Location: ../admin/cancelEvent.php');
+            exit;
+        } else {
+            echo "<script>alert('Error deleting event!'); window.location.href='../admin/cancelEvent.php';</script>";
+        }
+        $stmt->close();
+        $conn->close();
     } else {
-        // Set error message in response
-        $response['success'] = false;
-        $response['error'] = "Error deleting event: " . mysqli_error($conn);
+        echo "<script>alert('Failed to prepare the SQL statement!'); window.location.href='../admin/cancelEvent.php';</script>";
     }
 } else {
-    // Set error message if eventId is not set
-    $response['success'] = false;
-    $response['error'] = "Event ID not provided";
+    echo "<script>alert('Invalid event ID!'); window.location.href='../admin/cancelEvent.php';</script>";
 }
 
-// Send the response as JSON
-header('Content-Type: application/json');
-echo json_encode($response);
-
-// Exit to prevent any additional output
-exit();
+mysqli_close($conn);
 ?>

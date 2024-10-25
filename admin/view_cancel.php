@@ -2,6 +2,7 @@
 session_start();
 include('../function/F.event_retrieve.php');
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
+
 ?>
 
 
@@ -70,7 +71,9 @@ $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
                             <?php endif; ?>
                             <li>Status: <?php echo $_SESSION['event_data']['eventStatus']; ?></li>
                             <?php if ($_SESSION['event_data']['eventStatus'] === 'Cancelled'): ?>
-                                <li>Reason for Cancellation: <?php echo $_SESSION['event_data']['cancelReason']; ?></li>
+                                <li style="color: red">Reason for Cancellation: <br>
+                                    <strong><?php echo $_SESSION['event_data']['cancelReason']; ?></strong>
+                                </li>
                             <?php endif; ?>
                         </ul>
 

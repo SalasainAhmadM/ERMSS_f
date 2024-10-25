@@ -88,6 +88,12 @@
     color: white !important;
 }
 
+.attendance-btn-container {
+    display: flex;
+    justify-content: flex-start; 
+    gap: 5px; 
+}
+
 .attendance-btn {
     background-color: var(--first-color);
     color: white;
@@ -107,8 +113,9 @@
 }
 
 .attendance-btn:hover {
-    background-color: #c82333;
+    background-color: #c82333; /* Hover effect */
 }
+
 
 .no-participants-container {
     display: flex;
