@@ -136,38 +136,22 @@ if (isset($_GET['download'])) {
             $pdf->AddPage();
             $pdf->SetFont("Arial", 'B', 10);
             $pdf->SetFont("Arial", '', 10);          
-            
-            foreach ($headers as $header) {
-                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
-            }
-            
-            $pdf->SetFont("Arial", 'B', 10);
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDay = $startDay + $dayOffset;
-
-                if ($currentDay >= $totalDays) {
-                    break;
-                }
-
-                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('m-d');
-                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
-            }
-            $pdf->Ln();
-        } else {
-            // This part is added to handle the first set of dates
-            $pdf->SetFont("Arial", 'B', 10);
-            foreach ($headers as $header) {
-                $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
-            }
-
-            $pdf->SetFont("Arial", 'B', 10);
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDate = (new DateTime($dateStart))->modify("+$dayOffset day")->format('m-d');
-                $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
-            }
-            $pdf->Ln(); 
         }
 
+        // Print headers
+        $pdf->SetFont("Arial", 'B', 10);
+        foreach ($headers as $header) {
+            $pdf->Cell($header === "Participants" ? $participantColumnWidth : 15, 8, $header, 1, 0, 'C');
+        }
+
+        // Generate date headers for the current page (up to 7 or remaining days)
+        for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
+            $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('m-d');
+            $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
+        }
+        $pdf->Ln();
+
+        // Participant rows
         $participantsResult->data_seek(0);
         while ($row = $participantsResult->fetch_assoc()) {
             $participantId = $row['UserID'];
@@ -193,21 +177,14 @@ if (isset($_GET['download'])) {
         
             $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY); 
         
-            for ($dayOffset = 0; $dayOffset < 7; $dayOffset++) {
-                $currentDay = $startDay + $dayOffset;
-        
-                if ($currentDay >= $totalDays) {
-                    break;
-                }
-        
-                $currentDate = (new DateTime($dateStart))->modify("+$currentDay day")->format('Y-m-d');
+            for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
+                $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('Y-m-d');
         
                 // Check attendance status
                 $status = isset($attendanceData[$actualParticipantId][$currentDate]) ? $attendanceData[$actualParticipantId][$currentDate] : 'absent';
                 $symbol = ($status === 'present') ? '/' : 'X';
 
                 $pdf->Cell(15, 8, $symbol, 1, 0, 'C'); 
-
             }
             $pdf->Ln(); 
         }
@@ -219,9 +196,6 @@ if (isset($_GET['download'])) {
         $pdf->Cell(0, 8, '* X = Absent, / = Present', 0, 1);
         $pdf->Ln(5);
     }
-
-
-
 
     // Sponsors Section
     $pdf->SetFont("Arial", 'B', 10);
@@ -256,6 +230,7 @@ if (isset($_GET['download'])) {
     
     $conn->close();
 }
+
 
 ?>
 
@@ -438,7 +413,7 @@ if (isset($_GET['download'])) {
                 <div class="table_header">
                     <p>
                         <?php echo isset($eventTitle) ? htmlspecialchars($eventTitle) . ' Participants' : 'Event Title Here'; ?>
-                        <a href="?download=true&eventTitle=<?php echo urlencode($eventTitle); ?>" class="download-button">
+                        <a style="margin-left:2rem" href="?download=true&eventTitle=<?php echo urlencode($eventTitle); ?>" class="download-button">
                             <i class="fa fa-print" aria-hidden="true"></i> Download Event Report
                         </a>
 

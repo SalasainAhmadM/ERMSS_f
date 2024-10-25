@@ -1798,15 +1798,43 @@ table.tb_eco tr:hover td{
 
 .download-button {
     padding: 10px 20px;
-    font-size: 16px;
+    font-size: 1.5rem;
     color: #fff;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     text-decoration: none;
-    margin-left: 2rem;
+
 }
+
 .download-button:hover {
     background-color: #0056b3;
 }
+
+.event_report_download {
+    margin-top: 4.5rem;
+    position: relative;
+    background-color: var(--body-color);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: 20px;
+    width:30rem;
+}
+
+
+.event_report_download select{
+    padding: 0.5rem; 
+    margin-right: 1rem; 
+    font-size: 1.5rem;
+}
+
+.graphBox_alt {
+    position: relative;
+    width: 100%;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+

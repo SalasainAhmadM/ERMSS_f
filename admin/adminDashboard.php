@@ -27,7 +27,105 @@
     $totalEndedQuery = "SELECT COUNT(*) AS totalEnded FROM Events WHERE (NOW() > CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
     $totalEndedResult = mysqli_query($conn, $totalEndedQuery);
     $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
+
+
+
+    require('../fpdf186/fpdf.php');
+
+    if (isset($_GET['download'])) {
+        $selectedYear = $_GET['year'];
+        $selectedMonth = $_GET['month'] ?? null;
+    
+        // Fetch events based on selected year and month
+        $eventsQuery = "SELECT * FROM events WHERE YEAR(date_start) = ?";
+        $params = [$selectedYear];
+    
+        if ($selectedMonth) {
+            $eventsQuery .= " AND MONTH(date_start) = ?";
+            $params[] = $selectedMonth;
+        }
+    
+        $stmt = $conn->prepare($eventsQuery);
+        $stmt->bind_param(str_repeat('i', count($params)), ...$params);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $events = $result->fetch_all(MYSQLI_ASSOC);
+    
+        // Create PDF document
+        $pdf = new FPDF('P');
+        $pdf->AddPage();
+    
+        // Set title and header
+        $pdf->SetFont('helvetica', 'B', 20);
+        $pdf->Cell(0, 10, 'Events Report', 0, 1, 'C');
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->Ln(10);
+    
+        // Display selected filters
+        $pdf->Cell(0, 10, 'Year: ' . $selectedYear, 0, 1);
+        if ($selectedMonth) {
+            $pdf->Cell(0, 10, 'Month: ' . date('F', mktime(0, 0, 0, $selectedMonth, 10)), 0, 1);
+        }
+        $pdf->Ln(10);
+    
+        // Table Header
+        $pdf->SetFont('helvetica', 'B', 12);
+        $header = [
+            'Event Name' => 60,
+            'Start Date' => 30,
+            'End Date' => 30,
+            'Status' => 30
+        ];
+    
+        // Print header
+        foreach ($header as $title => $width) {
+            $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
+        }
+        $pdf->Ln();
+    
+        // Check if there are events and output content accordingly
+        if (empty($events)) {
+            // No events found
+            $pdf->SetFont('helvetica', 'I', 12);
+            $pdf->Cell(0, 10, 'No events found!', 0, 1, 'C');
+        } else {
+            // Table Content
+            $pdf->SetFont('helvetica', '', 12);
+            
+            date_default_timezone_set('Asia/Manila'); // Set timezone to Manila
+            $currentDate = date('Y-m-d');
+    
+            foreach ($events as $event) {
+                $eventTitleWidth = max(60, $pdf->GetStringWidth($event['event_title']) + 4); // +4 for padding
+                $pdf->Cell($eventTitleWidth, 10, $event['event_title'], 1);
+                $pdf->Cell(30, 10, $event['date_start'], 1, 0, 'C'); // Center content
+                $pdf->Cell(30, 10, $event['date_end'], 1, 0, 'C'); // Center content
+    
+                // Determine event status
+                if ($event['event_cancel'] !== null && $event['event_cancel'] !== '') {
+                    $status = 'Cancelled'; // Event is cancelled
+                } elseif ($event['date_start'] <= $currentDate && $event['date_end'] >= $currentDate) {
+                    $status = 'Ongoing'; // Ongoing event
+                } elseif ($event['date_end'] < $currentDate) {
+                    $status = 'Ended'; // Ended event
+                } else {
+                    $status = 'Upcoming'; // Upcoming event
+                }
+    
+                $pdf->Cell(30, 10, $status, 1, 0, 'C'); // Center content
+                $pdf->Ln();
+            }
+        }
+    
+        // Output PDF
+        $pdf->Output('events_report.pdf', 'D');
+        exit();
+    }
+    
+    
+    
 ?>
+
 
 
 <!DOCTYPE html>
@@ -256,6 +354,61 @@
                     </div>
                 </section>
                 
+
+            <div class="graphBox_alt">
+                <?php
+                $query = "SELECT DISTINCT YEAR(date_start) AS year FROM events ORDER BY year DESC";
+                $result = $conn->query($query);
+                ?>
+
+                <div class="event_report_download">
+
+                    <div style="margin-bottom:2rem;">
+
+                    <select id="yearSelect">
+                        <option value="" disabled selected>Select Year</option>
+                        <?php
+                        // Check if any rows were returned
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '<option value="' . $row['year'] . '">' . $row['year'] . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+
+                    <select id="monthSelect">
+                        <option value="" disabled selected>Select Month</option>
+                        <option value="all">All Months</option> <!-- Add this line -->
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+
+
+                    </div>
+
+                    <button style="margin-left: 4rem;" onclick="downloadReport()" class="download-button">
+                        <i class='fa fa-print'></i> Download Report
+                    </button>
+                </div>
+
+            </div>
+
+
+
+
+
+
                 <!--charts-->
                 <div class="graphBox">
                     <div class="box">
@@ -273,14 +426,27 @@
                     </div>
                 </div>
 
-                
-
             </div>
+
         </div>
 
 
 
         
+        <script>
+            function downloadReport() {
+                const selectedYear = document.getElementById('yearSelect').value;
+                const selectedMonth = document.getElementById('monthSelect').value;
+
+                if (selectedYear && selectedMonth === 'all') {
+                    window.location.href = `?download=true&year=${selectedYear}`; // Only pass year
+                } else if (selectedYear && selectedMonth) {
+                    window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
+                } else {
+                    alert('Please select a year and month.');
+                }
+            }
+        </script>
 
 
 
