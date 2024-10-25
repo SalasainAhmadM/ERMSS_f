@@ -67,43 +67,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 $eventTitle = isset($_GET['eventTitle']) ? urldecode($_GET['eventTitle']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (isset($_GET['eventTitle'])) {
-        $eventTitle = urldecode($_GET['eventTitle']);
-
-        // Fetch the event_id from the event title
+    if ($eventTitle) {
+        // Retrieve event_id from event title
         $sqlEvent = "SELECT event_id FROM events WHERE event_title = ?";
         $stmtEvent = $conn->prepare($sqlEvent);
         $stmtEvent->bind_param("s", $eventTitle);
         $stmtEvent->execute();
         $resultEvent = $stmtEvent->get_result();
 
-        if ($resultEvent->num_rows > 0) {
+        if ($resultEvent && $resultEvent->num_rows > 0) {
             $event = $resultEvent->fetch_assoc();
             $event_id = $event['event_id'];
 
-            // Fetch cancelled participants with their cancel_reason
+            // Fetch participants and their cancellation reasons
             $sqlCancelledParticipants = "
-            SELECT ep.UserID, u.FirstName, u.LastName, u.Age, u.Gender, u.Position, u.ContactNo, 
-                   u.Email, u.Affiliation, u.EducationalAttainment, u.Image, cr.description AS cancelReason
-            FROM eventparticipants ep
-            JOIN user u ON ep.UserID = u.UserID
-            JOIN cancel_reason cr ON ep.event_id = cr.event_id AND ep.UserID = cr.UserID
-            WHERE ep.event_id = ?";
-
+                SELECT u.FirstName, u.LastName, u.Age, u.Gender, u.Email, u.Affiliation, u.Image, u.EducationalAttainment, u.Position, u.ContactNo, cr.description AS cancel_reason 
+                FROM user u
+                INNER JOIN cancel_reason cr ON u.UserID = cr.UserID
+                WHERE cr.event_id = ?
+            ";
 
             $stmtCancelledParticipants = $conn->prepare($sqlCancelledParticipants);
             $stmtCancelledParticipants->bind_param("i", $event_id);
             $stmtCancelledParticipants->execute();
             $cancelledParticipantsResult = $stmtCancelledParticipants->get_result();
+
+            $stmtCancelledParticipants->close();
         } else {
             echo "Event not found.";
         }
 
         $stmtEvent->close();
-        $stmtCancelledParticipants->close();
     }
 }
-
 ?>
 
 
@@ -255,63 +251,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </div>
 
                 <div class="table_section">
-                    <div class="table_section">
-                        <table id="userTable" class="tb_eco">
-                            <thead class="tb_head">
+                    <table id="userTable" class="tb_eco">
+                        <thead class="tb_head">
+                            <tr>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Occupation</th>
+                                <th>Contact No.</th>
+                                <th>Cancel Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (isset($cancelledParticipantsResult) && $cancelledParticipantsResult->num_rows > 0): ?>
+                                <?php while ($row = $cancelledParticipantsResult->fetch_assoc()): ?>
+                                    <?php
+                                    $fullName = htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']);
+                                    $age = htmlspecialchars($row['Age'] ?? 'N/A');
+                                    $gender = htmlspecialchars($row['Gender'] ?? 'N/A');
+                                    $position = htmlspecialchars($row['Position'] ?? 'N/A');
+                                    $contact = htmlspecialchars($row['ContactNo'] ?? 'N/A');
+                                    $cancelReason = htmlspecialchars($row['cancel_reason'] ?? 'N/A');
+                                    $email = htmlspecialchars($row['Email'] ?? 'N/A');  // Assuming email exists
+                                    $affiliation = htmlspecialchars($row['Affiliation'] ?? 'N/A');  // Assuming affiliation exists
+                                    $image = htmlspecialchars($row['Image'] ?? '');  // Optional image path
+                                    $educationalAttainment = htmlspecialchars($row['EducationalAttainment'] ?? 'N/A');  // Optional field
+                                    ?>
+                                    <tr onclick="showProfile(
+                '<?= $fullName; ?>', 
+                '<?= $age; ?>', 
+                '<?= $gender; ?>', 
+                '<?= $email; ?>', 
+                '<?= $affiliation; ?>', 
+                '<?= $position; ?>', 
+                '<?= $image; ?>', 
+                '<?= $contact; ?>', 
+                '<?= $educationalAttainment; ?>', 
+                '<?= $cancelReason; ?>')">
+                                        <td><?= $fullName; ?></td>
+                                        <td><?= $age; ?></td>
+                                        <td><?= $gender; ?></td>
+                                        <td><?= $position; ?></td>
+                                        <td><?= $contact; ?></td>
+                                        <td><?= $cancelReason; ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Age</th>
-                                    <th>Gender</th>
-                                    <th>Occupation</th>
-                                    <th>Contact No.</th>
-                                    <th>Cancel Reason</th>
+                                    <td colspan="6" style="text-align: center;">No cancelled participants found for this
+                                        event.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                if ($cancelledParticipantsResult->num_rows > 0) {
-                                    while ($row = $cancelledParticipantsResult->fetch_assoc()) {
-                                        $fullName = htmlspecialchars($row['FirstName']) . ' ' . htmlspecialchars($row['LastName']);
-                                        $age = htmlspecialchars($row['Age']);
-                                        $gender = htmlspecialchars($row['Gender']);
-                                        $position = htmlspecialchars($row['Position']);
-                                        $contact = htmlspecialchars($row['ContactNo']);
-                                        $cancelReason = htmlspecialchars($row['cancelReason']);
-                                        $email = htmlspecialchars($row['Email']);
-                                        $affiliation = htmlspecialchars($row['Affiliation']);
-                                        $educationalAttainment = htmlspecialchars($row['EducationalAttainment']);
-                                        $image = htmlspecialchars($row['Image']);
+                            <?php endif; ?>
+                        </tbody>
 
-                                        // Add an onclick event to trigger the SweetAlert with the participant's data including cancel reason
-                                        ?>
-                                        <tr onclick="showProfile(
-                        '<?php echo $fullName; ?>', 
-                        '<?php echo $age; ?>', 
-                        '<?php echo $gender; ?>', 
-                        '<?php echo $email; ?>', 
-                        '<?php echo $affiliation; ?>', 
-                        '<?php echo $position; ?>', 
-                        '<?php echo $image; ?>', 
-                        '<?php echo $contact; ?>', 
-                        '<?php echo $educationalAttainment; ?>',
-                        '<?php echo $cancelReason; ?>')">
-                                            <td><?php echo $fullName; ?></td>
-                                            <td><?php echo $age; ?></td>
-                                            <td><?php echo $gender; ?></td>
-                                            <td><?php echo $position; ?></td>
-                                            <td><?php echo $contact; ?></td>
-                                            <td><?php echo $cancelReason; ?></td>
-                                        </tr>
-                                        <?php
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='6' style='text-align: center;'>No cancelled participants found for this event.</td></tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-
+                    </table>
                 </div>
 
             </div>
@@ -323,40 +316,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             Swal.fire({
                 title: 'Participant Profile',
                 html: `
-                <div style="text-align: left; padding:2.5rem;">
-                    <div style="text-align: center; margin-bottom: 1rem;">
-                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
-                            alt="Profile Image" 
-                            style="width: 100px; height: 100px; border-radius: 50%;">
-                    </div>
-
-                    <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
-                    <strong>Name:</strong> ${fullName}
-                    <strong style="margin-left:5rem;">Age:</strong> ${age} <br/>
-                    <strong>Gender:</strong> ${gender} <br/>
-                    <strong>Educational Attainment:</strong> ${educationalAttainment} <br/>
-                    <br/>
-
-                    <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
-                    <strong>Email:</strong> ${email} <br/>
-                    <strong>Contact:</strong> ${contact} <br/>
-                    <br/>
-
-                    <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
-                    <strong>Affiliation:</strong> ${affiliation} <br/>
-                    <strong>Occupation:</strong> ${position} <br/>
-                    <br/>
-
-                    <strong><h3 style="margin-bottom: 0.25rem;">Cancel Reason:</h3></strong>
-                    <span style="color: red;"><strong>${cancelReason}</strong></span> <!-- Red text for cancel reason -->
+            <div style="text-align: left; padding:2.5rem;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                        alt="Profile Image" 
+                        style="width: 100px; height: 100px; border-radius: 50%;">
                 </div>
-            `,
+
+                <h3>Personal Info:</h3>
+                <strong>Name:</strong> ${fullName}<br>
+                <strong>Age:</strong> ${age} <br/>
+                <strong>Gender:</strong> ${gender} <br/>
+                <strong>Educational Attainment:</strong> ${educationalAttainment} <br/>
+
+                <h3>Contact Info:</h3>
+                <strong>Email:</strong> ${email} <br/>
+                <strong>Contact:</strong> ${contact} <br/>
+
+                <h3>Profile Details:</h3>
+                <strong>Affiliation:</strong> ${affiliation} <br/>
+                <strong>Occupation:</strong> ${position} <br/>
+
+                <h3>Cancel Reason:</h3>
+                <span style="color: red;"><strong>${cancelReason}</strong></span>
+            </div>
+        `,
                 customClass: {
                     popup: 'larger-swal'
                 },
                 confirmButtonText: 'Close'
             });
         }
+
     </script>
 
 
