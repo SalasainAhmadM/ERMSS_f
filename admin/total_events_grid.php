@@ -305,8 +305,8 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
                                 class="output">
                             <div class="lists">
 
-                                <a href="total_events_grid.php">
-                                    <p class="items">Grid</p>
+                                <a href="total_events.php">
+                                    <p class="items">List</p>
                                 </a>
                             </div>
                         </div>

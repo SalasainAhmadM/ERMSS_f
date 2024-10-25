@@ -432,10 +432,6 @@ if (isset($_GET['download'])) {
             <!-- <h3 class="dashboard apply">Day 1</h3> -->
 
             <style>
-                .download-button {
-                    background-color: #ffd60a;
-                }
-
                 .download-button:hover {
                     background-color: #1d3557;
                 }
@@ -444,7 +440,7 @@ if (isset($_GET['download'])) {
                 <div class="table_header">
                     <p>
                         <?php echo isset($eventTitle) ? htmlspecialchars($eventTitle) . ' Participants' : 'Event Title Here'; ?>
-                        <a href="?download=true&eventTitle=<?php echo urlencode($eventTitle); ?>" class="download-button">
+                        <a style="margin-left:2rem;" href="?download=true&eventTitle=<?php echo urlencode($eventTitle); ?>" class="download-button">
                             <i class="fa fa-print" aria-hidden="true"></i> Download Event Report
                         </a>
 
