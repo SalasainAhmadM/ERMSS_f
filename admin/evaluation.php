@@ -352,6 +352,11 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                                 class="attendance-btn">
                                                 <i class='fa-solid fa-clipboard-check'></i>
                                             </button>
+                                            <!-- <button type="button"
+                                                onclick="editAttendance('<?php echo $row['participant_id']; ?>', '<?php echo $row['event_id']; ?>', '<?php echo $fullName; ?>', '<?php echo $eventTitle; ?>')"
+                                                class="attendance-btn">
+                                                <i class='fa-solid fa-clipboard-check'></i>
+                                            </button> -->
                                         </div>
                                     </div>
                                 </div>
@@ -369,111 +374,188 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
 
                 <script>
                     function fetchAttendance(participantId, eventId, fullName, eventName) {
-                        // Make an AJAX call to fetch attendance details
-                        fetch(`fetch_attendance_details.php?participant_id=${participantId}&event_id=${eventId}`)
+                        // Check if evaluation record already exists
+                        fetch(`check_evaluation.php?participant_id=${participantId}&event_id=${eventId}`)
                             .then(response => response.json())
                             .then(data => {
-                                if (data) {
-                                    let attendanceDetails = `
-    <div style="text-align: center; padding: 2.5rem;">
-        <h2 style="margin-bottom: 1rem;">${eventName}</h2>
-        <h3 style="margin-bottom: 1rem; font-weight: bold;">${fullName}</h3>
-    `;
-
-                                    // Helper function: Convert 24-hour time to 12-hour format with AM/PM
-                                    function formatTime(time) {
-                                        if (!time) return 'N/A';
-                                        let [hours, minutes] = time.split(':');
-                                        let ampm = hours >= 12 ? 'PM' : 'AM';
-                                        hours = hours % 12 || 12; // Convert to 12-hour format, set 12 for noon/midnight
-                                        return `${hours}:${minutes} ${ampm}`;
-                                    }
-
-                                    // Parse event start and end dates
-                                    const dateStart = new Date(data[0].date_start).toISOString().slice(0, 10);
-                                    const dateEnd = new Date(data[0].date_end).toISOString().slice(0, 10);
-
-                                    // Generate all event dates in between start and end
-                                    let eventDates = [];
-                                    let currentDate = new Date(dateStart);
-
-                                    while (currentDate <= new Date(dateEnd)) {
-                                        eventDates.push(currentDate.toISOString().slice(0, 10));
-                                        currentDate.setDate(currentDate.getDate() + 1); // Increment day
-                                    }
-
-                                    // Map attendance records to a lookup for easy access
-                                    const attendanceMap = data.reduce((acc, day) => {
-                                        acc[new Date(day.attendance_date).toISOString().slice(0, 10)] = day;
-                                        return acc;
-                                    }, {});
-
-                                    // Iterate over all event dates and display status
-                                    eventDates.forEach((eventDate, index) => {
-                                        let dayLabel = index === 0 ? "1st Day" :
-                                            index === eventDates.length - 1 ? "Last Day" :
-                                                `Day ${index + 1}`;
-
-                                        if (attendanceMap[eventDate]) {
-                                            // Display attendance if record exists
-                                            let day = attendanceMap[eventDate];
-                                            let formattedStatus = day.status.charAt(0).toUpperCase() + day.status.slice(1).toLowerCase();
-                                            let statusColor = formattedStatus === 'Present' ? 'green' : 'red';
-
-                                            attendanceDetails += `
-        <div style="margin-bottom: 1rem; text-align: center;">
-            <h4 style="margin-bottom: 0.5rem;">${dayLabel} - ${new Date(eventDate).toLocaleDateString('en-US', {
-                                                month: 'short', day: 'numeric', year: 'numeric'
-                                            })} - <span style="color: ${statusColor};">${formattedStatus}</span></h4>
-            <p><strong>Time-in:</strong> ${formatTime(day.time_in)} &nbsp;&nbsp;&nbsp;
-            <strong>Time-out:</strong> ${formatTime(day.time_out)}</p>
-        </div>`;
-                                        } else {
-                                            // Display "No Record!" for missing attendance
-                                            attendanceDetails += `
-        <div style="margin-bottom: 1rem; text-align: center;">
-            <h4 style="margin-bottom: 0.5rem; color: orange;">${dayLabel} - ${new Date(eventDate).toLocaleDateString('en-US', {
-                                                month: 'short', day: 'numeric', year: 'numeric'
-                                            })} - No Record!</h4>
-        </div>`;
-                                        }
-                                    });
-
-                                    attendanceDetails += `</div>`;
-
-                                    // Show the attendance details in a SweetAlert modal
+                                if (data.exists) {
+                                    // If evaluation already recorded, show error message
                                     Swal.fire({
-                                        title: '',
-                                        html: attendanceDetails,
-                                        showConfirmButton: true,
-                                        confirmButtonText: 'Approve?',
-                                        cancelButtonText: 'Cancel',
-                                        showCancelButton: true,
-                                        customClass: {
-                                            popup: 'larger-swal'
-                                        },
-                                        width: '600px',
+                                        title: 'Evaluation Recorded Already!',
+                                        text: `An evaluation record for ${fullName} in ${eventName} already exists.`,
+                                        icon: 'error',
+                                        confirmButtonText: 'Okay'
                                     });
                                 } else {
-                                    // Show a warning if no attendance data is found
-                                    Swal.fire({
-                                        title: 'No Attendance Records',
-                                        text: `No attendance details found for ${fullName}.`,
-                                        icon: 'warning',
-                                        showCloseButton: true,
-                                        showConfirmButton: false
-                                    });
+                                    // Proceed with fetching attendance if no evaluation record exists
+                                    fetch(`fetch_attendance_details.php?participant_id=${participantId}&event_id=${eventId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data && data.length > 0) {
+                                                let allPresent = true;
+                                                let allAbsentOrNoRecord = true;
+                                                let attendanceDetails = `
+                                <div style="text-align: center; padding: 2.5rem;">
+                                    <h2 style="margin-bottom: 1rem;">${eventName}</h2>
+                                    <h3 style="margin-bottom: 1rem; font-weight: bold;">${fullName}</h3>`;
+                                                // Function to format time
+                                                function formatTime(time) {
+                                                    if (!time) return 'N/A';
+                                                    let [hours, minutes] = time.split(':');
+                                                    let ampm = hours >= 12 ? 'PM' : 'AM';
+                                                    hours = hours % 12 || 12;
+                                                    return `${hours}:${minutes} ${ampm}`;
+                                                }
+                                                // Process attendance data and display
+                                                const dateStart = new Date(data[0].date_start).toISOString().slice(0, 10);
+                                                const dateEnd = new Date(data[0].date_end).toISOString().slice(0, 10);
+                                                let eventDates = [];
+                                                let currentDate = new Date(dateStart);
+                                                while (currentDate <= new Date(dateEnd)) {
+                                                    eventDates.push(currentDate.toISOString().slice(0, 10));
+                                                    currentDate.setDate(currentDate.getDate() + 1);
+                                                }
+                                                const attendanceMap = data.reduce((acc, day) => {
+                                                    acc[new Date(day.attendance_date).toISOString().slice(0, 10)] = day;
+                                                    return acc;
+                                                }, {});
+                                                eventDates.forEach((eventDate, index) => {
+                                                    let dayLabel = index === 0 ? "1st Day" :
+                                                        index === eventDates.length - 1 ? "Last Day" : `Day ${index + 1}`;
+                                                    if (attendanceMap[eventDate]) {
+                                                        let day = attendanceMap[eventDate];
+                                                        let formattedStatus = day.status.charAt(0).toUpperCase() + day.status.slice(1).toLowerCase();
+                                                        let statusColor = formattedStatus === 'Present' ? 'green' : 'red';
+                                                        if (formattedStatus === 'Absent') allPresent = false;
+                                                        if (formattedStatus === 'Present') allAbsentOrNoRecord = false;
+                                                        attendanceDetails += `
+                                        <div style="margin-bottom: 1rem; text-align: center;">
+                                            <h4 style="margin-bottom: 0.5rem;">${dayLabel} - ${new Date(eventDate).toLocaleDateString('en-US', {
+                                                            month: 'short', day: 'numeric', year: 'numeric'
+                                                        })} - <span style="color: ${statusColor};">${formattedStatus}</span></h4>
+                                            <p><strong>Time-in:</strong> ${formatTime(day.time_in)} &nbsp;&nbsp;&nbsp;
+                                            <strong>Time-out:</strong> ${formatTime(day.time_out)}</p>
+                                        </div>`;
+                                                    } else {
+                                                        allPresent = false;
+                                                        attendanceDetails += `
+                                        <div style="margin-bottom: 1rem; text-align: center;">
+                                            <h4 style="margin-bottom: 0.5rem; color: orange;">${dayLabel} - ${new Date(eventDate).toLocaleDateString('en-US', {
+                                                            month: 'short', day: 'numeric', year: 'numeric'
+                                                        })} - No Record!</h4>
+                                        </div>`;
+                                                    }
+                                                });
+                                                attendanceDetails += `</div>`;
+                                                let showApprove = !allAbsentOrNoRecord;
+                                                let showDecline = !allPresent;
+                                                Swal.fire({
+                                                    title: '',
+                                                    html: attendanceDetails,
+                                                    showConfirmButton: showApprove,
+                                                    confirmButtonText: 'Approve?',
+                                                    showDenyButton: showDecline,
+                                                    denyButtonText: 'Decline?',
+                                                    customClass: {
+                                                        popup: 'larger-swal'
+                                                    },
+                                                    width: '600px',
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        Swal.fire({
+                                                            title: 'Approve Certificate?',
+                                                            text: 'Are you sure you want to approve the certificate?',
+                                                            icon: 'question',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes, Approve!',
+                                                            cancelButtonText: 'Cancel',
+                                                        }).then((confirmResult) => {
+                                                            if (confirmResult.isConfirmed) {
+                                                                let attendedDays = data.filter(day => day.status.toLowerCase() === 'present').length;
+                                                                let absentDays = data.filter(day => day.status.toLowerCase() === 'absent').length;
+                                                                let remarks = `${attendedDays} Attended, ${absentDays} Absent`;
+                                                                saveEvaluation(participantId, eventId, 'approved', remarks);
+                                                                Swal.fire('Approved!', 'The certificate has been approved.', 'success');
+                                                            }
+                                                        });
+                                                    } else if (result.isDenied) {
+                                                        Swal.fire({
+                                                            title: 'Decline Certificate?',
+                                                            text: 'Are you sure you want to decline the certificate?',
+                                                            icon: 'warning',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes, Decline!',
+                                                            cancelButtonText: 'Cancel',
+                                                        }).then((confirmResult) => {
+                                                            if (confirmResult.isConfirmed) {
+                                                                let attendedDays = data.filter(day => day.status.toLowerCase() === 'present').length;
+                                                                let absentDays = data.filter(day => day.status.toLowerCase() === 'absent').length;
+                                                                let remarks = `${attendedDays} Attended, ${absentDays} Absent`;
+                                                                saveEvaluation(participantId, eventId, 'declined', remarks);
+                                                                Swal.fire('Declined!', 'The certificate has been declined.', 'error');
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Error',
+                                                    text: `No attendance records found for ${fullName} in ${eventName}.`,
+                                                    icon: 'error',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            }
+                                        }).catch(error => {
+                                            Swal.fire({
+                                                title: 'Error',
+                                                text: 'An error occurred while fetching attendance data. Please try again later.',
+                                                icon: 'error',
+                                                confirmButtonText: 'Okay'
+                                            });
+                                            console.error('Fetch error:', error);
+                                        });
                                 }
+                            }).catch(error => {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'An error occurred while checking evaluation status. Please try again later.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Okay'
+                                });
+                                console.error('Evaluation check error:', error);
                             });
                     }
+
+
+                    function saveEvaluation(participantId, eventId, status, remarks) {
+                        fetch('save_evaluation.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                participant_id: participantId,
+                                event_id: eventId,
+                                status: status,
+                                remarks: remarks
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    Swal.fire('Success!', 'Evaluation saved successfully.', 'success');
+                                } else {
+                                    Swal.fire('Error!', 'Failed to save the evaluation. Please try again.', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error saving evaluation:', error);
+                                Swal.fire('Error!', 'An unexpected error occurred.', 'error');
+                            });
+                    }
+
                 </script>
 
-
-
-                <script>
-
-
-                </script>
 
                 <script src="js/eventsParticipant.js"></script>
                 <!--sidebar functionality-->

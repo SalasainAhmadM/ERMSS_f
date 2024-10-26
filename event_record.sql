@@ -82,7 +82,6 @@ CREATE TABLE `evaluation` (
   `evaluation_id` INT(11) NOT NULL,
   `participant_id` INT(11) NOT NULL,
   `event_id` INT(11) NOT NULL,
-  `attendance_id` INT(11) DEFAULT NULL, 
   `evaluation_date` DATE NOT NULL DEFAULT CURRENT_DATE(), 
   `status` ENUM('approved', 'declined', 'no_record') DEFAULT 'no_record',
   `remarks` VARCHAR(255) DEFAULT NULL, 
@@ -103,7 +102,6 @@ CREATE TABLE `attendance` (
   `attendance_date` date DEFAULT NULL,
   `status` enum('present','absent') DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `day` int(11) DEFAULT NULL,
   `time_in` time DEFAULT NULL,
   `time_out` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -113,10 +111,10 @@ CREATE TABLE `attendance` (
 --
 
 INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`, `day`, `time_in`, `time_out`) VALUES
-(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL, NULL, NULL),
-(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL, NULL, NULL),
-(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL, NULL, NULL),
-(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19', NULL, NULL, NULL);
+(82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL, NULL),
+(83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL, NULL),
+(84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL, NULL),
+(85, 104, 50, '2024-03-01', 'absent', '2024-10-20 13:47:19', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -797,9 +795,8 @@ ALTER TABLE `attendance`
 -- Constraints for table `evaluation`
 --
 ALTER TABLE `evaluation`
-  ADD CONSTRAINT `evaluation_ibfk_1` FOREIGN KEY (`attendance_id`) REFERENCES `attendance` (`attendance_id`),
-  ADD CONSTRAINT `evaluation_ibfk_2` FOREIGN KEY (`participant_id`) REFERENCES `eventparticipants` (`participant_id`),
-  ADD CONSTRAINT `evaluation_ibfk_3` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
+  ADD CONSTRAINT `evaluation_ibfk_1` FOREIGN KEY (`participant_id`) REFERENCES `eventparticipants` (`participant_id`),
+  ADD CONSTRAINT `evaluation_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
 
 --
 -- Constraints for table `audit_trail`

@@ -20,7 +20,7 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
               AND attendance.status = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $selectedDate, $eventTitle, $status);  // Bind the selected date, event title, and status
+    $stmt->bind_param("sss", $selectedDate, $eventTitle, $status);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -35,7 +35,7 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
             $position = htmlspecialchars($row['Position']);
             $email = htmlspecialchars($row['Email']);
             $contactNo = htmlspecialchars($row['ContactNo']);
-            $statusText = ucfirst(htmlspecialchars($row['status'])) ?: 'Not Marked';  // Capitalize status
+            $statusText = ucfirst(htmlspecialchars($row['status'])) ?: 'Not Marked';
 
             echo "
             <li class='participant_item'>
@@ -50,8 +50,7 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
                     <div class='phone'><span>$contactNo</span></div>
                     <div class='status'><span>$statusText</span></div>
                     <div class='status attendance-btn-container'>
-                       
-                        <button type='button' onclick='resetAttendance(\"{$row['participant_id']}\", \"{$row['event_id']}\", \"{$row['event_id']}\")' class='attendance-btn'>
+                        <button type='button' onclick='resetAttendance2(\"{$row['participant_id']}\", \"{$row['event_id']}\", \"$selectedDate\")' class='attendance-btn'>
                             <i class='fa-solid fa-file-pen'></i>
                         </button>
                     </div>
@@ -66,7 +65,7 @@ if (isset($_GET['selectedDate']) && isset($_GET['eventTitle']) && isset($_GET['s
     }
 } else {
     echo "<div class='no-participants-container'>
-            <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participants found for the specified event and date.!</p>
+            <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No $status participants found for the specified event and date!</p>
           </div>";
 }
 ?>

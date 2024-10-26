@@ -637,6 +637,74 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             }
                         });
                     }
+                    function resetAttendance2(participant_id, event_id, selectedDate) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to reset this participant's attendance?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Reset!',
+                            customClass: {
+                                popup: 'larger-swal',
+                                confirmButton: 'swal-confirm',
+                                cancelButton: 'swal-cancel'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: 'reset_attendance.php',
+                                    type: 'POST',
+                                    data: {
+                                        participant_id: participant_id,
+                                        event_id: event_id,
+                                        selectedDate: selectedDate // Pass the selectedDate directly
+                                    },
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        if (response.status === 'success') {
+                                            Swal.fire({
+                                                title: 'Reset!',
+                                                text: response.message,
+                                                icon: 'success',
+                                                customClass: {
+                                                    popup: 'larger-swal',
+                                                    confirmButton: 'swal-confirm',
+                                                }
+                                            });
+                                            setTimeout(() => {
+                                                location.reload();
+                                            }, 1500);
+                                        } else if (response.status === 'error') {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: response.message,
+                                                icon: 'error',
+                                                customClass: {
+                                                    popup: 'larger-swal',
+                                                    confirmButton: 'swal-confirm',
+                                                }
+                                            });
+                                        }
+                                    },
+                                    error: function () {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: 'There was an error processing your request.',
+                                            icon: 'error',
+                                            customClass: {
+                                                popup: 'larger-swal',
+                                                confirmButton: 'swal-confirm',
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+
                     document.addEventListener("DOMContentLoaded", function () {
                         const presentDayItems = document.querySelectorAll(".present_day_filter");
                         const absentDayItems = document.querySelectorAll(".absent_day_filter");
