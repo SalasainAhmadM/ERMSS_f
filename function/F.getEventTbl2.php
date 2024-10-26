@@ -2,13 +2,15 @@
 // Include your database connection code here
 require_once('../db.connection/connection.php');
 
-
 // Fetch upcoming and ongoing events from the database
 $sql = "SELECT *, IF(event_cancel IS NULL OR event_cancel = '', '', event_cancel) AS event_status FROM pendingevents WHERE NOW() < CONCAT(date_end, ' ', time_end) ORDER BY date_created DESC";
 $result = mysqli_query($conn, $sql);
 
 // Get the role of the logged-in user
 $userRole = $_SESSION['Role'];
+
+// Initialize a variable to check if any events are displayed
+$hasEvents = false;
 
 // Loop through each event and generate a table row
 while ($row = mysqli_fetch_assoc($result)) {
@@ -40,8 +42,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     // Only display upcoming and ongoing events
     if ($eventStatus === 'upcoming' || $eventStatus === 'ongoing') {
-        echo '<tr data-start-date="' . $row['date_start'] . '" data-end-date="' . $row['date_end'] . '">';
+        $hasEvents = true; // Set to true since at least one event is displayed
 
+        echo '<tr data-start-date="' . $row['date_start'] . '" data-end-date="' . $row['date_end'] . '">';
         ?>
         <td data-label="Event Title"><?php echo $eventTitle; ?></td>
         <td data-label="Event Type"><?php echo $eventType; ?></td>
@@ -81,9 +84,13 @@ while ($row = mysqli_fetch_assoc($result)) {
             </td>
             <?php
         }
-
         echo '</tr>';
     }
+}
+
+// If no events were displayed, show the "No Pending Events!" message
+if (!$hasEvents) {
+    echo "<tr><td colspan='8' style='text-align: center;'>No Pending Events!</td></tr>";
 }
 
 // Close the result set
