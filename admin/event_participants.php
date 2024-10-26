@@ -13,30 +13,24 @@ if ($eventTitle) {
     $stmtEventId->execute();
     $resultEventId = $stmtEventId->get_result();
 
-    // If the event ID is found, store it in $eventId
-    if ($resultEventId->num_rows > 0) {
-        $rowEventId = $resultEventId->fetch_assoc();
-        $eventId = $rowEventId['event_id'];
-    } else {
-        // If no event is found with the given title, set $eventId to null or handle error
-        $eventId = null;
-    }
+    // Store event ID if found
+    $eventId = $resultEventId->num_rows > 0 ? $resultEventId->fetch_assoc()['event_id'] : null;
 } else {
-    // If eventTitle is not set, set eventId to null or empty
     $eventId = '';
 }
-// Fetch total participants for the specified event title
-$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants
-                          WHERE event_id = (SELECT event_id FROM Events WHERE event_title = ?)";
+
+// Fetch total participants for the event
+$totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants 
+                         FROM eventParticipants WHERE event_id = 
+                         (SELECT event_id FROM Events WHERE event_title = ?)";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
 $totalParticipantsStmt->bind_param("s", $eventTitle);
 $totalParticipantsStmt->execute();
 $totalParticipantsResult = $totalParticipantsStmt->get_result();
-$totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
-$totalParticipants = $totalParticipantsRow['totalParticipants'];
+$totalParticipants = $totalParticipantsResult->fetch_assoc()['totalParticipants'];
 
-// Fetch event date range based on the event title
-$eventDatesSql = "SELECT date_start, date_end FROM events WHERE event_title = ?";
+// Fetch event date range
+$eventDatesSql = "SELECT date_start, date_end FROM Events WHERE event_title = ?";
 $eventDatesStmt = $conn->prepare($eventDatesSql);
 $eventDatesStmt->bind_param("s", $eventTitle);
 $eventDatesStmt->execute();
@@ -46,7 +40,7 @@ $eventDatesRow = $eventDatesResult->fetch_assoc();
 $dateStart = $eventDatesRow['date_start'];
 $dateEnd = $eventDatesRow['date_end'];
 
-// Generate all the dates between date_start and date_end
+// Generate all dates between date_start and date_end
 function generateDateRange($startDate, $endDate)
 {
     $dates = [];
@@ -57,7 +51,6 @@ function generateDateRange($startDate, $endDate)
         $dates[] = date('Y-m-d', $currentDate);
         $currentDate = strtotime('+1 day', $currentDate);
     }
-
     return $dates;
 }
 
@@ -240,6 +233,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                 <div class="search_attendance">
                     <input type="text" id="search_input" placeholder="Filter using Name" onkeyup="filterParticipants()">
                 </div>
+
             </div>
 
 
@@ -327,8 +321,49 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                         </div>
                     </a>
 
+
                 </div>
             </section>
+            <style>
+                .parent-evaluation {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                }
+
+                .aButton {
+                    background-color: #ff4d4d;
+                    color: white;
+                    border: 1px solid #cc0000;
+                    padding: 12px 24px;
+                    font-size: 18px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    text-transform: uppercase;
+                    transition: background-color 0.3s, transform 0.2s;
+                    box-shadow: 0px 8px 16px rgba(204, 0, 0, 0.2);
+                }
+
+                .aButton:hover {
+                    background-color: #cc0000;
+                    transform: scale(1.05);
+                }
+
+                .aButton:active {
+                    background-color: #990000;
+                    transform: scale(0.98);
+                }
+            </style>
+            <div class="parent-evaluation">
+                <button class="aButton" onclick="navigateToEvaluation()">Go to Evaluation</button>
+            </div>
+            <script>
+                function navigateToEvaluation() {
+                    window.location.href = "evaluation.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>";
+                }
+
+            </script>
             <div class="table_wrap">
                 <div class="table_header">
                     <ul>
@@ -426,6 +461,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                                     class="attendance-btn">
                                                     <i class="fa-solid fa-file-pen"></i>
                                                 </button>
+
                                             </div>
 
                                         </div>
@@ -489,7 +525,7 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                         title: '',
                                         html: attendanceDetails,
                                         showConfirmButton: true,
-                                        confirmButtonText: 'Confirm',
+                                        confirmButtonText: 'Approve?',
                                         cancelButtonText: 'Cancel',
                                         showCancelButton: true,
                                         customClass: {

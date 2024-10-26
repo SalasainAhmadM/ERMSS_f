@@ -75,6 +75,24 @@ CREATE TABLE `agency` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `evaluation`
+--
+
+CREATE TABLE `evaluation` (
+  `evaluation_id` INT(11) NOT NULL,
+  `participant_id` INT(11) NOT NULL,
+  `event_id` INT(11) NOT NULL,
+  `attendance_id` INT(11) DEFAULT NULL, 
+  `evaluation_date` DATE NOT NULL DEFAULT CURRENT_DATE(), 
+  `status` ENUM('approved', 'declined', 'no_record') DEFAULT 'no_record',
+  `remarks` VARCHAR(255) DEFAULT NULL, 
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `attendance`
 --
 
@@ -94,7 +112,7 @@ CREATE TABLE `attendance` (
 -- Dumping data for table `attendance`
 --
 
-INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`, `day`) VALUES
+INSERT INTO `attendance` (`attendance_id`, `participant_id`, `event_id`, `attendance_date`, `status`, `created_at`, `day`, `time_in`, `time_out`) VALUES
 (82, 65, 203, '2024-04-29', 'absent', '2024-05-01 06:29:23', NULL, NULL, NULL),
 (83, 66, 203, '2024-04-29', 'present', '2024-05-01 06:29:51', NULL, NULL, NULL),
 (84, 8, 50, '2024-03-01', 'present', '2024-10-20 13:47:04', NULL, NULL, NULL),
@@ -409,7 +427,7 @@ CREATE TABLE `event_mode` (
 INSERT INTO `event_mode` (`event_mode_id`, `event_mode_name`) VALUES
 (1, 'Face-to-Face'),
 (2, 'Online'),
-(4, 'Hybrid');
+(3, 'Hybrid');
 
 -- --------------------------------------------------------
 
@@ -427,11 +445,11 @@ CREATE TABLE `event_type` (
 --
 
 INSERT INTO `event_type` (`event_type_id`, `event_type_name`) VALUES
-(3, 'Training Sessions'),
-(4, 'Specialized Seminars'),
-(5, 'Cluster-specific gathering'),
-(6, 'General Assembly'),
-(7, 'Workshop');
+(1, 'Training Sessions'),
+(2, 'Specialized Seminars'),
+(3, 'Cluster-specific gathering'),
+(4, 'General Assembly'),
+(5, 'Workshop');
 
 -- --------------------------------------------------------
 
@@ -576,6 +594,12 @@ ALTER TABLE `attendance`
   ADD KEY `event_id` (`event_id`);
 
 --
+-- Indexes for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD PRIMARY KEY `evaluation_id` (`evaluation_id`);
+
+--
 -- Indexes for table `audit_trail`
 --
 ALTER TABLE `audit_trail`
@@ -679,8 +703,16 @@ ALTER TABLE `attendance`
   MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
+-- AUTO_INCREMENT for table `evaluation`
+--
+
+ALTER TABLE `evaluation`
+  MODIFY `evaluation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+
+--
 -- AUTO_INCREMENT for table `director`
 --
+
 ALTER TABLE `director`
   MODIFY `DirectorID` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
@@ -760,6 +792,14 @@ ALTER TABLE `user`
 ALTER TABLE `attendance`
   ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`participant_id`) REFERENCES `eventparticipants` (`participant_id`),
   ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
+
+--
+-- Constraints for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD CONSTRAINT `evaluation_ibfk_1` FOREIGN KEY (`attendance_id`) REFERENCES `attendance` (`attendance_id`),
+  ADD CONSTRAINT `evaluation_ibfk_2` FOREIGN KEY (`participant_id`) REFERENCES `eventparticipants` (`participant_id`),
+  ADD CONSTRAINT `evaluation_ibfk_3` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
 
 --
 -- Constraints for table `audit_trail`

@@ -9,10 +9,13 @@ if (empty($participantId) || empty($eventId)) {
     exit;
 }
 
-$sql = "SELECT day, attendance_date, status, time_in, time_out
+$sql = "SELECT attendance.attendance_date, attendance.status, attendance.time_in, attendance.time_out,
+               events.date_start, events.date_end
         FROM attendance
-        WHERE participant_id = ? AND event_id = ?
-        ORDER BY attendance_date ASC";
+        JOIN events ON attendance.event_id = events.event_id
+        WHERE attendance.participant_id = ? AND attendance.event_id = ?
+        ORDER BY attendance.attendance_date ASC";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $participantId, $eventId);
 $stmt->execute();

@@ -25,6 +25,10 @@ $rowDates = $resultDates->fetch_assoc();
 $startDate = $rowDates['date_start'];
 $endDate = $rowDates['date_end'];
 
+// Format the dates as "Oct 20, 2023"
+$formattedStartDate = date('M d, Y', strtotime($startDate));
+$formattedEndDate = date('M d, Y', strtotime($endDate));
+
 // Fetch participants who have either perfect attendance or complete absences for all event dates
 $sqlParticipants = "
     SELECT u.FirstName, u.MI, u.LastName, u.Affiliation, u.Position, u.Email, u.ContactNo, ep.participant_id, ep.event_id
@@ -54,10 +58,8 @@ if ($resultParticipants->num_rows > 0) {
         $position = htmlspecialchars($row['Position']);
         $email = htmlspecialchars($row['Email']);
         $contactNo = htmlspecialchars($row['ContactNo']);
-        // Modify the status text based on the requested status
         $statusText = $status === 'present' ? 'For Evaluation' : ($status === 'absent' ? "Didn't Attend Event" : '');
 
-        // Create an "evaluate" button for participants with perfect attendance
         $evaluateButton = $status === 'present' ?
             "<button type='button' onclick=\"fetchAttendance('{$row['participant_id']}', '{$row['event_id']}', '{$fullName}', '{$eventTitle}')\" class='attendance-btn'>
         <i class='fa-solid fa-clipboard-check'></i>
@@ -66,6 +68,7 @@ if ($resultParticipants->num_rows > 0) {
 
         echo "<li class='participant_item'>
                 <div class='item'>
+                    <div class='name'><span>$formattedStartDate - $formattedEndDate</span></div>
                     <div class='name'><span>$fullName</span></div>
                     <div class='department'><span>$affiliation</span></div>
                     <div class='department'><span>$position</span></div>
@@ -78,14 +81,12 @@ if ($resultParticipants->num_rows > 0) {
     }
     echo "</ul>";
 } else {
-    if ($status === 'present') {
-        echo "<div class='no-participants-container'>
-                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participant has perfect attendance!</p>
-              </div>";
-    } elseif ($status === 'absent') {
-        echo "<div class='no-participants-container'>
-                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participant has complete absences!</p>
-              </div>";
-    }
+    $message = $status === 'present'
+        ? "No participant has perfect attendance!"
+        : "No participant has complete absences!";
+
+    echo "<div class='no-participants-container'>
+            <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> $message</p>
+          </div>";
 }
 ?>
