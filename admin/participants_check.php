@@ -140,9 +140,10 @@ if (isset($_GET['download'])) {
         for ($startDay = 0; $startDay < $totalDays; $startDay += 7) {
             if ($startDay > 0) {
                 $pdf->AddPage();
-                $pdf->SetFont("Arial", 'B', 10);
-                $pdf->SetFont("Arial", '', 10);          
             }
+        
+            // Reset participant count at the beginning of each page
+            $participantCount = 1;
 
             // Print headers
             $pdf->SetFont("Arial", 'B', 10);
