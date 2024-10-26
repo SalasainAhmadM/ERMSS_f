@@ -91,12 +91,23 @@ if (isset($_GET['download'])) {
     } else {
         // Table Content
         $pdf->SetFont('helvetica', '', 12);
-<<<<<<< HEAD
 
         date_default_timezone_set('Asia/Manila'); // Set timezone to Manila
         $currentDate = date('Y-m-d');
 
+        $eventCount = 0; // Initialize event counter
         foreach ($events as $event) {
+            // Add a new page if the count exceeds 20
+            if ($eventCount == 20) {
+                $pdf->AddPage();
+                // Print header again on the new page
+                foreach ($header as $title => $width) {
+                    $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
+                }
+                $pdf->Ln();
+                $eventCount = 0; // Reset counter
+            }
+
             $eventTitleWidth = max(60, $pdf->GetStringWidth($event['event_title']) + 4); // +4 for padding
             $pdf->Cell($eventTitleWidth, 10, $event['event_title'], 1);
             $pdf->Cell(30, 10, $event['date_start'], 1, 0, 'C'); // Center content
@@ -111,94 +122,19 @@ if (isset($_GET['download'])) {
                 $status = 'Ended'; // Ended event
             } else {
                 $status = 'Upcoming'; // Upcoming event
-=======
-        $pdf->Ln(10);
-    
-        // Display selected filters
-        $pdf->Cell(0, 10, 'Year: ' . $selectedYear, 0, 1);
-        if ($selectedMonth) {
-            $pdf->Cell(0, 10, 'Month: ' . date('F', mktime(0, 0, 0, $selectedMonth, 10)), 0, 1);
-        }
-        $pdf->Ln(10);
-    
-        // Table Header
-        $pdf->SetFont('helvetica', 'B', 12);
-        $header = [
-            'Event Name' => 60,
-            'Start Date' => 30,
-            'End Date' => 30,
-            'Status' => 30
-        ];
-    
-        // Print header
-        foreach ($header as $title => $width) {
-            $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
-        }
-        $pdf->Ln();
-    
-        // Check if there are events and output content accordingly
-        if (empty($events)) {
-            // No events found
-            $pdf->SetFont('helvetica', 'I', 12);
-            $pdf->Cell(0, 10, 'No events found!', 0, 1, 'C');
-        } else {
-            // Table Content
-            $pdf->SetFont('helvetica', '', 12);
-            
-            date_default_timezone_set('Asia/Manila'); // Set timezone to Manila
-            $currentDate = date('Y-m-d');
-    
-            $eventCount = 0; // Initialize event counter
-            foreach ($events as $event) {
-                // Add a new page if the count exceeds 20
-                if ($eventCount == 20) {
-                    $pdf->AddPage();
-                    // Print header again on the new page
-                    foreach ($header as $title => $width) {
-                        $pdf->Cell($width, 10, $title, 1, 0, 'C'); // Center header
-                    }
-                    $pdf->Ln();
-                    $eventCount = 0; // Reset counter
-                }
-    
-                $eventTitleWidth = max(60, $pdf->GetStringWidth($event['event_title']) + 4); // +4 for padding
-                $pdf->Cell($eventTitleWidth, 10, $event['event_title'], 1);
-                $pdf->Cell(30, 10, $event['date_start'], 1, 0, 'C'); // Center content
-                $pdf->Cell(30, 10, $event['date_end'], 1, 0, 'C'); // Center content
-    
-                // Determine event status
-                if ($event['event_cancel'] !== null && $event['event_cancel'] !== '') {
-                    $status = 'Cancelled'; // Event is cancelled
-                } elseif ($event['date_start'] <= $currentDate && $event['date_end'] >= $currentDate) {
-                    $status = 'Ongoing'; // Ongoing event
-                } elseif ($event['date_end'] < $currentDate) {
-                    $status = 'Ended'; // Ended event
-                } else {
-                    $status = 'Upcoming'; // Upcoming event
-                }
-    
-                $pdf->Cell(30, 10, $status, 1, 0, 'C'); // Center content
-                $pdf->Ln();
-                $eventCount++; // Increment the event counter
->>>>>>> 565f654fc6f6b5d52b04ea022ac95b098bc48873
             }
 
             $pdf->Cell(30, 10, $status, 1, 0, 'C'); // Center content
             $pdf->Ln();
+            $eventCount++; // Increment the event counter
         }
     }
-<<<<<<< HEAD
 
     // Output PDF
     $pdf->Output('events_report.pdf', 'D');
     exit();
 }
 
-
-
-=======
-      
->>>>>>> 565f654fc6f6b5d52b04ea022ac95b098bc48873
 ?>
 
 
@@ -215,15 +151,10 @@ if (isset($_GET['download'])) {
     <!--boxicons-->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
-<<<<<<< HEAD
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
-=======
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        <!--browser icon-->
-        <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
->>>>>>> c8480ed76c9a6fa9586ef7f901fd149d639e0c5e
 
     <link rel="stylesheet" href="css/main.css">
 
@@ -440,72 +371,27 @@ if (isset($_GET['download'])) {
                 </div>
             </section>
 
-<<<<<<< HEAD
-=======
-        <!-- ============ CONTENT ============-->
-        <div class="main-content">
-            
-            <div class="containerr">
-                <h3 class="dashboard apply">EVENT MANAGEMENT SYSTEM</h3>
-
-                <section class="category">
-
-                    <div class="box-container">
-
-                        <a href="total_events.php" class="box">
-                            <i class='bx bx-archive'></i>
-                            <div>
-                                <h3>Total</h3>
-                                <span><?php echo $totalEvents; ?> Events</span>
-                            </div>
-                        </a>
-
-                        <a href="upcoming_events.php" class="box">
-                            <i class='bx bx-archive'></i>
-                            <div>
-                                <h3>Upcoming</h3>
-                                <span><?php echo $totalUpcoming; ?> Events</span>
-                            </div>
-                        </a>
-
-                        <a href="ongoing_events.php" class="box">
-                            <i class='bx bx-archive'></i>
-                            <div>
-                                <h3>Ongoing</h3>
-                                <span><?php echo $totalOngoing; ?> Events</span>
-                            </div>
-                        </a>
-
-                        <a href="ended_events.php" class="box">
-                            <i class='bx bx-archive'></i>
-                            <div>
-                                <h3>Completed</h3>
-                                <span><?php echo $totalEnded; ?> Events</span>
-                            </div>
-                        </a>
-                    </div>
-                </section>
-                
-                <!--charts-->
-                <div class="graphBox">
-                    <div class="box">
-                        <div>
-                            <select name="selectedYear" id="selectedYear">
-                                <?php foreach ($years as $year): ?>
-                                    <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <canvas id="myChart" width="400" height="300"></canvas> <!--change the size by adjusting the width and height-->
-                        </div>
-                    </div>
-                    <div class="box">
-                        <canvas id="eventsYear"></canvas>
+            <!--charts-->
+            <div class="graphBox">
+                <div class="box">
+                    <div>
+                        <select name="selectedYear" id="selectedYear">
+                            <?php foreach ($years as $year): ?>
+                                <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <canvas id="myChart" width="400" height="300"></canvas>
+                        <!--change the size by adjusting the width and height-->
                     </div>
                 </div>
+                <div class="box">
+                    <canvas id="eventsYear"></canvas>
+                </div>
+            </div>
 
->>>>>>> c8480ed76c9a6fa9586ef7f901fd149d639e0c5e
 
-                <div class="graphBox_alt">
+            <div class="graphBox_alt">
                 <?php
                 $query = "SELECT DISTINCT YEAR(date_start) AS year FROM events ORDER BY year DESC";
                 $result = $conn->query($query);
@@ -554,40 +440,12 @@ if (isset($_GET['download'])) {
 
             </div>
 
-<<<<<<< HEAD
-
-
-
-
-
-            <!--charts-->
-            <div class="graphBox">
-                <div class="box">
-                    <div>
-                        <select name="selectedYear" id="selectedYear">
-                            <?php foreach ($years as $year): ?>
-                                <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <canvas id="myChart" width="400" height="300"></canvas>
-                        <!--change the size by adjusting the width and height-->
-                    </div>
-                </div>
-                <div class="box">
-                    <canvas id="eventsYear"></canvas>
-                </div>
-=======
->>>>>>> c8480ed76c9a6fa9586ef7f901fd149d639e0c5e
-            </div>
-
         </div>
 
     </div>
 
 
 
-<<<<<<< HEAD
 
     <script>
         function downloadReport() {
@@ -595,60 +453,56 @@ if (isset($_GET['download'])) {
             const selectedMonth = document.getElementById('monthSelect').value;
 
             if (selectedYear && selectedMonth === 'all') {
-                window.location.href = `?download=true&year=${selectedYear}`; // Only pass year
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to download the report for the selected year?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, download it!',
+                    customClass: {
+                        popup: 'larger-swal'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `?download=true&year=${selectedYear}`;
+                    }
+                });
             } else if (selectedYear && selectedMonth) {
-                window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to download the report for the selected year and month?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, download it!',
+                    customClass: {
+                        popup: 'larger-swal'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
+                    }
+                });
             } else {
-                alert('Please select a year and month.');
-=======
-                if (selectedYear && selectedMonth === 'all') {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to download the report for the selected year?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, download it!',
-                        customClass: {
-                            popup: 'larger-swal'
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = `?download=true&year=${selectedYear}`; 
-                        }
-                    });
-                } else if (selectedYear && selectedMonth) {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to download the report for the selected year and month?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, download it!',
-                        customClass: {
-                            popup: 'larger-swal'
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = `?download=true&year=${selectedYear}&month=${selectedMonth}`;
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: "Please select a year/month.",
-                        icon: 'warning',
-                        customClass: {
-                            popup: 'larger-swal'
-                        }
-                    });
-                }
->>>>>>> c8480ed76c9a6fa9586ef7f901fd149d639e0c5e
+                Swal.fire({
+                    title: 'Error!',
+                    text: "Please select a year/month.",
+                    icon: 'warning',
+                    customClass: {
+                        popup: 'larger-swal'
+                    }
+                });
             }
         }
     </script>
+
+
+
+
+
 
 
 
@@ -657,19 +511,8 @@ if (isset($_GET['download'])) {
     <script src=js/deleteEvent.js></script>
 
 
-<<<<<<< HEAD
     <!--JS -->
     <script src="js/eventscript.js"></script>
-=======
-
-
-
-
-
-        <!-- CONFIRM DELETE -->
-        <script src=js/deleteEvent.js></script>
-            
->>>>>>> c8480ed76c9a6fa9586ef7f901fd149d639e0c5e
 
 
     <!--sidebar functionality-->
