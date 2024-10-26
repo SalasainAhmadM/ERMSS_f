@@ -304,9 +304,10 @@ function hasCanceledEvent($conn, $eventId, $UserID)
         </ul>
     </div>
     <style>
-        @media only screen and (max-width: 768px) {
-            .details {
-                width: 200px;
+        @media (max-width: 768px) {
+            .event-details .details {
+                width: 100%;
+                padding: 1rem;
             }
         }
     </style>
