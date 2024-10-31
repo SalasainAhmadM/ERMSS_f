@@ -213,8 +213,8 @@ if (isset($_GET['download'])) {
     $stmt->bind_param("i", $eventId);
     $stmt->execute();
     $sponsors_result = $stmt->get_result();
-
-    if ($sponsors_result->num_rows > 0) {
+        
+    if ($sponsors_result->num_rows > 0) {  
 
         // Sponsors Section
         $pdf->SetFont("Arial", 'B', 10);
@@ -223,7 +223,7 @@ if (isset($_GET['download'])) {
         $pdf->Cell(15, 8, "#", 1, 0, 'C');
         $pdf->Cell(0, 8, "Name", 1, 1);
         $pdf->SetFont("Arial", 'B', 10);
-
+        
         $sponsor_count = 1;
         while ($sponsor_row = $sponsors_result->fetch_assoc()) {
             $sponsor_full_name = trim($sponsor_row['sponsor_firstName'] . ' ' . $sponsor_row['sponsor_MI'] . ' ' . $sponsor_row['sponsor_lastName']);
@@ -234,6 +234,36 @@ if (isset($_GET['download'])) {
         // No sponsors found message
         $pdf->Cell(0, 8, 'No sponsors detected.', 0, 1, 'C');
     }
+    
+
+    // Check if speaker are present
+    $sponsors_query = "SELECT speaker_id, speaker_firstName, speaker_MI, speaker_lastName FROM speaker WHERE event_id = ?";
+    $stmt = $conn->prepare($sponsors_query);
+    $stmt->bind_param("i", $eventId);
+    $stmt->execute();
+    $sponsors_result = $stmt->get_result();
+
+    if ($sponsors_result->num_rows > 0) {
+
+        // Speaker Section
+        $pdf->SetFont("Arial", 'B', 10);
+        $pdf->Cell(0, 10, 'Speakers', 0, 1);
+        $pdf->SetFont("Arial", 'B', 10);
+        $pdf->Cell(15, 8, "#", 1, 0, 'C');
+        $pdf->Cell(0, 8, "Name", 1, 1);
+        $pdf->SetFont("Arial", 'B', 10);
+
+        $sponsor_count = 1;
+        while ($sponsor_row = $sponsors_result->fetch_assoc()) {
+            $sponsor_full_name = trim($sponsor_row['speaker_firstName'] . ' ' . $sponsor_row['speaker_MI'] . ' ' . $sponsor_row['speaker_lastName']);
+            $pdf->Cell(15, 8, strval($sponsor_count++), 1, 0, 'C');
+            $pdf->Cell(0, 8, $sponsor_full_name, 1, 1);
+        }
+    } else {
+        // No sponsors found message
+        $pdf->Cell(0, 8, 'No sponsors detected.', 0, 1, 'C');
+    }
+
 
     $stmt->close();
 
