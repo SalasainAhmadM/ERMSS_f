@@ -177,6 +177,23 @@ INSERT INTO `director` (`DirectorID`, `LastName`, `FirstName`, `MI`, `Email`, `P
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `evaluation`
+--
+
+CREATE TABLE `evaluation` (
+  `evaluation_id` INT(11) NOT NULL,
+  `participant_id` INT(11) NOT NULL,
+  `event_id` INT(11) NOT NULL,
+  `evaluation_date` DATE NOT NULL DEFAULT CURRENT_DATE(), 
+  `status` ENUM('approved', 'declined', 'no_record') DEFAULT 'no_record',
+  `remarks` VARCHAR(255) DEFAULT NULL, 
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `eventparticipants`
 --
 
@@ -601,6 +618,12 @@ ALTER TABLE `director`
   ADD PRIMARY KEY (`DirectorID`);
 
 --
+-- Indexes for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD PRIMARY KEY `evaluation_id` (`evaluation_id`);
+
+--
 -- Indexes for table `eventparticipants`
 --
 ALTER TABLE `eventparticipants`
@@ -700,6 +723,13 @@ ALTER TABLE `director`
   MODIFY `DirectorID` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `evaluation`
+--
+
+ALTER TABLE `evaluation`
+  MODIFY `evaluation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+
+--
 -- AUTO_INCREMENT for table `eventparticipants`
 --
 ALTER TABLE `eventparticipants`
@@ -782,6 +812,14 @@ ALTER TABLE `audit_trail`
 ALTER TABLE `cancel_reason`
   ADD CONSTRAINT `cancel_reason_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
   ADD CONSTRAINT `cancel_reason_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `user` (`UserID`);
+
+
+--
+-- Constraints for table `evaluation`
+--
+ALTER TABLE `evaluation`
+  ADD CONSTRAINT `evaluation_ibfk_1` FOREIGN KEY (`participant_id`) REFERENCES `eventparticipants` (`participant_id`),
+  ADD CONSTRAINT `evaluation_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
 
 --
 -- Constraints for table `eventparticipants`
