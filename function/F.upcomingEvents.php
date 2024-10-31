@@ -1,11 +1,15 @@
 <?php
-    // Include your database connection code here
-    require_once('../db.connection/connection.php');
+// Include your database connection code here
+require_once('../db.connection/connection.php');
 
-    // Fetch upcoming events from the database based on the current date and time
-    $sql = "SELECT * FROM Events WHERE (date_start > CURDATE() OR (date_start = CURDATE() AND time_start > CURTIME())) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
-    $result = mysqli_query($conn, $sql);
+// Fetch upcoming events from the database based on the current date and time
+$sql = "SELECT * FROM Events WHERE (date_start > CURDATE() OR (date_start = CURDATE() AND time_start > CURTIME())) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
+$result = mysqli_query($conn, $sql);
 
+// Check if there are no results
+if (mysqli_num_rows($result) === 0) {
+    echo "<tr><td colspan='8' style='text-align: center;'>No Joined Events!</td></tr>";
+} else {
     // Loop through each upcoming event and generate a table row
     while ($row = mysqli_fetch_assoc($result)) {
         $eventTitle = $row['event_title'];
@@ -29,15 +33,17 @@
         <td data-label="Event Time"><?php echo "$eventTimeStart - $eventTimeEnd"; ?></td>
         <td data-label="Status">Upcoming</td>
         <td data-label="View Event" class="pad">
-            <a href="view_eventHistory.php?event_id=<?php echo $row['event_id']; ?>"><button class="btn_view"><i class="fa-solid fa-eye"></i></i></button></a>
+            <a href="view_eventHistory.php?event_id=<?php echo $eventId; ?>"><button class="btn_view"><i
+                        class="fa-solid fa-eye"></i></button></a>
         </td>
         <?php
         echo '</tr>';
     }
+}
 
-    // Close the result set
-    mysqli_free_result($result);
+// Close the result set
+mysqli_free_result($result);
 
-    // Close database connection
-    mysqli_close($conn);
+// Close database connection
+mysqli_close($conn);
 ?>

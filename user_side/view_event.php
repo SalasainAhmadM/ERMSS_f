@@ -378,18 +378,63 @@ function hasCanceledEvent($conn, $eventId, $UserID)
 
                             <li>Participants: <?php echo $participantRatio; ?> </li>
                         </ul>
-                        <h3>Sponsors</h3>
-                        <ul>
-                            <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
-                                <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                    <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li>No sponsors available for this event.</li>
-                            <?php endif; ?>
-                        </ul>
+                        <!-- Sponsors and Speakers Section -->
+                        <div class="sponsors-speakers">
+                            <div class="sponsor-column">
+                                <h3>Sponsors</h3>
+                                <ul>
+                                    <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
+                                        <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
+                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li>No sponsors available for this event.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+
+                            <div class="speaker-column">
+                                <h3>Speakers</h3>
+                                <ul>
+                                    <?php if (!empty($_SESSION['event_data']['speakers'])): ?>
+                                        <?php foreach ($_SESSION['event_data']['speakers'] as $speaker): ?>
+                                            <li><?php echo $speaker['speaker_firstName'] . ' ' . $speaker['speaker_MI'] . ' ' . $speaker['speaker_lastName']; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li>No speakers available for this event.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
+
+                    <style>
+                        .sponsors-speakers {
+                            display: flex;
+                            gap: 40px;
+                        }
+
+                        .sponsor-column,
+                        .speaker-column {
+                            flex: 1;
+                            text-align: left;
+                        }
+
+                        .sponsor-column ul,
+                        .speaker-column ul {
+                            list-style: none;
+                            padding: 0;
+                        }
+
+                        .sponsor-column h3,
+                        .speaker-column h3 {
+                            margin-bottom: 10px;
+                            font-weight: bold;
+                            font-size: 1.2em;
+                        }
+                    </style>
 
 
                     <!-- <form action="" method="post" class="flex-btn">

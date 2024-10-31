@@ -285,12 +285,19 @@ include('../function/F.addEvent.php');
                         <label>Date End</label>
                         <input type="date" class="input" name="date_end" id="date_end" required>
                     </div>
+
                     <script>
                         const dateStart = document.getElementById('date_start');
                         const dateEnd = document.getElementById('date_end');
-                        const today = new Date().toISOString().split('T')[0];
-                        dateStart.min = today;
-                        dateEnd.min = today;
+
+                        // Set the start date to tomorrow
+                        const today = new Date();
+                        today.setDate(today.getDate() + 1);
+                        const tomorrow = today.toISOString().split('T')[0];
+
+                        dateStart.min = tomorrow;
+                        dateEnd.min = tomorrow;
+
                         dateStart.addEventListener('change', function () {
                             const startDate = this.value;
                             dateEnd.min = startDate;
@@ -299,6 +306,7 @@ include('../function/F.addEvent.php');
                             }
                         });
                     </script>
+
 
 
                     <div class="input_field">
