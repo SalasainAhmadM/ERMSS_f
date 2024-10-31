@@ -10,6 +10,8 @@
         <!--boxicons-->
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
         <!--browser icon-->
         <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
