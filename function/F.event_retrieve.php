@@ -85,7 +85,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             } else {
                 $_SESSION['event_data']['sponsors'] = [];
             }
+            // Query to get speakers for the event
+            $speakerSql = "SELECT speaker_firstName, speaker_MI, speaker_lastName 
+ FROM speaker 
+ WHERE event_id = $event_id";
+            $speakerResult = $conn->query($speakerSql);
 
+            if ($speakerResult->num_rows > 0) {
+                // Store speaker data in session
+                $speakers = array();
+                while ($speakerRow = $speakerResult->fetch_assoc()) {
+                    $speakers[] = $speakerRow;
+                }
+                $_SESSION['event_data']['speakers'] = $speakers;
+            } else {
+                $_SESSION['event_data']['speakers'] = [];
+            }
         } else {
             echo "No records found for the specified event_id";
         }

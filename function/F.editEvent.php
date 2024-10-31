@@ -159,6 +159,13 @@ if (isset($_GET['event_id'])) {
                 );
 
                 if ($updateStmt->execute()) {
+                    // First, delete existing sponsors for this event
+                    $deleteSponsorSql = "DELETE FROM sponsor WHERE event_id = ?";
+                    $stmtDeleteSponsor = $conn->prepare($deleteSponsorSql);
+                    $stmtDeleteSponsor->bind_param("i", $eventId);
+                    $stmtDeleteSponsor->execute();
+                    $stmtDeleteSponsor->close();
+
                     $deleteSpeakerSql = "DELETE FROM speaker WHERE event_id = ?";
                     $stmtDeleteSpeaker = $conn->prepare($deleteSpeakerSql);
                     $stmtDeleteSpeaker->bind_param("i", $eventId);

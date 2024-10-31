@@ -2,6 +2,18 @@
 session_start();
 include('../function/F.event_retrieve.php');
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
+// Fetch speakers for the event
+$speakersSql = "SELECT speaker_firstName, speaker_MI, speaker_lastName FROM speaker WHERE event_id = ?";
+$speakersStmt = $conn->prepare($speakersSql);
+$speakersStmt->bind_param("i", $eventId);
+$speakersStmt->execute();
+$speakersResult = $speakersStmt->get_result();
+
+$speakers = [];
+while ($row = $speakersResult->fetch_assoc()) {
+    $speakers[] = $row;
+}
+$speakersStmt->close();
 // Fetch sponsors for the event
 $sponsorsSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
 $sponsorsStmt = $conn->prepare($sponsorsSql);
@@ -58,6 +70,14 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
 
     <link rel="stylesheet" href="css/main.css">
 </head>
+<style>
+    /* Sponsor and Speaker list styling */
+    .description ul {
+        display: grid;
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+    }
+</style>
 
 <body>
 
@@ -107,20 +127,63 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                             <li>Status: <?php echo $_SESSION['event_data']['eventStatus']; ?></li>
                             <li>Participants: <?php echo $participantRatio; ?> </li>
                         </ul>
-                        <h3>Sponsors</h3>
-                        <ul>
-                            <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
-                                <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                    <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li>No sponsors available for this event.</li>
-                            <?php endif; ?>
-                        </ul>
+                        <!-- Sponsors and Speakers Section -->
+                        <div class="sponsors-speakers">
+                            <div class="sponsor-column">
+                                <h3>Sponsors</h3>
+                                <ul>
+                                    <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
+                                        <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
+                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li>No sponsors available for this event.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+
+                            <div class="speaker-column">
+                                <h3>Speakers</h3>
+                                <ul>
+                                    <?php if (!empty($_SESSION['event_data']['speakers'])): ?>
+                                        <?php foreach ($_SESSION['event_data']['speakers'] as $speaker): ?>
+                                            <li><?php echo $speaker['speaker_firstName'] . ' ' . $speaker['speaker_MI'] . ' ' . $speaker['speaker_lastName']; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li>No speakers available for this event.</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <style>
+                        .sponsors-speakers {
+                            display: flex;
+                            gap: 40px;
+                        }
+
+                        .sponsor-column,
+                        .speaker-column {
+                            flex: 1;
+                            text-align: left;
+                        }
+
+                        .sponsor-column ul,
+                        .speaker-column ul {
+                            list-style: none;
+                            padding: 0;
+                        }
+
+                        .sponsor-column h3,
+                        .speaker-column h3 {
+                            margin-bottom: 10px;
+                            font-weight: bold;
+                            font-size: 1.2em;
+                        }
+
                         .participants-links {
                             display: flex;
                             gap: 10px;

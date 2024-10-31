@@ -21,6 +21,38 @@ include('../function/F.editEvent2.php');
 
     <link rel="stylesheet" href="css/main.css">
 </head>
+<style>
+    .sponsorRow,
+    .speakerRow {
+        display: flex;
+        gap: 3px;
+    }
+
+    .sponsor_firstName,
+    .sponsor_lastName,
+    .speaker_firstName,
+    .speaker_lastName {
+        width: 45%;
+    }
+
+    .sponsor_MI,
+    .speaker_MI {
+        width: 8%;
+    }
+
+    .deleteSponsorIcon,
+    .deleteSpeakerIcon {
+        color: #d9534f;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    .deleteSponsorIcon:hover,
+    .deleteSpeakerIcon:hover {
+        color: #c9302c;
+    }
+</style>
 
 <body>
     <?php
@@ -275,6 +307,74 @@ include('../function/F.editEvent2.php');
                         <input type="time" class="input" name="time_end" value="<?php echo $eventTimeEnd; ?>" required>
                     </div>
 
+                    <div class="input_field">
+                        <label>Speakers</label>
+                        <button type="button" id="addSpeakerBtn" onclick="addSpeakerField()">Add Speaker</button>
+                    </div>
+
+                    <div class="speaker_fields_container">
+                        <?php
+                        $maxSpeakers = 5; // Limit to 5 Speaker fields
+                        
+                        // Loop through the number of Speakers and render input fields
+                        for ($i = 0; $i < $maxSpeakers; $i++) {
+                            // Check if there's a speaker at the current index
+                            if (isset($speakers[$i])) {
+                                $speakerFirstName = $speakers[$i]['speaker_firstName'];
+                                $speakerMI = $speakers[$i]['speaker_MI'];
+                                $speakerLastName = $speakers[$i]['speaker_lastName'];
+                            } else {
+                                $speakerFirstName = '';
+                                $speakerMI = '';
+                                $speakerLastName = '';
+                            }
+
+                            // Only show the field if there's data or if we're below the number of speakers
+                            $displayStyle = ($i < count($speakers)) ? 'flex' : 'none';
+                            ?>
+                            <div class="input_field speaker_row" id="speakerField<?= $i + 1 ?>"
+                                style="display: <?= $displayStyle ?>;">
+                                <label>Speaker <?= $i + 1 ?></label>
+                                <div class="speakerRow">
+                                    <input type="text" class="input speaker_firstName" name="speaker<?= $i + 1 ?>_firstName"
+                                        placeholder="First Name" value="<?= $speakerFirstName ?>">
+                                    <input type="text" class="input speaker_MI" name="speaker<?= $i + 1 ?>_MI"
+                                        placeholder="MI" value="<?= $speakerMI ?>">
+                                    <input type="text" class="input speaker_lastName" name="speaker<?= $i + 1 ?>_lastName"
+                                        placeholder="Last Name" value="<?= $speakerLastName ?>">
+                                </div>
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(<?= $i + 1 ?>)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <script>let currentSpeakerCount = <?= count($speakers) ?>; // Set the initial speaker count
+                        const maxSpeakers = 5; // Maximum number of speaker fields
+
+                        function addSpeakerField() {
+                            if (currentSpeakerCount < maxSpeakers) {
+                                currentSpeakerCount++;
+                                const speakerField = document.getElementById('speakerField' + currentSpeakerCount);
+                                speakerField.style.display = 'flex'; // Show the next hidden speaker field
+                            }
+                            if (currentSpeakerCount >= maxSpeakers) {
+                                document.getElementById('addSpeakerBtn').style.display = 'none'; // Hide 'Add Speaker' button when limit reached
+                            }
+                        }
+
+                        function deleteSpeakerField(index) {
+                            const speakerField = document.getElementById('speakerField' + index);
+                            speakerField.style.display = 'none'; // Hide the selected speaker field
+                            speakerField.querySelectorAll('input').forEach(input => input.value = ''); // Clear the input values
+
+                            currentSpeakerCount--;
+                            if (currentSpeakerCount < maxSpeakers) {
+                                document.getElementById('addSpeakerBtn').style.display = 'inline-block'; // Show 'Add Speaker' button
+                            }
+                        }
+                    </script>
                     <div class="input_field">
                         <label>Sponsors</label>
                         <button type="button" id="addSponsorBtn" onclick="addSponsorField()">Add Sponsor</button>
