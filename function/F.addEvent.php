@@ -224,6 +224,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sponsorStmt->close();
                 }
             }
+            // Speaker Insertion logic
+            for ($i = 1; $i <= 5; $i++) {
+                $speakerFirstName = isset($_POST["speaker{$i}_firstName"]) ? $_POST["speaker{$i}_firstName"] : null;
+                $speakerMI = isset($_POST["speaker{$i}_MI"]) ? $_POST["speaker{$i}_MI"] : null;
+                $speakerLastName = isset($_POST["speaker{$i}_lastName"]) ? $_POST["speaker{$i}_lastName"] : null;
+
+                if ($speakerFirstName && $speakerLastName) {
+                    $speakerSql = "INSERT INTO speaker (event_id, speaker_firstName, speaker_MI, speaker_lastName) 
+                               VALUES (?, ?, ?, ?)";
+                    $speakerStmt = $conn->prepare($speakerSql);
+                    $speakerStmt->bind_param("isss", $newEventID, $speakerFirstName, $speakerMI, $speakerLastName);
+                    $speakerStmt->execute();
+                    $speakerStmt->close();
+                }
+            }
             $_SESSION['success'] = 'Event successfully created!';
         } elseif ($Role == 'Admin') {
             // Sponsor Insertion logic
@@ -239,6 +254,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
                     $sponsorStmt->execute();
                     $sponsorStmt->close();
+                }
+            }
+            // Speaker Insertion logic
+            for ($i = 1; $i <= 5; $i++) {
+                $speakerFirstName = isset($_POST["speaker{$i}_firstName"]) ? $_POST["speaker{$i}_firstName"] : null;
+                $speakerMI = isset($_POST["speaker{$i}_MI"]) ? $_POST["speaker{$i}_MI"] : null;
+                $speakerLastName = isset($_POST["speaker{$i}_lastName"]) ? $_POST["speaker{$i}_lastName"] : null;
+
+                if ($speakerFirstName && $speakerLastName) {
+                    $speakerSql = "INSERT INTO pendingspeaker (event_id, speaker_firstName, speaker_MI, speaker_lastName) 
+                               VALUES (?, ?, ?, ?)";
+                    $speakerStmt = $conn->prepare($speakerSql);
+                    $speakerStmt->bind_param("isss", $newEventID, $speakerFirstName, $speakerMI, $speakerLastName);
+                    $speakerStmt->execute();
+                    $speakerStmt->close();
                 }
             }
             $_SESSION['success2'] = 'Event successfully created and is now pending approval!';

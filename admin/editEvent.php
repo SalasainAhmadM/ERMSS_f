@@ -22,7 +22,36 @@ include('../function/F.editEvent.php');
     <link rel="stylesheet" href="css/main.css">
 </head>
 <style>
+    .sponsorRow,
+    .speakerRow {
+        display: flex;
+        gap: 3px;
+    }
 
+    .sponsor_firstName,
+    .sponsor_lastName,
+    .speaker_firstName,
+    .speaker_lastName {
+        width: 45%;
+    }
+
+    .sponsor_MI,
+    .speaker_MI {
+        width: 8%;
+    }
+
+    .deleteSponsorIcon,
+    .deleteSpeakerIcon {
+        color: #d9534f;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    .deleteSponsorIcon:hover,
+    .deleteSpeakerIcon:hover {
+        color: #c9302c;
+    }
 </style>
 
 <body>

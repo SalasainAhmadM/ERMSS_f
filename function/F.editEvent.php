@@ -50,6 +50,13 @@ if (isset($_GET['event_id'])) {
         $stmtSpeakers->bind_param("i", $eventId);
         $stmtSpeakers->execute();
         $resultSpeakers = $stmtSpeakers->get_result();
+
+        $speakers = [];
+        while ($row = $resultSpeakers->fetch_assoc()) {
+            $speakers[] = $row;
+        }
+        $stmtSpeakers->close();
+
         // Fetch sponsors for the event
         $sqlSponsors = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
         $stmtSponsors = $conn->prepare($sqlSponsors);
@@ -152,14 +159,29 @@ if (isset($_GET['event_id'])) {
                 );
 
                 if ($updateStmt->execute()) {
-                    // First, delete existing sponsors for this event
-                    $deleteSponsorSql = "DELETE FROM sponsor WHERE event_id = ?";
-                    $stmtDeleteSponsor = $conn->prepare($deleteSponsorSql);
-                    $stmtDeleteSponsor->bind_param("i", $eventId);
-                    $stmtDeleteSponsor->execute();
-                    $stmtDeleteSponsor->close();
+                    $deleteSpeakerSql = "DELETE FROM speaker WHERE event_id = ?";
+                    $stmtDeleteSpeaker = $conn->prepare($deleteSpeakerSql);
+                    $stmtDeleteSpeaker->bind_param("i", $eventId);
+                    $stmtDeleteSpeaker->execute();
+                    $stmtDeleteSpeaker->close();
 
-                    // Handle sponsor updates/inserts
+                    // Handle speaker updates/inserts
+                    for ($i = 1; $i <= 5; $i++) {
+                        $speakerFirstName = cleanInput($_POST["speaker{$i}_firstName"]);
+                        $speakerMI = cleanInput($_POST["speaker{$i}_MI"]);
+                        $speakerLastName = cleanInput($_POST["speaker{$i}_lastName"]);
+
+                        if (!empty($speakerFirstName) || !empty($speakerMI) || !empty($speakerLastName)) {
+                            $insertSpeakerSql = "INSERT INTO speaker (event_id, speaker_firstName, speaker_MI, speaker_lastName) 
+                                         VALUES (?, ?, ?, ?)";
+                            $stmtInsertSpeaker = $conn->prepare($insertSpeakerSql);
+                            $stmtInsertSpeaker->bind_param("isss", $eventId, $speakerFirstName, $speakerMI, $speakerLastName);
+                            $stmtInsertSpeaker->execute();
+                            $stmtInsertSpeaker->close();
+                        }
+                    }
+
+                    // Handle sponsors (similar to previous script)
                     for ($i = 1; $i <= 5; $i++) {
                         $sponsorFirstName = cleanInput($_POST["sponsor{$i}_firstName"]);
                         $sponsorMI = cleanInput($_POST["sponsor{$i}_MI"]);
@@ -167,7 +189,7 @@ if (isset($_GET['event_id'])) {
 
                         if (!empty($sponsorFirstName) || !empty($sponsorMI) || !empty($sponsorLastName)) {
                             $insertSponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
-                                                 VALUES (?, ?, ?, ?)";
+                                         VALUES (?, ?, ?, ?)";
                             $stmtInsertSponsor = $conn->prepare($insertSponsorSql);
                             $stmtInsertSponsor->bind_param("isss", $eventId, $sponsorFirstName, $sponsorMI, $sponsorLastName);
                             $stmtInsertSponsor->execute();
