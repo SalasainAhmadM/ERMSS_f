@@ -40,13 +40,10 @@ if ($eventDetailsRow) {
     die("Event not found."); // Handle case where event is not found
 }
 
-// Calculate the number of days between start and end dates
 $numDays = dateRange($dateStart, $dateEnd);
 
-// Close statement and result set
 $eventDetailsStmt->close();
 
-// Fetch total participants for the specified event title
 $totalParticipantsSql = "SELECT COUNT(*) AS totalParticipants FROM eventParticipants WHERE event_id = ?";
 $totalParticipantsStmt = $conn->prepare($totalParticipantsSql);
 $totalParticipantsStmt->bind_param("i", $eventId);
@@ -55,14 +52,12 @@ $totalParticipantsResult = $totalParticipantsStmt->get_result();
 $totalParticipantsRow = $totalParticipantsResult->fetch_assoc();
 $totalParticipants = $totalParticipantsRow['totalParticipants'];
 
-// Fetch and display participants for the specified event title
 $participantsSql = "SELECT user.FirstName, user.LastName, user.Age, user.Gender, user.Email, user.Affiliation, user.Position, user.Image, user.ContactNo, user.EducationalAttainment, eventParticipants.UserID FROM eventParticipants INNER JOIN user ON eventParticipants.UserID = user.UserID WHERE eventParticipants.event_id = ?";
 $participantsStmt = $conn->prepare($participantsSql);
 $participantsStmt->bind_param("i", $eventId);
 $participantsStmt->execute();
 $participantsResult = $participantsStmt->get_result();
 
-// Fetch attendance data for participants
 $attendanceData = [];
 $attendanceSql = "SELECT participant_id, attendance_date, status FROM attendance WHERE event_id = ?";
 $attendanceStmt = $conn->prepare($attendanceSql);
@@ -76,10 +71,10 @@ while ($attendanceRow = $attendanceResult->fetch_assoc()) {
 
 
 
-require('../fpdf186/fpdf.php'); 
+require('../fpdf186/fpdf.php');
 
 if (isset($_GET['download'])) {
-    $pdf = new FPDF('P'); 
+    $pdf = new FPDF('P');
     $pdf->SetAutoPageBreak(TRUE, 15);
     $pdf->AddPage();
 
@@ -128,20 +123,20 @@ if (isset($_GET['download'])) {
             $maxParticipantWidth = max($maxParticipantWidth, $nameWidth);
         }
 
-        $minWidth = 50; 
+        $minWidth = 50;
         $participantColumnWidth = max($minWidth, $maxParticipantWidth + 10);
 
         $pdf->Ln();
 
         $participantCount = 1;
-        $participantsResult->data_seek(0); 
+        $participantsResult->data_seek(0);
         $totalDays = $numDays;
 
         for ($startDay = 0; $startDay < $totalDays; $startDay += 7) {
             if ($startDay > 0) {
                 $pdf->AddPage();
             }
-        
+
             // Reset participant count at the beginning of each page
             $participantCount = 1;
 
@@ -153,7 +148,7 @@ if (isset($_GET['download'])) {
 
             // Generate date headers for the current page (up to 7 or remaining days)
             for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
-                $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('m-d');
+                $currentDate = (new DateTime($dateStart))->modify("+" . ($startDay + $dayOffset) . " day")->format('m-d');
                 $pdf->Cell(15, 8, $currentDate, 1, 0, 'C');
             }
             $pdf->Ln();
@@ -162,7 +157,7 @@ if (isset($_GET['download'])) {
             $participantsResult->data_seek(0);
             while ($row = $participantsResult->fetch_assoc()) {
                 $participantId = $row['UserID'];
-            
+
                 // Fetch participant ID
                 $participantInfoSql = "SELECT participant_id FROM eventParticipants WHERE UserID = ? AND event_id = ?";
                 $participantInfoStmt = $conn->prepare($participantInfoSql);
@@ -171,34 +166,34 @@ if (isset($_GET['download'])) {
                 $participantInfoResult = $participantInfoStmt->get_result();
                 $participantInfoRow = $participantInfoResult->fetch_assoc();
                 $actualParticipantId = $participantInfoRow['participant_id'];
-            
+
                 $pdf->Cell(15, 8, $participantCount++, 1, 0, 'C');
-            
+
                 $currentY = $pdf->GetY();
                 $pdf->SetXY($pdf->GetX(), $currentY);
                 $participantName = htmlspecialchars($row['FirstName'] . ' ' . $row['LastName']);
 
-                $pdf->Cell($participantColumnWidth, 8, $participantName, 1, 'C'); 
+                $pdf->Cell($participantColumnWidth, 8, $participantName, 1, 'C');
 
-                $multiCellHeight = $pdf->GetY() - $currentY; 
-            
-                $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY); 
-            
+                $multiCellHeight = $pdf->GetY() - $currentY;
+
+                $pdf->SetXY($pdf->GetX() + $participantColumnWidth, $currentY);
+
                 for ($dayOffset = 0; $dayOffset < 7 && ($startDay + $dayOffset) < $totalDays; $dayOffset++) {
-                    $currentDate = (new DateTime($dateStart))->modify("+".($startDay + $dayOffset)." day")->format('Y-m-d');
-            
+                    $currentDate = (new DateTime($dateStart))->modify("+" . ($startDay + $dayOffset) . " day")->format('Y-m-d');
+
                     // Check attendance status
                     $status = isset($attendanceData[$actualParticipantId][$currentDate]) ? $attendanceData[$actualParticipantId][$currentDate] : 'absent';
                     $symbol = ($status === 'present') ? '/' : 'X';
 
-                    $pdf->Cell(15, 8, $symbol, 1, 0, 'C'); 
+                    $pdf->Cell(15, 8, $symbol, 1, 0, 'C');
                 }
-                $pdf->Ln(); 
+                $pdf->Ln();
             }
 
             // Legend
             $pdf->SetFont("Arial", 'B', 12);
-            $pdf->Ln(5); 
+            $pdf->Ln(5);
             $pdf->SetFont("Arial", 'I', 8);
             $pdf->Cell(0, 8, '* X = Absent, / = Present', 0, 1);
             $pdf->Ln(5);
@@ -221,13 +216,13 @@ if (isset($_GET['download'])) {
 
     if ($sponsors_result->num_rows > 0) {
 
-    // Sponsors Section
-    $pdf->SetFont("Arial", 'B', 10);
-    $pdf->Cell(0, 10, 'Sponsors', 0, 1);
-    $pdf->SetFont("Arial", 'B', 10);
-    $pdf->Cell(15, 8, "#", 1, 0, 'C');
-    $pdf->Cell(0, 8, "Name", 1, 1);
-    $pdf->SetFont("Arial", 'B', 10); 
+        // Sponsors Section
+        $pdf->SetFont("Arial", 'B', 10);
+        $pdf->Cell(0, 10, 'Sponsors', 0, 1);
+        $pdf->SetFont("Arial", 'B', 10);
+        $pdf->Cell(15, 8, "#", 1, 0, 'C');
+        $pdf->Cell(0, 8, "Name", 1, 1);
+        $pdf->SetFont("Arial", 'B', 10);
 
         $sponsor_count = 1;
         while ($sponsor_row = $sponsors_result->fetch_assoc()) {
@@ -249,7 +244,7 @@ if (isset($_GET['download'])) {
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="event_details.pdf"');
     echo $pdf_output;
-    
+
     $conn->close();
 }
 
@@ -429,6 +424,11 @@ if (isset($_GET['download'])) {
             <!-- <h3 class="dashboard apply">Day 1</h3> -->
 
             <style>
+                .download-button {
+                    color: black;
+                    background-color: white;
+                }
+
                 .download-button:hover {
                     background-color: #1d3557;
                 }
@@ -437,7 +437,8 @@ if (isset($_GET['download'])) {
                 <div class="table_header">
                     <p>
                         <?php echo isset($eventTitle) ? htmlspecialchars($eventTitle) . ' Participants' : 'Event Title Here'; ?>
-                        <a style="margin-left:2rem;" href="#" class="download-button" onclick="confirmDownload('<?php echo urlencode($eventTitle); ?>')">
+                        <a style="margin-left:2rem;" href="#" class="download-button"
+                            onclick="confirmDownload('<?php echo urlencode($eventTitle); ?>')">
                             <i class="fa fa-print" aria-hidden="true"></i> Download Event Report
                         </a>
 
