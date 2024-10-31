@@ -44,6 +44,12 @@ if (isset($_GET['event_id'])) {
 
         $result->close();
 
+        // Fetch speakers for the event
+        $sqlSpeakers = "SELECT speaker_firstName, speaker_MI, speaker_lastName FROM speaker WHERE event_id = ?";
+        $stmtSpeakers = $conn->prepare($sqlSpeakers);
+        $stmtSpeakers->bind_param("i", $eventId);
+        $stmtSpeakers->execute();
+        $resultSpeakers = $stmtSpeakers->get_result();
         // Fetch sponsors for the event
         $sqlSponsors = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
         $stmtSponsors = $conn->prepare($sqlSponsors);

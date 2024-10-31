@@ -1324,7 +1324,7 @@ section{
 }
 
 .wrapper form .input_field .input,
-.wrapper form .input_field .textarea, .addSponsorBtn , #addSponsorBtn{
+.wrapper form .input_field .textarea, .addSponsorBtn , #addSponsorBtn ,.addSpeakerBtn , #addSpeakerBtn{
     width: 100%;
     outline: none;
     border: var(--border);

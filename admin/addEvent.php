@@ -24,28 +24,34 @@ include('../function/F.addEvent.php');
     <link rel="stylesheet" href="css/main.css">
 </head>
 <style>
-    .sponsorRow {
+    .sponsorRow,
+    .speakerRow {
         display: flex;
         gap: 3px;
     }
 
     .sponsor_firstName,
-    .sponsor_lastName {
+    .sponsor_lastName,
+    .speaker_firstName,
+    .speaker_lastName {
         width: 45%;
     }
 
-    .sponsor_MI {
+    .sponsor_MI,
+    .speaker_MI {
         width: 8%;
     }
 
-    .deleteSponsorIcon {
+    .deleteSponsorIcon,
+    .deleteSpeakerIcon {
         color: #d9534f;
         cursor: pointer;
         margin-left: 10px;
         font-size: 20px;
     }
 
-    .deleteSponsorIcon:hover {
+    .deleteSponsorIcon:hover,
+    .deleteSpeakerIcon:hover {
         color: #c9302c;
     }
 </style>
@@ -304,6 +310,83 @@ include('../function/F.addEvent.php');
                         <label>Time End</label>
                         <input type="time" class="input" name="time_end" id="timeEnd" required>
                     </div>
+                    <!-- Add Speaker Section -->
+                    <div class="input_field">
+                        <label>Speakers</label>
+                        <button type="button" class="addSpeakerBtn" id="addSpeakerBtn" onclick="addSpeakerField()">Add
+                            Speaker</button>
+                    </div>
+
+                    <!-- Speaker Fields (Initially Hidden) -->
+                    <div class="speaker_fields_container">
+                        <div class="input_field" id="speakerField1" style="display:none;">
+                            <label>Speaker 1</label>
+                            <div class="speakerRow">
+                                <input type="text" class="input speaker_firstName" name="speaker1_firstName"
+                                    placeholder="First Name">
+                                <input type="text" class="input speaker_MI" name="speaker1_MI" placeholder="MI">
+                                <input type="text" class="input speaker_lastName" name="speaker1_lastName"
+                                    placeholder="Last Name">
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(1)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                        </div>
+
+                        <!-- Repeat the above structure for speakers 2 to 5 -->
+                        <div class="input_field" id="speakerField2" style="display:none;">
+                            <label>Speaker 2</label>
+                            <div class="speakerRow">
+                                <input type="text" class="input speaker_firstName" name="speaker2_firstName"
+                                    placeholder="First Name">
+                                <input type="text" class="input speaker_MI" name="speaker2_MI" placeholder="MI">
+                                <input type="text" class="input speaker_lastName" name="speaker2_lastName"
+                                    placeholder="Last Name">
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(2)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                        </div>
+
+                        <div class="input_field" id="speakerField3" style="display:none;">
+                            <label>Speaker 3</label>
+                            <div class="speakerRow">
+                                <input type="text" class="input speaker_firstName" name="speaker3_firstName"
+                                    placeholder="First Name">
+                                <input type="text" class="input speaker_MI" name="speaker3_MI" placeholder="MI">
+                                <input type="text" class="input speaker_lastName" name="speaker3_lastName"
+                                    placeholder="Last Name">
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(3)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                        </div>
+
+                        <div class="input_field" id="speakerField4" style="display:none;">
+                            <label>Speaker 4</label>
+                            <div class="speakerRow">
+                                <input type="text" class="input speaker_firstName" name="speaker4_firstName"
+                                    placeholder="First Name">
+                                <input type="text" class="input speaker_MI" name="speaker4_MI" placeholder="MI">
+                                <input type="text" class="input speaker_lastName" name="speaker4_lastName"
+                                    placeholder="Last Name">
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(4)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                        </div>
+
+                        <div class="input_field" id="speakerField5" style="display:none;">
+                            <label>Speaker 5</label>
+                            <div class="speakerRow">
+                                <input type="text" class="input speaker_firstName" name="speaker5_firstName"
+                                    placeholder="First Name">
+                                <input type="text" class="input speaker_MI" name="speaker5_MI" placeholder="MI">
+                                <input type="text" class="input speaker_lastName" name="speaker5_lastName"
+                                    placeholder="Last Name">
+                                <i class="fas fa-trash-alt deleteSpeakerIcon" onclick="deleteSpeakerField(5)"
+                                    title="Delete Speaker"></i>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <div class="input_field">
                         <label>Sponsors</label>
                         <button type="button" class="addSponsorBtn" id="addSponsorBtn" onclick="addSponsorField()">Add
@@ -379,27 +462,52 @@ include('../function/F.addEvent.php');
                     </div>
 
                     <script>
+                        let currentSpeakerCount = 0;
+                        const maxSpeakers = 5;
+
+                        function addSpeakerField() {
+                            if (currentSpeakerCount < maxSpeakers) {
+                                currentSpeakerCount++;
+                                document.getElementById('speakerField' + currentSpeakerCount).style.display = 'flex'; // Show the field
+                            }
+                            if (currentSpeakerCount >= maxSpeakers) {
+                                document.getElementById('addSpeakerBtn').disabled = true; // Disable button after max speakers
+                            }
+                        }
+
+                        function deleteSpeakerField(index) {
+                            const speakerField = document.getElementById('speakerField' + index);
+                            speakerField.style.display = 'none'; // Hide the selected field
+                            speakerField.querySelectorAll('input').forEach(input => input.value = ''); // Clear input values
+
+                            currentSpeakerCount--;
+                            if (currentSpeakerCount < maxSpeakers) {
+                                document.getElementById('addSpeakerBtn').disabled = false; // Enable 'Add Speaker' button again
+                            }
+                        }
+                    </script>
+                    <script>
                         let currentSponsorCount = 0;
                         const maxSponsors = 5;
 
                         function addSponsorField() {
                             if (currentSponsorCount < maxSponsors) {
                                 currentSponsorCount++;
-                                document.getElementById('sponsorField' + currentSponsorCount).style.display = 'flex'; // Show the field
+                                document.getElementById('sponsorField' + currentSponsorCount).style.display = 'flex';
                             }
                             if (currentSponsorCount >= maxSponsors) {
-                                document.getElementById('addSponsorBtn').disabled = true; // Disable button after max sponsors
+                                document.getElementById('addSponsorBtn').disabled = true;
                             }
                         }
 
                         function deleteSponsorField(index) {
                             const sponsorField = document.getElementById('sponsorField' + index);
-                            sponsorField.style.display = 'none'; // Hide the selected field
-                            sponsorField.querySelectorAll('input').forEach(input => input.value = ''); // Clear input values
+                            sponsorField.style.display = 'none';
+                            sponsorField.querySelectorAll('input').forEach(input => input.value = '');
 
                             currentSponsorCount--;
                             if (currentSponsorCount < maxSponsors) {
-                                document.getElementById('addSponsorBtn').disabled = false; // Enable 'Add Sponsor' button again
+                                document.getElementById('addSponsorBtn').disabled = false;
                             }
                         }
                     </script>

@@ -487,6 +487,20 @@ CREATE TABLE `pendingsponsor` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pendingspeaker`
+--
+
+CREATE TABLE `pendingspeaker` (
+  `speaker_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `speaker_firstName` varchar(255) NOT NULL,
+  `speaker_MI` varchar(255) DEFAULT NULL,
+  `speaker_lastName` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pendinguser`
 --
 
@@ -527,6 +541,20 @@ CREATE TABLE `sponsor` (
 INSERT INTO `sponsor` (`sponsor_id`, `event_id`, `sponsor_firstName`, `sponsor_MI`, `sponsor_lastName`) VALUES
 (8, 214, 'Gol', 'D', 'Roger'),
 (9, 214, 'Monkey', 'D', 'Garp');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `speaker`
+--
+
+CREATE TABLE `speaker` (
+  `speaker_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `speaker_firstName` varchar(255) NOT NULL,
+  `speaker_MI` varchar(255) DEFAULT NULL,
+  `speaker_lastName` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -676,6 +704,13 @@ ALTER TABLE `pendingsponsor`
   ADD KEY `pendingsponsor_ibfk_1` (`event_id`);
 
 --
+-- Indexes for table `pendingspeaker`
+--
+ALTER TABLE `pendingspeaker`
+  ADD PRIMARY KEY (`speaker_id`),
+  ADD KEY `pendingspeaker_ibfk_1` (`event_id`);
+
+--
 -- Indexes for table `pendinguser`
 --
 ALTER TABLE `pendinguser`
@@ -687,6 +722,13 @@ ALTER TABLE `pendinguser`
 ALTER TABLE `sponsor`
   ADD PRIMARY KEY (`sponsor_id`),
   ADD KEY `sponsor_ibfk_1` (`event_id`);
+
+--
+-- Indexes for table `speaker`
+--
+ALTER TABLE `speaker`
+  ADD PRIMARY KEY (`speaker_id`),
+  ADD KEY `speaker_ibfk_1` (`event_id`);
 
 --
 -- Indexes for table `user`
@@ -772,6 +814,12 @@ ALTER TABLE `pendingsponsor`
   MODIFY `sponsor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `pendingspeaker`
+--
+ALTER TABLE `pendingspeaker`
+  MODIFY `speaker_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `pendinguser`
 --
 ALTER TABLE `pendinguser`
@@ -782,6 +830,12 @@ ALTER TABLE `pendinguser`
 --
 ALTER TABLE `sponsor`
   MODIFY `sponsor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `speaker`
+--
+ALTER TABLE `speaker`
+  MODIFY `speaker_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user`
@@ -835,10 +889,22 @@ ALTER TABLE `pendingsponsor`
   ADD CONSTRAINT `pendingsponsor_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `pendingevents` (`event_id`);
 
 --
+-- Constraints for table `pendingspeaker`
+--
+ALTER TABLE `pendingspeaker`
+  ADD CONSTRAINT `pendingspeaker_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `pendingevents` (`event_id`);
+
+--
 -- Constraints for table `sponsor`
 --
 ALTER TABLE `sponsor`
   ADD CONSTRAINT `sponsor_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
+  
+--
+-- Constraints for table `speaker`
+--
+ALTER TABLE `speaker`
+  ADD CONSTRAINT `speaker_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
