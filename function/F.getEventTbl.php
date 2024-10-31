@@ -1,12 +1,9 @@
 <?php
-// Include your database connection code here
 require_once('../db.connection/connection.php');
 
-// Fetch upcoming and ongoing events from the database
 $sql = "SELECT *, IF(event_cancel IS NULL OR event_cancel = '', '', event_cancel) AS event_status FROM Events WHERE NOW() < CONCAT(date_end, ' ', time_end) ORDER BY date_created DESC";
 $result = mysqli_query($conn, $sql);
 
-// Loop through each event and generate a table row
 while ($row = mysqli_fetch_assoc($result)) {
     $eventTitle = $row['event_title'];
     $eventLocation = $row['location'];
