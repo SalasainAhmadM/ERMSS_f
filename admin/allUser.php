@@ -175,7 +175,14 @@
                                         data-contact="<?php echo $user['ContactNo']; ?>"
                                         data-position="<?php echo $user['Position']; ?>"
                                         onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
+
+                                        <button class="btn_delete" onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
+                                        <i class="fa fa-trash"></i>
+
                             </td>
+
+
+
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -420,6 +427,30 @@ function showUserProfile(userId) {
             });
         });
     });
+</script>
+
+
+<script>
+    function confirmDeleteEvent(userId) {
+        Swal.fire({
+            title: 'Delete User?',
+            text: 'Are you sure you want to delete this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `deleteUser.php?user_id=${userId}`;
+            }
+        });
+    }
 </script>
 
 

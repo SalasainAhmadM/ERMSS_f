@@ -28,6 +28,7 @@ if (isset($_GET['event_id'])) {
         }
         $stmt->close();
     }
+    
     // Delete pending sponsors
     $deletePendingSponsorsSql = "DELETE FROM pendingsponsor WHERE event_id = ?";
     if ($stmt = $conn->prepare($deletePendingSponsorsSql)) {
