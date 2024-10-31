@@ -29,8 +29,8 @@ $alertMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../db.connection/connection.php');
 
-    if (isset($_SESSION['UserID'])) {
-        $UserID = $_SESSION['UserID'];
+    if (isset($_SESSION['AdminID'])) {
+        $UserID = $_SESSION['AdminID'];
         $eventId = isset($_POST['event_id']) ? $_POST['event_id'] : null;
         $participantId = isset($_POST['user_id']) ? $_POST['user_id'] : null;
 
