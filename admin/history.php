@@ -265,38 +265,47 @@
 
 
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const status = urlParams.get('status');
-        if (status === 'success') {
-            Swal.fire({
-                title: "Success!",
-                text: "Event successfully updated!",
-                icon: "success",
-                customClass: {
-                    popup: 'larger-swal'
-                }
-            }).then(() => {
-                const newUrl = window.location.pathname;
-                window.history.replaceState(null, '', newUrl);
-            });
-        }
-
-        if (status === 'cancelled') {
-            Swal.fire({
-                title: "Cancelled!",
-                text: "Event successfully cancelled!",
-                icon: "error",
-                customClass: {
-                    popup: 'larger-swal'
-                }
-            }).then(() => {
-                const newUrl = window.location.pathname;
-                window.history.replaceState(null, '', newUrl);
-            });
-        }
-    </script>
-
+    <?php
+    if (isset($_SESSION['success'])) {
+        echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+            popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+        unset($_SESSION['success']);
+    }
+    if (isset($_SESSION['error'])) {
+        echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+        unset($_SESSION['error']);
+    }
+    if (isset($_SESSION['duplicate'])) {
+        echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['duplicate'] . "',
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+        unset($_SESSION['duplicate']);
+    }
+    ?>
 
 
 
