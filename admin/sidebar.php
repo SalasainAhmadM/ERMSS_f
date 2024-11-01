@@ -15,20 +15,21 @@ function countPendingUsers($conn)
 
 $pendingUsersCount = countPendingUsers($conn);
 function countPendingEvents($conn)
-            {
-                $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-                $result = $conn->query($sqls);
-            
-                if ($result) {
-                    $row = $result->fetch_assoc();
-                    return $row['totalPendingEvents'];
-                } else {
-                    return 0; 
-                }
-            }
-            
-            $pendingEventsCount = countPendingEvents($conn);
-function getAdminData($conn, $AdminID) {
+{
+    $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+    $result = $conn->query($sqls);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalPendingEvents'];
+    } else {
+        return 0;
+    }
+}
+
+$pendingEventsCount = countPendingEvents($conn);
+function getAdminData($conn, $AdminID)
+{
     $sql = "SELECT * FROM admin WHERE AdminID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $AdminID);
@@ -99,27 +100,27 @@ if ($adminData) {
         </li>
 
         <li class="events-side2 nav-sidebar">
-                    <a href="#" class="a-events">
-                        <i class='bx bx-archive'></i>
-                        <span class="nav-item">Events</span>
-                        <i class='bx bx-chevron-down hide'></i>
-                    </a>
-                    <span class="tooltip">Events</span>
-                    <div class="uno">
-                        <ul>
-                             <?php if ($_SESSION['Role'] === 'superadmin') { ?>
-                            <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
-                                <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
-                            <?php } ?>
-                            <a href="landingPage.php">Events</a>
-                            <a href="addEvent.php">Add Event</a>
-                            <a href="addEventTypeMode.php">Event Settings</a>
-                            <a href="history.php">History</a>
-                            <a href="cancelEvent.php">Cancelled</a>
-                        </ul>
-                    </div>
-                </li>
+            <a href="#" class="a-events">
+                <i class='bx bx-archive'></i>
+                <span class="nav-item">Events</span>
+                <i class='bx bx-chevron-down hide'></i>
+            </a>
+            <span class="tooltip">Events</span>
+            <div class="uno">
+                <ul>
+                    <?php if ($_SESSION['Role'] === 'superadmin') { ?>
+                        <a href="eventsValidation.php">Events Validation <span><?php echo $pendingEventsCount; ?></span></a>
+                    <?php } elseif ($_SESSION['Role'] === 'Admin') { ?>
+                        <a href="pendingEvents.php">Pending Events <span><?php echo $pendingEventsCount; ?></span></a>
+                    <?php } ?>
+                    <a href="landingPage.php">Events</a>
+                    <a href="addEvent.php">Add Event</a>
+                    <a href="addEventTypeMode.php">Event Settings</a>
+                    <a href="history.php">History</a>
+                    <a href="cancelEvent.php">Cancelled</a>
+                </ul>
+            </div>
+        </li>
 
         <li class="events-side nav-sidebar">
             <a href="#" class="a-events">
@@ -131,7 +132,7 @@ if ($adminData) {
             <div class="uno">
                 <ul>
                     <a href="profile.php">My Profile</a>
-                    <a href="validation.php">User Validation <span><?php echo $pendingUsersCount;  ?></span></a>
+                    <a href="validation.php">User Validation <span><?php echo $pendingUsersCount; ?></span></a>
                     <a href="newAccount.php">Create Account</a>
                     <a href="allUser.php">All User</a>
                 </ul>
@@ -139,11 +140,31 @@ if ($adminData) {
         </li>
 
         <li class="nav-sidebar">
-            <a href="../login.php">
+            <a href="#" onclick="confirmLogout(event)">
                 <i class="bx bx-log-out"></i>
                 <span class="nav-item">Logout</span>
             </a>
             <span class="tooltip">Logout</span>
         </li>
+
+        <script>
+            function confirmLogout(event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, logout'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "../login.php";
+                    }
+                });
+            }
+        </script>
     </ul>
 </div>
