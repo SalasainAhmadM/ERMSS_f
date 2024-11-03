@@ -46,11 +46,11 @@
                 <td data-label="View Event" class="pad">
                     <a href="view_eventHistory.php?event_id=<?php echo $row['event_id']; ?>"><button class="btn_view"><i class="fa-solid fa-eye"></i></i></button></a>
                 </td>
-                <td data-label="Delete" class="pad">
+                <!-- <td data-label="Delete" class="pad">
                     <button class="btn_delete" onclick="confirmDeleteEvent('<?php echo $eventId; ?>')">
                         <i class="fa fa-trash"></i>
                     </button>
-                </td>
+                </td> -->
                 <?php
                 echo '</tr>';
             }

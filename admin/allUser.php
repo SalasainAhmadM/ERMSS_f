@@ -28,6 +28,64 @@ $totalEndedResult = mysqli_query($conn, $totalEndedQuery);
 $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 ?>
 
+<?php
+// Fetch all users with the specified fields
+$userQuery = $conn->query("
+    SELECT 
+        UserID, 
+        LastName, 
+        FirstName, 
+        MI, 
+        Gender, 
+        Age, 
+        Email, 
+        Password, 
+        ContactNo, 
+        Address, 
+        Affiliation, 
+        Position, 
+        Image, 
+        EducationalAttainment, 
+        Role, 
+        'user' as userType 
+    FROM user
+");
+$allUsers = [];
+while ($user = $userQuery->fetch_assoc()) {
+    $allUsers[] = $user;
+}
+
+// Fetch all admins with the specified fields
+$adminQuery = $conn->query("
+    SELECT 
+        AdminID as UserID, 
+        LastName, 
+        FirstName, 
+        MI, 
+        Gender, 
+        Email, 
+        Password, 
+        ContactNo, 
+        Address, 
+        Affiliation, 
+        Position, 
+        Image, 
+        Role, 
+        'admin' as userType 
+    FROM admin
+");
+$allAdmins = [];
+while ($admin = $adminQuery->fetch_assoc()) {
+    $allAdmins[] = $admin;
+}
+
+// Merge both users and admins into a single array
+$allUsersAndAdmins = array_merge($allUsers, $allAdmins);
+?>
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -164,10 +222,22 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
         <div class="containerr">
             <div class="tables container">
                 <div class="table_header">
-                    <p>All Users</p>
+                <div class="select-container" style="position: relative; display: inline-block;">
+                    <select id="userDropdown" onchange="filterByUserType()"
+                        style="width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; 
+                            background-color: #f9f9f9; color: #333; font-size: 16px; cursor: pointer; 
+                            transition: border-color 0.3s ease; -webkit-appearance: none; 
+                            -moz-appearance: none; appearance: none;">
+                        <option value="all" selected>All Users</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admins</option>
+                    </select>
+                </div>
+
+
                     <div>
                         <input class="tb_input" placeholder="Search..." oninput="filterTable()">
-                        <button class="add_new"> <?php echo $totalUsersCount; ?> Users</button>
+                        <button class="add_new"><?php echo count($allUsersAndAdmins); ?> Users</button>
                     </div>
                 </div>
                 <div class="table_section">
@@ -178,48 +248,45 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Affiliation</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($allUsers as $user): ?>
-                                <tr>
+                            <?php foreach ($allUsersAndAdmins as $user): ?>
+                                <tr data-user-type="<?php echo $user['userType']; ?>">
                                     <td><?php echo $user['UserID']; ?></td>
                                     <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
                                     <td><?php echo $user['Email']; ?></td>
                                     <td><?php echo $user['Affiliation']; ?></td>
+                                    <td><?php echo $user['Role']; ?></td>
                                     <td>
                                         <button class="action-button" data-userid="<?php echo $user['UserID']; ?>"
                                             data-image="<?php echo $user['Image']; ?>"
                                             data-gender="<?php echo $user['Gender']; ?>"
-                                            data-age="<?php echo $user['Age']; ?>"
+                                            data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
                                             data-affiliation="<?php echo $user['Affiliation']; ?>"
-                                            data-educationalattainment="<?php echo $user['EducationalAttainment']; ?>"
+                                            data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
                                             data-contact="<?php echo $user['ContactNo']; ?>"
                                             data-position="<?php echo $user['Position']; ?>"
                                             onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
 
                                         <?php if ($_SESSION['Role'] === 'superadmin'): ?>
-                                            <button class="btn_delete"
-                                                onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
+                                            <button class="btn_delete" onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         <?php endif; ?>
-
                                     </td>
-
-
-
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+
                     </table>
                 </div>
             </div>
         </div>
-        <tbody>
-
     </div>
+
 
 
     <script>
@@ -549,6 +616,23 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             }
         });
     }
+</script>
+
+
+<script>
+function filterByUserType() {
+    const userType = document.getElementById("userDropdown").value;
+    const rows = document.querySelectorAll("#userTable tbody tr");
+
+    rows.forEach(row => {
+        if (userType === "all" || row.getAttribute("data-user-type") === userType) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
 </script>
 
 

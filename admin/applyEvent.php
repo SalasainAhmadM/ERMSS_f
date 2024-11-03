@@ -3,27 +3,6 @@ include('../function/F.addParticipant.php');
 
 $eventId = isset($_GET['event_id']) ? $_GET['event_id'] : null;
 
-// Fetch distinct years from the Events table
-$yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM Events ORDER BY event_year DESC";
-$yearResult = mysqli_query($conn, $yearQuery);
-$years = mysqli_fetch_all($yearResult, MYSQLI_ASSOC);
-
-$totalEventsQuery = "SELECT COUNT(*) AS totalEvents FROM Events";
-$totalEventsResult = mysqli_query($conn, $totalEventsQuery);
-$totalEvents = mysqli_fetch_assoc($totalEventsResult)['totalEvents'];
-
-$totalUpcomingQuery = "SELECT COUNT(*) AS totalUpcoming FROM Events WHERE (NOW() < CONCAT(date_start, ' ', time_start)) AND (event_cancel IS NULL OR event_cancel = '')";
-$totalUpcomingResult = mysqli_query($conn, $totalUpcomingQuery);
-$totalUpcoming = mysqli_fetch_assoc($totalUpcomingResult)['totalUpcoming'];
-
-$totalOngoingQuery = "SELECT COUNT(*) AS totalOngoing FROM Events WHERE (NOW() BETWEEN CONCAT(date_start, ' ', time_start) AND CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
-$totalOngoingResult = mysqli_query($conn, $totalOngoingQuery);
-$totalOngoing = mysqli_fetch_assoc($totalOngoingResult)['totalOngoing'];
-
-$totalEndedQuery = "SELECT COUNT(*) AS totalEnded FROM Events WHERE (NOW() > CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
-$totalEndedResult = mysqli_query($conn, $totalEndedQuery);
-$totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
-
 $alertMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -35,16 +14,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $participantId = isset($_POST['user_id']) ? $_POST['user_id'] : null;
 
         if ($eventId && $participantId) {
-            // Function to add participant to EventParticipants
-            function addParticipant($conn, $eventId, $participantId)
+
+            // Check if event is ongoing
+            function isEventOngoing($conn, $eventId)
             {
-                $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
-                $stmtInsert = $conn->prepare($sqlInsert);
-                $stmtInsert->bind_param("ii", $eventId, $participantId);
-                return $stmtInsert->execute();
+                $sqlOngoing = "SELECT COUNT(*) AS ongoing_count FROM Events WHERE event_id = ? AND NOW() BETWEEN CONCAT(date_start, ' ', time_start) AND CONCAT(date_end, ' ', time_end)";
+                $stmtOngoing = $conn->prepare($sqlOngoing);
+                $stmtOngoing->bind_param("i", $eventId);
+                $stmtOngoing->execute();
+                $resultOngoing = $stmtOngoing->get_result();
+                $ongoingData = $resultOngoing->fetch_assoc();
+                $stmtOngoing->close();
+                return $ongoingData['ongoing_count'] > 0;
             }
 
-            // Function to get the current participant count for an event
+            // Function to get the current number of participants in the event
             function getParticipantCount($conn, $eventId)
             {
                 $sqlCount = "SELECT COUNT(*) AS participant_count FROM EventParticipants WHERE event_id = ?";
@@ -57,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return $countData['participant_count'];
             }
 
-            // Function to get the participant limit for an event
+            // Function to get the participant limit for the event
             function getParticipantLimit($conn, $eventId)
             {
-                $sqlLimit = "SELECT participant_limit FROM events WHERE event_id = ?";
+                $sqlLimit = "SELECT participant_limit FROM Events WHERE event_id = ?";
                 $stmtLimit = $conn->prepare($sqlLimit);
                 $stmtLimit->bind_param("i", $eventId);
                 $stmtLimit->execute();
@@ -70,18 +54,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return $limitData['participant_limit'];
             }
 
-            // Get participant count and limit
-            $currentCount = getParticipantCount($conn, $eventId);
-            $participantLimit = getParticipantLimit($conn, $eventId);
+            // Function to add participant to EventParticipants
+            function addParticipant($conn, $eventId, $participantId)
+            {
+                $sqlInsert = "INSERT INTO EventParticipants (event_id, UserID) VALUES (?, ?)";
+                $stmtInsert = $conn->prepare($sqlInsert);
+                $stmtInsert->bind_param("ii", $eventId, $participantId);
+                return $stmtInsert->execute();
+            }
 
-            if ($currentCount >= $participantLimit) {
-                // Participant limit reached
+            // Check if the event is ongoing
+            if (isEventOngoing($conn, $eventId)) {
                 $alertMessage = "
                     <script>
                         Swal.fire({
-                            title: 'Limit Reached!',
-                            text: 'The participant limit for this event has been reached.',
-                            icon: 'warning'
+                            title: 'Event Ongoing!',
+                            text: 'Participants cannot be added to an ongoing event.',
+                            icon: 'error',
+                            customClass: {
+                                popup: 'larger-swal'
+                            },
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 window.location.href = '';
@@ -90,60 +82,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </script>
                 ";
             } else {
-                // Check if participant has canceled before
-                $checkCancelQuery = "SELECT COUNT(*) AS cancel_count FROM cancel_reason WHERE event_id = ? AND UserID = ?";
-                $stmtCheckCancel = $conn->prepare($checkCancelQuery);
-                $stmtCheckCancel->bind_param("ii", $eventId, $participantId);
-                $stmtCheckCancel->execute();
-                $resultCheckCancel = $stmtCheckCancel->get_result();
-                $cancelData = $resultCheckCancel->fetch_assoc();
+                // Check participant count and limit
+                $currentCount = getParticipantCount($conn, $eventId);
+                $participantLimit = getParticipantLimit($conn, $eventId);
 
-                if ($cancelData['cancel_count'] > 0) {
-                    // Participant has canceled before, ask to rejoin
+                if ($currentCount >= $participantLimit) {
                     $alertMessage = "
                         <script>
                             Swal.fire({
-                                title: 'Notice!',
-                                text: 'This participant already cancelled. Rejoin?',
+                                title: 'Limit Reached!',
+                                text: 'The participant limit for this event has been reached.',
                                 icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33',
-                                confirmButtonText: 'Yes, rejoin!',
-                                cancelButtonText: 'No, cancel'
+                                customClass: {
+                                    popup: 'larger-swal'
+                                },
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    document.getElementById('rejoinForm').submit();
-                                } else {
-                                    Swal.fire('Cancelled', 'Action cancelled.', 'error');
+                                    window.location.href = '';
                                 }
                             });
                         </script>
                     ";
-
-                    echo '
-                    <form id="rejoinForm" action="" method="post" style="display:none;">
-                        <input type="hidden" name="event_id" value="' . $eventId . '">
-                        <input type="hidden" name="user_id" value="' . $participantId . '">
-                        <input type="hidden" name="rejoin_action" value="1">
-                    </form>';
                 } else {
-                    // Check if participant is already enrolled
-                    $checkParticipantQuery = "SELECT COUNT(*) AS participant_count FROM EventParticipants WHERE event_id = ? AND UserID = ?";
-                    $stmtCheckParticipant = $conn->prepare($checkParticipantQuery);
-                    $stmtCheckParticipant->bind_param("ii", $eventId, $participantId);
-                    $stmtCheckParticipant->execute();
-                    $resultCheckParticipant = $stmtCheckParticipant->get_result();
-                    $participantData = $resultCheckParticipant->fetch_assoc();
-
-                    if ($participantData['participant_count'] > 0) {
-                        // Participant already added
+                    // Add the participant if checks are passed
+                    if (addParticipant($conn, $eventId, $participantId)) {
                         $alertMessage = "
                             <script>
                                 Swal.fire({
-                                    title: 'Error!',
-                                    text: 'The participant is already added to the event.',
-                                    icon: 'error'
+                                    title: 'Success!',
+                                    text: 'Participant added successfully.',
+                                    icon: 'success',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         window.location.href = '';
@@ -152,41 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </script>
                         ";
                     } else {
-                        // Add new participant
-                        if (addParticipant($conn, $eventId, $participantId)) {
-                            $alertMessage = "
-                                <script>
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        text: 'Participant added successfully!',
-                                        icon: 'success'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = '';
-                                        }
-                                    });
-                                </script>
-                            ";
-                        }
-                    }
-                    $stmtCheckParticipant->close();
-                }
-
-                // If rejoin is confirmed
-                if (isset($_POST['rejoin_action']) && $_POST['rejoin_action'] == 1) {
-                    if (addParticipant($conn, $eventId, $participantId)) {
-                        // Delete from cancel_reason
-                        $deleteCancelQuery = "DELETE FROM cancel_reason WHERE event_id = ? AND UserID = ?";
-                        $stmtDeleteCancel = $conn->prepare($deleteCancelQuery);
-                        $stmtDeleteCancel->bind_param("ii", $eventId, $participantId);
-                        $stmtDeleteCancel->execute();
-
                         $alertMessage = "
                             <script>
                                 Swal.fire({
-                                    title: 'Success!',
-                                    text: 'Rejoined the event successfully!',
-                                    icon: 'success'
+                                    title: 'Error!',
+                                    text: 'An error occurred while adding the participant.',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         window.location.href = '';
@@ -196,8 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ";
                     }
                 }
-
-                $stmtCheckCancel->close();
             }
         }
     } else {
@@ -206,6 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 
 
@@ -403,7 +347,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     confirmButtonColor: '#3085d6',
                                     cancelButtonColor: '#d33',
                                     confirmButtonText: 'Yes, proceed!',
-                                    cancelButtonText: 'No, cancel'
+                                    cancelButtonText: 'No, cancel',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         form.submit(); // Submit the form
