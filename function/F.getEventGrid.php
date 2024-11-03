@@ -57,10 +57,11 @@
                 <div class="flex-btn">
                     <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
                     <a href="editEventGrid.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
-                    <a href="javascript:void(0);" onclick="confirmDeleteEvent(<?php echo $eventId; ?>);">
+                    <!-- <a href="javascript:void(0);" onclick="confirmDeleteEvent(<?php echo $eventId; ?>);">
                         <button class="btn_delete"><i class="fa fa-trash"></i></button>
-                    </a>
+                    </a> -->
                 </a>
+                
                 </div>
             </div>
 <?php
