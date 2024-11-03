@@ -253,44 +253,48 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         </thead>
 
                         <tbody>
-                        <?php foreach ($allUsersAndAdmins as $user): ?>
-                            <?php if ($user['Role'] === 'superadmin') continue; ?>
-                            <tr data-user-type="<?php echo $user['userType']; ?>">
-                                <td><?php echo $user['UserID']; ?></td>
-                                <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
-                                <td><?php echo $user['Email']; ?></td>
-                                <td><?php echo $user['Affiliation']; ?></td>
-                                <td><?php echo $user['Role']; ?></td>
-                                <td>
-                                    <button class="action-button" data-userid="<?php echo $user['UserID']; ?>" 
-                                        data-fullname="<?php echo $user['FirstName'] . ' ' . $user['LastName']; ?>"
-                                        data-email="<?php echo $user['Email']; ?>"
-                                        data-image="<?php echo $user['Image']; ?>"
-                                        data-gender="<?php echo $user['Gender']; ?>"
-                                        data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
-                                        data-affiliation="<?php echo $user['Affiliation']; ?>"
-                                        data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
-                                        data-contact="<?php echo $user['ContactNo']; ?>"
-                                        data-position="<?php echo $user['Position']; ?>" 
-                                        data-role="<?php echo $user['Role']; ?>"
-                                        onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
+                            <?php foreach ($allUsersAndAdmins as $userOrAdmin): ?>
+                                <?php if ($userOrAdmin['Role'] === 'superadmin')
+                                    continue; ?>
 
+                                <tr data-user-type="<?php echo $userOrAdmin['userType']; ?>">
+                                    <td class="user-id"><?php echo $userOrAdmin['UserID']; ?></td>
+                                    <td><?php echo $userOrAdmin['FirstName'] . ' ' . $userOrAdmin['LastName']; ?></td>
+                                    <td><?php echo $userOrAdmin['Email']; ?></td>
+                                    <td><?php echo $userOrAdmin['Affiliation']; ?></td>
+                                    <td><?php echo $userOrAdmin['Role']; ?></td>
+                                    <td>
+                                        <button class="action-button" data-userid="<?php echo $userOrAdmin['UserID']; ?>"
+                                            data-adminid="<?php echo $userOrAdmin['UserID']; ?>"
+                                            data-fullname="<?php echo $userOrAdmin['FirstName'] . ' ' . $userOrAdmin['LastName']; ?>"
+                                            data-email="<?php echo $userOrAdmin['Email']; ?>"
+                                            data-image="<?php echo $userOrAdmin['Image']; ?>"
+                                            data-gender="<?php echo $userOrAdmin['Gender']; ?>"
+                                            data-age="<?php echo $userOrAdmin['userType'] === 'admin' ? 'N/A' : $userOrAdmin['Age']; ?>"
+                                            data-affiliation="<?php echo $userOrAdmin['Affiliation']; ?>"
+                                            data-educationalattainment="<?php echo $userOrAdmin['userType'] === 'admin' ? 'N/A' : $userOrAdmin['EducationalAttainment']; ?>"
+                                            data-contact="<?php echo $userOrAdmin['ContactNo']; ?>"
+                                            data-position="<?php echo $userOrAdmin['Position']; ?>"
+                                            data-role="<?php echo $userOrAdmin['Role']; ?>"
+                                            onclick="viewProfile('<?php echo $userOrAdmin['UserID']; ?>', '<?php echo $userOrAdmin['Role']; ?>')">
+                                            View Profile
+                                        </button>
 
-                                        <?php if ($user['Role'] === 'User'): ?>
+                                        <?php if ($userOrAdmin['Role'] === 'User'): ?>
                                             <button class="btn_delete"
-                                                onclick="confirmDeleteEventUser('<?php echo $user['UserID']; ?>')">
+                                                onclick="confirmDeleteEventUser('<?php echo $userOrAdmin['UserID']; ?>')">
                                                 <i class="fa fa-trash"></i>
                                             </button>
-                                        <?php elseif ($user['Role'] === 'Admin'): ?>
+                                        <?php elseif ($userOrAdmin['Role'] === 'Admin'): ?>
                                             <button class="btn_delete"
-                                                onclick="confirmDeleteEventAdmin('<?php echo $user['UserID']; ?>')">
+                                                onclick="confirmDeleteEventAdmin('<?php echo $userOrAdmin['UserID']; ?>')">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
 
                     </table>
                 </div>
@@ -301,6 +305,15 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
 
     <script>
+
+        function viewProfile(userId, role) {
+            if (role === 'Admin') {
+                showAdminProfile(userId);
+            } else if (role === 'User') {
+                showUserProfile(userId);
+            }
+        }
+
         function showUserProfile(userId) {
             const fullName = document.querySelector(`button[data-userid="${userId}"]`).dataset.fullname;
             const email = document.querySelector(`button[data-userid="${userId}"]`).dataset.email;
@@ -311,19 +324,19 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
             const contact = document.querySelector(`button[data-userid="${userId}"]`).dataset.contact;
             const position = document.querySelector(`button[data-userid="${userId}"]`).dataset.position;
             const role = document.querySelector(`button[data-userid="${userId}"]`).dataset.role;
-            const image = document.querySelector(`button[data-userid="${userId}"]`).dataset.image;  
+            const image = document.querySelector(`button[data-userid="${userId}"]`).dataset.image;
 
             // for admin only
-            const ageInput = role === 'Admin' 
-            ? '' 
-            : `
+            const ageInput = role === 'Admin'
+                ? ''
+                : `
                 <label>Age:</label>
                 <input type="number" id="editAge" value="${age}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
             `;
 
-            const ageDisplay = role === 'Admin' 
-            ? '' 
-            : `
+            const ageDisplay = role === 'Admin'
+                ? ''
+                : `
                 <strong>Age:</strong> ${age} <br/>
             `;
             // ----------
@@ -424,7 +437,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
                         fetch(endpoint, {
                             method: 'POST',
-                            body: formData 
+                            body: formData
                         })
                             .then(response => response.json())
                             .then(data => {
@@ -452,14 +465,14 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                             })
                             .catch(error => {
                                 console.error('Error updating user:', error);
-                                    Swal.fire({
-                                        title: 'Error!',
-                                        text: 'An error database!.',
-                                        icon: 'error',
-                                        customClass: {
-                                            popup: 'larger-swal'
-                                        },
-                                    });
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'An error database!.',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
+                                });
                             });
                     }
                 });
@@ -468,6 +481,147 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
         }
     </script>
 
+    <script>
+        function showAdminProfile(adminId) {
+            const fullName = document.querySelector(`button[data-userid="${adminId}"]`).dataset.fullname;
+            const email = document.querySelector(`button[data-userid="${adminId}"]`).dataset.email;
+            const affiliation = document.querySelector(`button[data-userid="${adminId}"]`).dataset.affiliation;
+            const gender = document.querySelector(`button[data-userid="${adminId}"]`).dataset.gender;
+            const contact = document.querySelector(`button[data-userid="${adminId}"]`).dataset.contact;
+            const position = document.querySelector(`button[data-userid="${adminId}"]`).dataset.position;
+            const role = document.querySelector(`button[data-userid="${adminId}"]`).dataset.role;
+            const image = document.querySelector(`button[data-userid="${adminId}"]`).dataset.image;
+
+            Swal.fire({
+                title: 'Admin Profile',
+                html: `
+                <div style="text-align: left; padding:2rem;">
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                             alt="Profile Image" 
+                             style="width: 100px; height: 100px; border-radius: 50%;">
+                    </div>
+
+                    <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
+                    <strong>Name:</strong> ${fullName} <br/>
+                    <strong>Gender:</strong> ${gender} <br/>
+                    <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
+                    <strong>Email:</strong> ${email} <br/>
+                    <strong>Contact:</strong> ${contact} <br/><br/>
+                    <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
+                    <strong>Affiliation:</strong> ${affiliation} <br/>
+                    <strong>Occupation:</strong> ${position} <br/><br/>
+                    <strong>Role:</strong> ${role} <br/><br/>
+                    
+                    <button id="editAdminProfileButton" style="background-color: #28a745; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">Edit Profile</button>
+                </div>
+            `,
+                showCancelButton: true,
+                cancelButtonText: 'Close',
+                customClass: {
+                    popup: 'larger-swal'
+                },
+            });
+
+            document.getElementById('editAdminProfileButton').addEventListener('click', function () {
+                editAdminProfile(adminId, fullName, email, affiliation, gender, contact, position, role, image);
+            });
+        }
+
+        function editAdminProfile(adminId, fullName, email, affiliation, gender, contact, position, role, image) {
+            Swal.fire({
+                title: 'Edit Admin Profile',
+                html: `
+                <div style="text-align: left; padding: 2.5rem; font-size:2rem;">
+                    <label>Name:</label>
+                    <input type="text" id="editAdminName" value="${fullName}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Email:</label>
+                    <input type="email" id="editAdminEmail" value="${email}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Affiliation:</label>
+                    <input type="text" id="editAdminAffiliation" value="${affiliation}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Gender:</label>
+                    <select id="editAdminGender" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                        <option value="Male" ${gender === 'Male' ? 'selected' : ''}>Male</option>
+                        <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
+                        <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
+                    </select>
+                    <label>Contact:</label>
+                    <input type="text" id="editAdminContact" value="${contact}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Position:</label>
+                    <input type="text" id="editAdminPosition" value="${position}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Role:</label>
+                    <input type="text" id="editAdminRole" value="${role}" style="pointer-events: none;width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Profile Photo:</label>
+                    <input type="file" id="editAdminProfilePhoto" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                </div>
+            `,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    popup: 'larger-swal'
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const updatedAdmin = {
+                        adminId: adminId,
+                        name: document.getElementById('editAdminName').value,
+                        email: document.getElementById('editAdminEmail').value,
+                        affiliation: document.getElementById('editAdminAffiliation').value,
+                        gender: document.getElementById('editAdminGender').value,
+                        contact: document.getElementById('editAdminContact').value,
+                        position: document.getElementById('editAdminPosition').value,
+                        image: document.getElementById('editAdminProfilePhoto').files[0]
+                    };
+
+                    const formData = new FormData();
+                    for (const key in updatedAdmin) {
+                        formData.append(key, updatedAdmin[key]);
+                    }
+
+                    fetch('updateAdmin.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Admin profile updated.',
+                                    icon: 'success',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'An error occurred while updating the admin profile.',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    },
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating admin:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred with the database!',
+                                icon: 'error',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                },
+                            });
+                        });
+                }
+            });
+        }
+    </script>
 
 
 
@@ -606,8 +760,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
         actionButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const userId = this.dataset.userid; 
-                const eventId = <?php echo $eventId; ?>; 
+                const userId = this.dataset.userid;
+                const eventId = <?php echo $eventId; ?>;
 
                 fetch('addParticipant.php', {
                     method: 'POST',

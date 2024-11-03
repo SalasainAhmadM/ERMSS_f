@@ -208,6 +208,31 @@ if (isset($_GET['event_id'])) {
 
                     // Redirect based on success (same as before)
                     if (!empty($cancelReason)) {
+                        if (!empty($cancelReason)) {
+                            // Fetch all participants for the event
+                            $fetchParticipantsSql = "SELECT UserID FROM eventparticipants WHERE event_id = ?";
+                            $stmtFetchParticipants = $conn->prepare($fetchParticipantsSql);
+                            $stmtFetchParticipants->bind_param("i", $eventId);
+
+                            if ($stmtFetchParticipants->execute()) {
+                                $resultParticipants = $stmtFetchParticipants->get_result();
+
+                                // Insert cancellation reason for each participant
+                                $insertCancelReasonSql = "INSERT INTO cancel_reason (event_id, UserID, description) VALUES (?, ?, ?)";
+                                $stmtInsertCancelReason = $conn->prepare($insertCancelReasonSql);
+
+                                while ($rowParticipant = $resultParticipants->fetch_assoc()) {
+                                    $userId = $rowParticipant['UserID'];
+                                    $stmtInsertCancelReason->bind_param("iis", $eventId, $userId, $cancelReason);
+                                    $stmtInsertCancelReason->execute();
+                                }
+
+                                $stmtInsertCancelReason->close();
+                            }
+
+                            $stmtFetchParticipants->close();
+                        }
+
                         $_SESSION['cancelled'] = 'Event successfully cancelled!';
                         header("Location: ../admin/landingPage.php?event_id=$eventId&status=cancelled");
                     } else {
