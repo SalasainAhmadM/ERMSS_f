@@ -95,6 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventTitle = $_POST['event_title'];
     $eventDescription = $_POST['event_description'];
     $eventType = $_POST['event_type'];
+    $audienceType = $_POST['audience_type'];
     $eventMode = $_POST['event_mode'];
     $eventLocation = strtolower(trim($_POST['location']));
     if (empty($eventLocation)) {
@@ -153,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if ($eventLocation !== "N/A") {
-        
+
         $sqlCheckExisting = "SELECT * FROM events WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
         $stmtCheckExisting = $conn->prepare($sqlCheckExisting);
         $stmtCheckExisting->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
