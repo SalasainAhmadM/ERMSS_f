@@ -23,7 +23,7 @@ function dateRange($start, $end)
 $eventTitle = isset($_GET['eventTitle']) ? urldecode($_GET['eventTitle']) : null;
 
 // Fetch event details (including type and mode)
-$eventDetailsSql = "SELECT event_id, event_type, event_mode, date_start, date_end FROM events WHERE event_title = ?";
+$eventDetailsSql = "SELECT event_id, event_type, event_mode, date_start, date_end, audience_type FROM events WHERE event_title = ?";
 $eventDetailsStmt = $conn->prepare($eventDetailsSql);
 $eventDetailsStmt->bind_param("s", $eventTitle);
 $eventDetailsStmt->execute();
@@ -35,6 +35,7 @@ if ($eventDetailsRow) {
     $dateStart = $eventDetailsRow['date_start'];
     $dateEnd = $eventDetailsRow['date_end'];
     $eventType = $eventDetailsRow['event_type'];
+    $audienceType = $eventDetailsRow['audience_type'];
     $eventMode = $eventDetailsRow['event_mode'];
 } else {
     die("Event not found."); // Handle case where event is not found
@@ -92,6 +93,7 @@ if (isset($_GET['download'])) {
     $event_info = [
         "Event Title: " . htmlspecialchars($eventTitle),
         "Event Type: " . htmlspecialchars($eventType),
+        "Audience Type: " . htmlspecialchars($audienceType),
         "Event Mode: " . htmlspecialchars($eventMode),
         "Start Date: " . htmlspecialchars($dateStart),
         "End Date: " . htmlspecialchars($dateEnd)
@@ -208,7 +210,7 @@ if (isset($_GET['download'])) {
 
 
     // Check if sponsors are present
-    $sponsors_query = "SELECT sponsor_id, sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
+    $sponsors_query = "SELECT sponsor_id, sponsor_Name FROM sponsor WHERE event_id = ?";
     $stmt = $conn->prepare($sponsors_query);
     $stmt->bind_param("i", $eventId);
     $stmt->execute();
@@ -226,7 +228,7 @@ if (isset($_GET['download'])) {
 
         $sponsor_count = 1;
         while ($sponsor_row = $sponsors_result->fetch_assoc()) {
-            $sponsor_full_name = trim($sponsor_row['sponsor_firstName'] . ' ' . $sponsor_row['sponsor_MI'] . ' ' . $sponsor_row['sponsor_lastName']);
+            $sponsor_full_name = trim($sponsor_row['sponsor_Name']);
             $pdf->Cell(15, 8, strval($sponsor_count++), 1, 0, 'C');
             $pdf->Cell(0, 8, $sponsor_full_name, 1, 1);
         }
