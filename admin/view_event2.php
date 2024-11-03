@@ -103,7 +103,7 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                                 <ul>
                                     <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
                                         <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            <li><?php echo $sponsor['sponsor_Name']; ?>
                                             </li>
                                         <?php endforeach; ?>
                                     <?php else: ?>
@@ -125,6 +125,12 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                                     <?php endif; ?>
                                 </ul>
                             </div>
+                        </div>
+                        <!-- Back Button -->
+                        <div class="back-button-container">
+                            <a href="./pendingEvents2.php" class="back-button">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
                         </div>
                     </div>
 

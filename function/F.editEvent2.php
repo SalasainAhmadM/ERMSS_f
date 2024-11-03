@@ -58,7 +58,8 @@ if (isset($_GET['event_id'])) {
         }
         $stmtSpeakers->close();
         // Fetch sponsors for the event
-        $sqlSponsors = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM pendingsponsor WHERE event_id = ?";
+        $sqlSponsors = "SELECT sponsor_Name FROM pendingsponsor WHERE event_id = ?";
+        // $sqlSponsors = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM pendingsponsor WHERE event_id = ?";
         $stmtSponsors = $conn->prepare($sqlSponsors);
         $stmtSponsors->bind_param("i", $eventId);
         $stmtSponsors->execute();
@@ -184,20 +185,30 @@ if (isset($_GET['event_id'])) {
                         }
                     }
                     // Handle sponsor updates/inserts
+                    // Handle sponsor updates/inserts
                     for ($i = 1; $i <= 5; $i++) {
-                        $sponsorFirstName = cleanInput($_POST["sponsor{$i}_firstName"]);
-                        $sponsorMI = cleanInput($_POST["sponsor{$i}_MI"]);
-                        $sponsorLastName = cleanInput($_POST["sponsor{$i}_lastName"]);
+                        $sponsorName = cleanInput($_POST["sponsor{$i}_Name"]);
+                        // $sponsorFirstName = cleanInput($_POST["sponsor{$i}_firstName"]);
+                        // $sponsorMI = cleanInput($_POST["sponsor{$i}_MI"]);
+                        // $sponsorLastName = cleanInput($_POST["sponsor{$i}_lastName"]);
 
-                        if (!empty($sponsorFirstName) || !empty($sponsorMI) || !empty($sponsorLastName)) {
-                            $insertSponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
-                                                 VALUES (?, ?, ?, ?)";
+                        if (
+                            !empty($sponsorName)
+                            // !empty($sponsorFirstName) || !empty($sponsorMI) || !empty($sponsorLastName
+                        ) {
+                            $insertSponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_Name) 
+                                                 VALUES (?, ?)";
                             $stmtInsertSponsor = $conn->prepare($insertSponsorSql);
-                            $stmtInsertSponsor->bind_param("isss", $eventId, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                            $stmtInsertSponsor->bind_param("is", $eventId, $sponsorName);
+                            // $insertSponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                            //                      VALUES (?, ?, ?, ?)";
+                            // $stmtInsertSponsor = $conn->prepare($insertSponsorSql);
+                            // $stmtInsertSponsor->bind_param("isss", $eventId, $sponsorFirstName, $sponsorMI, $sponsorLastName);
                             $stmtInsertSponsor->execute();
                             $stmtInsertSponsor->close();
                         }
                     }
+
 
                     // Redirect based on success (same as before)
                     if (!empty($cancelReason)) {

@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 );
             }
             // Query to get sponsors for the event
-            $sponsorSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName 
+            $sponsorSql = "SELECT sponsor_Name 
                            FROM pendingsponsor 
                            WHERE event_id = $event_id";
             $sponsorResult = $conn->query($sponsorSql);

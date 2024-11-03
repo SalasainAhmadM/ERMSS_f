@@ -211,15 +211,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($Role == 'superadmin') {
             // Sponsor Insertion logic
             for ($i = 1; $i <= 5; $i++) {
-                $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
-                $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
-                $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
+                $sponsorName = isset($_POST["sponsor{$i}_Name"]) ? $_POST["sponsor{$i}_Name"] : null;
+                // $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
+                // $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
+                // $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
 
-                if ($sponsorFirstName && $sponsorLastName) {
-                    $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
-                               VALUES (?, ?, ?, ?)";
+                if (
+                    $sponsorName
+                    //     $sponsorFirstName
+                    //  && $sponsorLastName
+                ) {
+                    $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_Name) 
+                               VALUES (?, ?)";
                     $sponsorStmt = $conn->prepare($sponsorSql);
-                    $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                    $sponsorStmt->bind_param("is", $newEventID, $sponsorName);
+                    // $sponsorSql = "INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                    // VALUES (?, ?, ?, ?)";
+                    // $sponsorStmt = $conn->prepare($sponsorSql);
+                    // $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
                     $sponsorStmt->execute();
                     $sponsorStmt->close();
                 }
@@ -243,15 +252,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } elseif ($Role == 'Admin') {
             // Sponsor Insertion logic
             for ($i = 1; $i <= 5; $i++) {
-                $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
-                $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
-                $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
+                $sponsorName = isset($_POST["sponsor{$i}_Name"]) ? $_POST["sponsor{$i}_Name"] : null;
+                // $sponsorFirstName = isset($_POST["sponsor{$i}_firstName"]) ? $_POST["sponsor{$i}_firstName"] : null;
+                // $sponsorMI = isset($_POST["sponsor{$i}_MI"]) ? $_POST["sponsor{$i}_MI"] : null;
+                // $sponsorLastName = isset($_POST["sponsor{$i}_lastName"]) ? $_POST["sponsor{$i}_lastName"] : null;
 
-                if ($sponsorFirstName && $sponsorLastName) {
-                    $sponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
-                               VALUES (?, ?, ?, ?)";
+                if (
+                    $sponsorName
+                    // $sponsorFirstName && $sponsorLastName
+                ) {
+                    $sponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_Name) 
+                               VALUES (?,?)";
                     $sponsorStmt = $conn->prepare($sponsorSql);
-                    $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
+                    $sponsorStmt->bind_param("is", $newEventID, $sponsorName);
+                    // $sponsorSql = "INSERT INTO pendingsponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName) 
+                    // VALUES (?, ?, ?, ?)";
+                    // $sponsorStmt = $conn->prepare($sponsorSql);
+                    // $sponsorStmt->bind_param("isss", $newEventID, $sponsorFirstName, $sponsorMI, $sponsorLastName);
                     $sponsorStmt->execute();
                     $sponsorStmt->close();
                 }

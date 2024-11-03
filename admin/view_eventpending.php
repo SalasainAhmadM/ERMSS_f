@@ -60,12 +60,15 @@ if ($eventId) {
         <div class="containerr">
             <h3 class="dashboard">EVENT DETAILS</h3>
             <!-- view event starts-->
+
             <section class="event-details">
 
                 <h1 class="heading">event details</h1>
 
                 <div class="details">
+
                     <div class="event-info">
+
                         <h3><?php echo $_SESSION['event_data']['eventTitle']; ?></h3>
                         <p><i class="fas fa-map-marker-alt"></i> <?php echo $_SESSION['event_data']['eventLocation']; ?>
                         </p>
@@ -107,7 +110,7 @@ if ($eventId) {
                                 <ul>
                                     <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
                                         <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            <li><?php echo $sponsor['sponsor_Name']; ?>
                                             </li>
                                         <?php endforeach; ?>
                                     <?php else: ?>
@@ -129,6 +132,12 @@ if ($eventId) {
                                     <?php endif; ?>
                                 </ul>
                             </div>
+                        </div>
+                        <!-- Back Button -->
+                        <div class="back-button-container">
+                            <a href="./pendingEvents.php" class="back-button">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
                         </div>
                     </div>
 

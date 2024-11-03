@@ -58,72 +58,74 @@ if (isset($eventId)) {
             mysqli_stmt_execute($stmtSponsors);
             $sponsorResult = mysqli_stmt_get_result($stmtSponsors);
 
-            // Prepare the insert statement for sponsors
-            $sqlInsertSponsor = "INSERT INTO sponsor (sponsor_id, event_id, sponsor_firstName, sponsor_MI, sponsor_lastName)
-                                 VALUES (?, ?, ?, ?, ?)";
-            $stmtInsertSponsor = mysqli_prepare($conn, $sqlInsertSponsor);
+            // Only proceed if there are sponsors
+            if (mysqli_num_rows($sponsorResult) > 0) {
+                $sqlInsertSponsor = "INSERT INTO sponsor (sponsor_id, event_id, sponsor_Name)
+                                     VALUES (?, ?, ?)";
+                $stmtInsertSponsor = mysqli_prepare($conn, $sqlInsertSponsor);
 
-            // Loop through all sponsors and insert them into the sponsor table with the next event_id
-            $sponsorCount = 0;
-            while ($sponsorRow = mysqli_fetch_assoc($sponsorResult)) {
-                mysqli_stmt_bind_param(
-                    $stmtInsertSponsor,
-                    "iisss",
-                    $sponsorRow['sponsor_id'],
-                    $nextEventId,
-                    $sponsorRow['sponsor_firstName'],
-                    $sponsorRow['sponsor_MI'],
-                    $sponsorRow['sponsor_lastName']
-                );
-                mysqli_stmt_execute($stmtInsertSponsor);
-                $sponsorCount++;
+                $sponsorCount = 0;
+                while ($sponsorRow = mysqli_fetch_assoc($sponsorResult)) {
+                    mysqli_stmt_bind_param(
+                        $stmtInsertSponsor,
+                        "iis",
+                        $sponsorRow['sponsor_id'],
+                        $nextEventId,
+                        $sponsorRow['sponsor_Name']
+                    );
+                    mysqli_stmt_execute($stmtInsertSponsor);
+                    $sponsorCount++;
 
-                if ($sponsorCount >= 5) {
-                    break; // Limit to 5 sponsors
+                    if ($sponsorCount >= 5) {
+                        break;
+                    }
                 }
+
+                // Delete sponsors from pendingsponsor
+                $sqlDeleteSponsors = "DELETE FROM pendingsponsor WHERE event_id = ?";
+                $stmtDeleteSponsors = mysqli_prepare($conn, $sqlDeleteSponsors);
+                mysqli_stmt_bind_param($stmtDeleteSponsors, "i", $eventId);
+                mysqli_stmt_execute($stmtDeleteSponsors);
             }
 
-            // Delete sponsors from pendingsponsor
-            $sqlDeleteSponsors = "DELETE FROM pendingsponsor WHERE event_id = ?";
-            $stmtDeleteSponsors = mysqli_prepare($conn, $sqlDeleteSponsors);
-            mysqli_stmt_bind_param($stmtDeleteSponsors, "i", $eventId);
-            mysqli_stmt_execute($stmtDeleteSponsors);
-
-            // Speakers
+            // Fetch up to 5 speakers related to this event from pendingspeaker
             $sqlFetchSpeakers = "SELECT * FROM pendingspeaker WHERE event_id = ? LIMIT 5";
             $stmtSpeakers = mysqli_prepare($conn, $sqlFetchSpeakers);
             mysqli_stmt_bind_param($stmtSpeakers, "i", $eventId);
             mysqli_stmt_execute($stmtSpeakers);
             $speakerResult = mysqli_stmt_get_result($stmtSpeakers);
 
-            $sqlInsertSpeaker = "INSERT INTO speaker (speaker_id, event_id, speaker_firstName, speaker_MI, speaker_lastName)
-                                 VALUES (?, ?, ?, ?, ?)";
-            $stmtInsertSpeaker = mysqli_prepare($conn, $sqlInsertSpeaker);
+            // Only proceed if there are speakers
+            if (mysqli_num_rows($speakerResult) > 0) {
+                $sqlInsertSpeaker = "INSERT INTO speaker (speaker_id, event_id, speaker_firstName, speaker_MI, speaker_lastName)
+                                     VALUES (?, ?, ?, ?, ?)";
+                $stmtInsertSpeaker = mysqli_prepare($conn, $sqlInsertSpeaker);
 
-            $speakerCount = 0;
-            while ($speakerRow = mysqli_fetch_assoc($speakerResult)) {
-                mysqli_stmt_bind_param(
-                    $stmtInsertSpeaker,
-                    "iisss",
-                    $speakerRow['speaker_id'],
-                    $nextEventId,
-                    $speakerRow['speaker_firstName'],
-                    $speakerRow['speaker_MI'],
-                    $speakerRow['speaker_lastName']
-                );
-                mysqli_stmt_execute($stmtInsertSpeaker);
-                $speakerCount++;
+                $speakerCount = 0;
+                while ($speakerRow = mysqli_fetch_assoc($speakerResult)) {
+                    mysqli_stmt_bind_param(
+                        $stmtInsertSpeaker,
+                        "iisss",
+                        $speakerRow['speaker_id'],
+                        $nextEventId,
+                        $speakerRow['speaker_firstName'],
+                        $speakerRow['speaker_MI'],
+                        $speakerRow['speaker_lastName']
+                    );
+                    mysqli_stmt_execute($stmtInsertSpeaker);
+                    $speakerCount++;
 
-                if ($speakerCount >= 5) {
-                    break;
+                    if ($speakerCount >= 5) {
+                        break;
+                    }
                 }
-            }
 
-            // Delete the speakers from pendingspeaker
-            $sqlDeleteSpeakers = "DELETE FROM pendingspeaker WHERE event_id = ?";
-            $stmtDeleteSpeakers = mysqli_prepare($conn, $sqlDeleteSpeakers);
-            mysqli_stmt_bind_param($stmtDeleteSpeakers, "i", $eventId);
-            mysqli_stmt_execute($stmtDeleteSpeakers);
+                // Delete the speakers from pendingspeaker
+                $sqlDeleteSpeakers = "DELETE FROM pendingspeaker WHERE event_id = ?";
+                $stmtDeleteSpeakers = mysqli_prepare($conn, $sqlDeleteSpeakers);
+                mysqli_stmt_bind_param($stmtDeleteSpeakers, "i", $eventId);
+                mysqli_stmt_execute($stmtDeleteSpeakers);
+            }
 
             // Now delete the event from pendingevents
             $sqlDeleteEvent = "DELETE FROM pendingevents WHERE event_id = ?";

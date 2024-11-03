@@ -15,7 +15,7 @@ while ($row = $speakersResult->fetch_assoc()) {
 }
 $speakersStmt->close();
 // Fetch sponsors for the event
-$sponsorsSql = "SELECT sponsor_firstName, sponsor_MI, sponsor_lastName FROM sponsor WHERE event_id = ?";
+$sponsorsSql = "SELECT sponsor_Name FROM sponsor WHERE event_id = ?";
 $sponsorsStmt = $conn->prepare($sponsorsSql);
 $sponsorsStmt->bind_param("i", $eventId);
 $sponsorsStmt->execute();
@@ -134,7 +134,7 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                                 <ul>
                                     <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
                                         <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            <li><?php echo $sponsor['sponsor_Name']; ?>
                                             </li>
                                         <?php endforeach; ?>
                                     <?php else: ?>
@@ -157,6 +157,7 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                                 </ul>
                             </div>
                         </div>
+
                     </div>
 
                     <style>
@@ -218,7 +219,12 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                         </div>
 
                     </div>
-
+                    <!-- Back Button -->
+                    <div class="back-button-container">
+                        <a href="./landingPage.php" class="back-button">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
                 </div>
 
             </section>

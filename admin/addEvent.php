@@ -24,10 +24,14 @@ include('../function/F.addEvent.php');
     <link rel="stylesheet" href="css/main.css">
 </head>
 <style>
-    .sponsorRow,
+    /* .sponsorRow, */
     .speakerRow {
         display: flex;
         gap: 3px;
+    }
+
+    .sponsor_Row {
+        width: 100%;
     }
 
     .sponsor_firstName,
@@ -405,67 +409,87 @@ include('../function/F.addEvent.php');
                     <div class="sponsor_fields_container">
                         <div class="input_field" id="sponsorField1" style="display:none;">
                             <label>Sponsor 1</label>
-                            <div class="sponsorRow">
+                            <input type="text" class="input sponsor_Name" name="sponsor1_Name"
+                                placeholder="Sponsor Name">
+                            <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(1)"
+                                title="Delete Sponsor"></i>
+                            <!-- <div class="sponsorRow">
+
                                 <input type="text" class="input sponsor_firstName" name="sponsor1_firstName"
                                     placeholder="First Name">
                                 <input type="text" class="input sponsor_MI" name="sponsor1_MI" placeholder="MI">
                                 <input type="text" class="input sponsor_lastName" name="sponsor1_lastName"
                                     placeholder="Last Name">
-                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(1)"
-                                    title="Delete Sponsor"></i>
-                            </div>
+
+                              
+                            </div> -->
                         </div>
 
                         <div class="input_field" id="sponsorField2" style="display:none;">
                             <label>Sponsor 2</label>
-                            <div class="sponsorRow">
+                            <input type="text" class="input sponsor_Name" name="sponsor2_Name"
+                                placeholder="Sponsor Name">
+                            <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(2)"
+                                title="Delete Sponsor"></i>
+                            <!-- <div class="sponsorRow">
+
                                 <input type="text" class="input sponsor_firstName" name="sponsor2_firstName"
                                     placeholder="First Name">
                                 <input type="text" class="input sponsor_MI" name="sponsor2_MI" placeholder="MI">
                                 <input type="text" class="input sponsor_lastName" name="sponsor2_lastName"
                                     placeholder="Last Name">
-                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(2)"
-                                    title="Delete Sponsor"></i>
-                            </div>
+                               
+                            </div> -->
                         </div>
 
                         <div class="input_field" id="sponsorField3" style="display:none;">
                             <label>Sponsor 3</label>
-                            <div class="sponsorRow">
+                            <input type="text" class="input sponsor_Name" name="sponsor3_Name"
+                                placeholder="Sponsor Name">
+                            <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(3)"
+                                title="Delete Sponsor"></i>
+                            <!-- <div class="sponsorRow">
+
                                 <input type="text" class="input sponsor_firstName" name="sponsor3_firstName"
                                     placeholder="First Name">
                                 <input type="text" class="input sponsor_MI" name="sponsor3_MI" placeholder="MI">
                                 <input type="text" class="input sponsor_lastName" name="sponsor3_lastName"
                                     placeholder="Last Name">
-                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(3)"
-                                    title="Delete Sponsor"></i>
-                            </div>
+                                
+                            </div> -->
                         </div>
 
                         <div class="input_field" id="sponsorField4" style="display:none;">
                             <label>Sponsor 4</label>
-                            <div class="sponsorRow">
+                            <input type="text" class="input sponsor_Name" name="sponsor4_Name"
+                                placeholder="Sponsor Name">
+                            <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(4)"
+                                title="Delete Sponsor"></i>
+                            <!-- <div class="sponsorRow">
+
                                 <input type="text" class="input sponsor_firstName" name="sponsor4_firstName"
                                     placeholder="First Name">
                                 <input type="text" class="input sponsor_MI" name="sponsor4_MI" placeholder="MI">
                                 <input type="text" class="input sponsor_lastName" name="sponsor4_lastName"
                                     placeholder="Last Name">
-                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(4)"
-                                    title="Delete Sponsor"></i>
-                            </div>
+                                
+                            </div> -->
                         </div>
 
                         <div class="input_field" id="sponsorField5" style="display:none;">
                             <label>Sponsor 5</label>
-                            <div class="sponsorRow">
+                            <input type="text" class="input sponsor_Name" name="sponsor5_Name"
+                                placeholder="Sponsor Name">
+                            <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(5)"
+                                title="Delete Sponsor"></i>
+                            <!-- <div class="sponsorRow">
                                 <input type="text" class="input sponsor_firstName" name="sponsor5_firstName"
                                     placeholder="First Name">
                                 <input type="text" class="input sponsor_MI" name="sponsor5_MI" placeholder="MI">
                                 <input type="text" class="input sponsor_lastName" name="sponsor5_lastName"
                                     placeholder="Last Name">
-                                <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(5)"
-                                    title="Delete Sponsor"></i>
-                            </div>
+                                
+                            </div> -->
                         </div>
                     </div>
 

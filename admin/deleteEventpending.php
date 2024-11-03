@@ -39,6 +39,17 @@ if (isset($_GET['event_id'])) {
         }
         $stmt->close();
     }
+    // Delete pending speakers
+    $deletePendingSpeakersSql = "DELETE FROM pendingspeaker WHERE event_id = ?";
+    if ($stmt = $conn->prepare($deletePendingSpeakersSql)) {
+        $stmt->bind_param("i", $eventId);
+        if (!$stmt->execute()) {
+            $_SESSION['error'] = 'Error deleting pending speakers!';
+            redirectBasedOnRole($conn);
+            exit;
+        }
+        $stmt->close();
+    }
     // Delete cancel_reason
     $deleteCancelReasonSql = "DELETE FROM cancel_reason WHERE event_id = ?";
     if ($stmt = $conn->prepare($deleteCancelReasonSql)) {

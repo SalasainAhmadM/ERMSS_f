@@ -408,13 +408,15 @@ include('../function/F.editEvent2.php');
                         for ($i = 0; $i < $maxSponsors; $i++) {
                             // Check if there's a sponsor at the current index
                             if (isset($sponsors[$i])) {
-                                $sponsorFirstName = $sponsors[$i]['sponsor_firstName'];
-                                $sponsorMI = $sponsors[$i]['sponsor_MI'];
-                                $sponsorLastName = $sponsors[$i]['sponsor_lastName'];
+                                $sponsorName = $sponsors[$i]['sponsor_Name'];
+                                // $sponsorFirstName = $sponsors[$i]['sponsor_firstName'];
+                                // $sponsorMI = $sponsors[$i]['sponsor_MI'];
+                                // $sponsorLastName = $sponsors[$i]['sponsor_lastName'];
                             } else {
-                                $sponsorFirstName = '';
-                                $sponsorMI = '';
-                                $sponsorLastName = '';
+                                $sponsorName = '';
+                                // $sponsorFirstName = '';
+                                // $sponsorMI = '';
+                                // $sponsorLastName = '';
                             }
 
                             // Only show the field if there's data or if we're below the number of sponsors
@@ -423,14 +425,16 @@ include('../function/F.editEvent2.php');
                             <div class="input_field sponsor_row" id="sponsorField<?= $i + 1 ?>"
                                 style="display: <?= $displayStyle ?>;">
                                 <label>Sponsor <?= $i + 1 ?></label>
-                                <div class="sponsorRow">
+                                <input type="text" class="input sponsor_Name" name="sponsor<?= $i + 1 ?>_Name"
+                                    placeholder="Sponsor Name" value="<?= $sponsorName ?>">
+                                <!-- <div class="sponsorRow">
                                     <input type="text" class="input sponsor_firstName" name="sponsor<?= $i + 1 ?>_firstName"
                                         placeholder="First Name" value="<?= $sponsorFirstName ?>">
                                     <input type="text" class="input sponsor_MI" name="sponsor<?= $i + 1 ?>_MI"
                                         placeholder="MI" value="<?= $sponsorMI ?>">
                                     <input type="text" class="input sponsor_lastName" name="sponsor<?= $i + 1 ?>_lastName"
                                         placeholder="Last Name" value="<?= $sponsorLastName ?>">
-                                </div>
+                                </div> -->
                                 <i class="fas fa-trash-alt deleteSponsorIcon" onclick="deleteSponsorField(<?= $i + 1 ?>)"
                                     title="Delete Sponsor"></i>
                             </div>
