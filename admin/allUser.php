@@ -271,7 +271,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                                         data-affiliation="<?php echo $user['Affiliation']; ?>"
                                         data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
                                         data-contact="<?php echo $user['ContactNo']; ?>"
-                                        data-position="<?php echo $user['Position']; ?>"
+                                        data-position="<?php echo $user['Position']; ?>" 
+                                        data-role="<?php echo $user['Role']; ?>"
                                         onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
 
 
@@ -309,7 +310,23 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
             const educationalAttainment = document.querySelector(`button[data-userid="${userId}"]`).dataset.educationalattainment;
             const contact = document.querySelector(`button[data-userid="${userId}"]`).dataset.contact;
             const position = document.querySelector(`button[data-userid="${userId}"]`).dataset.position;
-            const image = document.querySelector(`button[data-userid="${userId}"]`).dataset.image;  // User's profile image
+            const role = document.querySelector(`button[data-userid="${userId}"]`).dataset.role;
+            const image = document.querySelector(`button[data-userid="${userId}"]`).dataset.image;  
+
+            // for admin only
+            const ageInput = role === 'Admin' 
+            ? '' 
+            : `
+                <label>Age:</label>
+                <input type="number" id="editAge" value="${age}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+            `;
+
+            const ageDisplay = role === 'Admin' 
+            ? '' 
+            : `
+                <strong>Age:</strong> ${age} <br/>
+            `;
+            // ----------
 
             Swal.fire({
                 title: 'User Profile',
@@ -323,10 +340,10 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
                 <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
                 <strong>Name:</strong> ${fullName} <br/>
-                <strong>Age:</strong> ${age} <br/>
+
                 <strong>Gender:</strong> ${gender} <br/>
                 <strong>Educational Attainment:</strong> ${educationalAttainment} <br/><br/>
-                
+                ${ageDisplay}
                 <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
                 <strong>Email:</strong> ${email} <br/>
                 <strong>Contact:</strong> ${contact} <br/><br/>
@@ -334,6 +351,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                 <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
                 <strong>Affiliation:</strong> ${affiliation} <br/>
                 <strong>Occupation:</strong> ${position} <br/><br/>
+                <strong>Role:</strong> ${role} <br/><br/>
 
                 <button id="editProfileButton" style="background-color: #28a745; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">Edit Profile</button>
             </div>
@@ -362,12 +380,14 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
                         <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
                     </select>
-                    <label>Age:</label>
-                    <input type="number" id="editAge" value="${age}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    ${ageInput}
                     <label>Contact:</label>
                     <input type="text" id="editContact" value="${contact}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
                     <label>Position:</label>
                     <input type="text" id="editPosition" value="${position}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <label>Role:</label>
+                    <input type="text" id="editPosition" value="${role}" style="pointer-events: none;width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    
                     <label>Profile Photo:</label>
                     <input type="file" id="editProfilePhoto" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
                 </div>
@@ -386,20 +406,25 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                             email: document.getElementById('editEmail').value,
                             affiliation: document.getElementById('editAffiliation').value,
                             gender: document.getElementById('editGender').value,
-                            age: document.getElementById('editAge').value,
                             contact: document.getElementById('editContact').value,
                             position: document.getElementById('editPosition').value,
                             image: document.getElementById('editProfilePhoto').files[0]
                         };
+
+                        if (role !== 'Admin') {
+                            updatedUser.age = document.getElementById('editAge').value;
+                        }
 
                         const formData = new FormData();
                         for (const key in updatedUser) {
                             formData.append(key, updatedUser[key]);
                         }
 
-                        fetch('updateUser.php', {
+                        const endpoint = role === 'Admin' ? 'updateAdmin.php' : 'updateUser.php'; // Update database..
+
+                        fetch(endpoint, {
                             method: 'POST',
-                            body: formData // Send FormData
+                            body: formData 
                         })
                             .then(response => response.json())
                             .then(data => {
@@ -427,7 +452,14 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                             })
                             .catch(error => {
                                 console.error('Error updating user:', error);
-                                Swal.fire('Error!', 'An error occurred while updating the profile.', 'error');
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error database!.',
+                                        icon: 'error',
+                                        customClass: {
+                                            popup: 'larger-swal'
+                                        },
+                                    });
                             });
                     }
                 });
@@ -574,10 +606,9 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
         actionButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const userId = this.dataset.userid; // Get the user ID from the button's data attribute
-                const eventId = <?php echo $eventId; ?>; // Get the event ID from PHP variable
+                const userId = this.dataset.userid; 
+                const eventId = <?php echo $eventId; ?>; 
 
-                // Send the user ID and event ID to the server
                 fetch('addParticipant.php', {
                     method: 'POST',
                     headers: {
@@ -590,7 +621,6 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                 })
                     .then(response => {
                         if (response.ok) {
-                            // Reload the page after successful addition of participant
                             window.location.reload();
                         } else {
                             console.error('Failed to add participant');
@@ -632,7 +662,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 <script>
     function confirmDeleteEventAdmin(userId) {
         Swal.fire({
-            title: 'Delete User?',
+            title: 'Delete Admin?',
             text: 'Are you sure you want to delete this admin?',
             icon: 'warning',
             showCancelButton: true,
