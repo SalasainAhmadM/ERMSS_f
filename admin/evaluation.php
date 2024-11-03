@@ -46,6 +46,15 @@ $eventDatesRow = $eventDatesResult->fetch_assoc();
 $dateStart = $eventDatesRow['date_start'];
 $dateEnd = $eventDatesRow['date_end'];
 
+// Fetch and display evaluation data for participants
+$evaluationSql = "SELECT e.evaluation_id, e.participant_id, e.event_id, e.status, e.remarks
+                  FROM evaluation e
+                  INNER JOIN eventParticipants ep ON e.participant_id = ep.participant_id
+                  WHERE e.event_id = ?";
+$evaluationStmt = $conn->prepare($evaluationSql);
+$evaluationStmt->bind_param("i", $eventId);
+$evaluationStmt->execute();
+$evaluationResult = $evaluationStmt->get_result();
 // Generate all the dates between date_start and date_end
 function generateDateRange($startDate, $endDate)
 {
@@ -249,7 +258,38 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
             </script>
         </ul>
     </div>
+    <style>
+        .parent-evaluation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
 
+        .aButton {
+            background-color: #ff4d4d;
+            color: white;
+            border: 1px solid #cc0000;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0px 8px 16px rgba(204, 0, 0, 0.2);
+        }
+
+        .aButton:hover {
+            background-color: #cc0000;
+            transform: scale(1.05);
+        }
+
+        .aButton:active {
+            background-color: #990000;
+            transform: scale(0.98);
+        }
+    </style>
     <div class="main-content">
         <div class="attendance">
             <div class="attendance_header">
@@ -263,39 +303,26 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
 
             </div>
 
+            <!-- <section class="category">
 
-            <style>
-                .parent-evaluation {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100%;
-                    padding: 20px;
-                }
+                <div class="box-container">
 
-                .aButton {
-                    background-color: #ff4d4d;
-                    color: white;
-                    border: 1px solid #cc0000;
-                    padding: 12px 24px;
-                    font-size: 18px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    text-transform: uppercase;
-                    transition: background-color 0.3s, transform 0.2s;
-                    box-shadow: 0px 8px 16px rgba(204, 0, 0, 0.2);
-                }
+                    <a href="evaluation.php?eventTitle=<?php echo urlencode($eventTitle); ?>" class="box"
+                        id="viewEvaluation" onclick="clearSelectedDate()">
+                        <i class="fa-solid fa-clipboard"></i>
+                        <div>
+                            <h3>Remarks</h3>
+                            <span></span>
+                        </div>
+                    </a>
 
-                .aButton:hover {
-                    background-color: #cc0000;
-                    transform: scale(1.05);
-                }
 
-                .aButton:active {
-                    background-color: #990000;
-                    transform: scale(0.98);
-                }
-            </style>
+
+
+
+                </div>
+            </section> -->
+
             <div class="parent-evaluation">
                 <button class="aButton" onclick="navigateToAttendance()">Back to Attendance</button>
             </div>
@@ -311,10 +338,11 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                         <li>
                             <div class="item">
                                 <div class="name"><span>Full Name</span></div>
-                                <div class="department"><span>Affiliation</span></div>
-                                <div class="department"><span>Position</span></div>
                                 <div class="info"><span>Email</span></div>
-                                <div class="phone"><span>Phone#</span></div>
+                                <div class="phone"><span>Contact</span></div>
+                                <div class="department"><span>Date Evaluated</span></div>
+                                <div class="department"><span>Status</span></div>
+                                <div class="department"><span>Remarks</span></div>
                                 <div class="status"><span>Action</span></div>
                             </div>
                         </li>
@@ -325,17 +353,23 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                     <?php
                     $selectedDate = isset($_GET['selectedDate']) ? $_GET['selectedDate'] : '';
 
-                    $sql = "SELECT user.FirstName, user.MI, user.LastName, user.Affiliation, 
-                   user.Position, user.Email, user.ContactNo, 
-                   eventParticipants.participant_id, eventParticipants.event_id,
-                   attendance.status
-            FROM eventParticipants
-            INNER JOIN user ON eventParticipants.UserID = user.UserID
-            LEFT JOIN attendance ON eventParticipants.participant_id = attendance.participant_id 
-                                  AND eventParticipants.event_id = attendance.event_id 
-                                  AND attendance.attendance_date = ?
-            WHERE eventParticipants.event_id = 
-                  (SELECT event_id FROM Events WHERE event_title = ?)";
+                    // Modify the query to join with the evaluation table
+                    $sql = "SELECT 
+user.FirstName, user.MI, user.LastName, user.Affiliation, 
+user.Position, user.Email, user.ContactNo, 
+eventParticipants.participant_id, eventParticipants.event_id,
+attendance.status AS attendance_status,
+evaluation.evaluation_date, evaluation.status AS evaluation_status, 
+evaluation.remarks
+FROM eventParticipants
+INNER JOIN user ON eventParticipants.UserID = user.UserID
+LEFT JOIN attendance ON eventParticipants.participant_id = attendance.participant_id 
+                  AND eventParticipants.event_id = attendance.event_id 
+                  AND attendance.attendance_date = ?
+LEFT JOIN evaluation ON eventParticipants.participant_id = evaluation.participant_id 
+                  AND eventParticipants.event_id = evaluation.event_id
+WHERE eventParticipants.event_id = 
+  (SELECT event_id FROM Events WHERE event_title = ?)";
 
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("ss", $selectedDate, $eventTitle);  // Bind the date and event title
@@ -349,19 +383,24 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             $MI = htmlspecialchars($row['MI']);
                             $lastName = htmlspecialchars($row['LastName']);
                             $fullName = $firstName . ' ' . $MI . ' ' . $lastName;
-                            $affiliation = htmlspecialchars($row['Affiliation']);
-                            $position = htmlspecialchars($row['Position']);
                             $email = htmlspecialchars($row['Email']);
                             $contactNo = htmlspecialchars($row['ContactNo']);
-                            $status = htmlspecialchars($row['status']) ?: 'Not Marked';  // Handle NULL status
+                            $attendanceStatus = htmlspecialchars($row['attendance_status']) ?: 'Not Marked';
+
+                            // Check for evaluation date, status, and remarks, use 'N/A' if not available
+                            $evaluationDate = isset($row['evaluation_date']) ? htmlspecialchars($row['evaluation_date']) : 'N/A';
+                            $evaluationStatus = isset($row['evaluation_status']) ? htmlspecialchars($row['evaluation_status']) : 'N/A';
+                            $remarks = isset($row['remarks']) ? htmlspecialchars($row['remarks']) : 'N/A';
+
                             ?>
                             <li class="participant_item">
                                 <div class="item">
                                     <div class="name"><span><?php echo $fullName; ?></span></div>
-                                    <div class="department"><span><?php echo $affiliation; ?></span></div>
-                                    <div class="department"><span><?php echo $position; ?></span></div>
                                     <div class="info"><span><?php echo $email; ?></span></div>
                                     <div class="phone"><span><?php echo $contactNo; ?></span></div>
+                                    <div class="department"><span><?php echo $evaluationDate; ?></span></div>
+                                    <div class="department"><span><?php echo $evaluationStatus; ?></span></div>
+                                    <div class="department"><span><?php echo $remarks; ?></span></div>
                                     <div class="status">
                                         <input type="hidden" name="participant_id"
                                             value="<?php echo $row['participant_id']; ?>">
@@ -372,11 +411,6 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                                 class="attendance-btn">
                                                 <i class='fa-solid fa-clipboard-check'></i>
                                             </button>
-                                            <!-- <button type="button"
-                                                onclick="editAttendance('<?php echo $row['participant_id']; ?>', '<?php echo $row['event_id']; ?>', '<?php echo $fullName; ?>', '<?php echo $eventTitle; ?>')"
-                                                class="attendance-btn">
-                                                <i class='fa-solid fa-clipboard-check'></i>
-                                            </button> -->
                                         </div>
                                     </div>
                                 </div>
@@ -386,9 +420,10 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                         echo "</ul>";
                     } else {
                         echo "<div class='no-participants-container'>
-                <p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participants found for the specified event.</p>
-              </div>";
+<p class='no-participants-message'><i class='fas fa-exclamation-circle'></i> No participants found for the specified event.</p>
+</div>";
                     }
+
                     ?>
                 </div>
 
@@ -399,12 +434,60 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             .then(response => response.json())
                             .then(data => {
                                 if (data.exists) {
-                                    // If evaluation already recorded, show error message
+                                    // Show options if evaluation already recorded
                                     Swal.fire({
                                         title: 'Evaluation Recorded Already!',
                                         text: `An evaluation record for ${fullName} in ${eventName} already exists.`,
                                         icon: 'error',
-                                        confirmButtonText: 'Okay'
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Okay',
+                                        cancelButtonText: 'Edit?',
+                                    }).then((result) => {
+                                        if (result.isDismissed) { // If "Edit?" is selected
+                                            // Check current status of evaluation
+                                            fetch(`get_evaluation_status.php?participant_id=${participantId}&event_id=${eventId}`)
+                                                .then(response => response.json())
+                                                .then(statusData => {
+                                                    if (statusData.status === 'approved') {
+                                                        // Prompt to switch from "approved" to "declined"
+                                                        Swal.fire({
+                                                            title: 'Already Approved!',
+                                                            text: 'Would you like to change the status to "Declined"?',
+                                                            icon: 'question',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Decline',
+                                                            cancelButtonText: 'Cancel'
+                                                        }).then((confirmResult) => {
+                                                            if (confirmResult.isConfirmed) {
+                                                                updateEvaluationStatus(participantId, eventId, 'declined');
+                                                            }
+                                                        });
+                                                    } else if (statusData.status === 'declined') {
+                                                        // Prompt to switch from "declined" to "approved"
+                                                        Swal.fire({
+                                                            title: 'Already Declined!',
+                                                            text: 'Would you like to change the status to "Approved"?',
+                                                            icon: 'question',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Approve',
+                                                            cancelButtonText: 'Cancel'
+                                                        }).then((confirmResult) => {
+                                                            if (confirmResult.isConfirmed) {
+                                                                updateEvaluationStatus(participantId, eventId, 'approved');
+                                                            }
+                                                        });
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        text: 'Could not retrieve evaluation status. Please try again later.',
+                                                        icon: 'error',
+                                                        confirmButtonText: 'Okay'
+                                                    });
+                                                    console.error('Status check error:', error);
+                                                });
+                                        }
                                     });
                                 } else {
                                     // Proceed with fetching attendance if no evaluation record exists
@@ -546,7 +629,47 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                             });
                     }
 
-
+                    // Function to update the evaluation status in the database
+                    function updateEvaluationStatus(participantId, eventId, newStatus) {
+                        fetch('update_evaluation_status.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                participant_id: participantId,
+                                event_id: eventId,
+                                status: newStatus,
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    Swal.fire({
+                                        title: 'Status Updated!',
+                                        text: `The evaluation status has been updated to "${newStatus}".`,
+                                        icon: 'success',
+                                        confirmButtonText: 'Okay'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: 'Failed to update evaluation status. Please try again.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Okay'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'An unexpected error occurred while updating evaluation status.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Okay'
+                                });
+                                console.error('Error updating evaluation status:', error);
+                            });
+                    }
                     function saveEvaluation(participantId, eventId, status, remarks) {
                         fetch('save_evaluation.php', {
                             method: 'POST',

@@ -224,14 +224,24 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                 <div class="table_header">
                     <div class="select-container" style="position: relative; display: inline-block;">
                         <select id="userDropdown" onchange="filterByUserType()" style="width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; 
-                            background-color: #f9f9f9; color: #333; font-size: 16px; cursor: pointer; 
-                            transition: border-color 0.3s ease; -webkit-appearance: none; 
-                            -moz-appearance: none; appearance: none;">
-                            <option value="all" selected>All Users</option>
-                            <option value="user">User</option>
+        background-color: #f9f9f9; color: #333; font-size: 16px; cursor: pointer; 
+        transition: border-color 0.3s ease; -webkit-appearance: none; 
+        -moz-appearance: none; appearance: none;">
+                            <option value="all" selected>Users</option>
                             <option value="admin">Admins</option>
                         </select>
                     </div>
+
+                    <script>
+                        function filterByUserType() {
+                            var userType = document.getElementById("userDropdown").value;
+
+                            if (userType === "superadmin") {
+                                window.location.href = "allAdmin.php";
+                            }
+                        }
+                    </script>
+
 
 
                     <div>
@@ -253,36 +263,42 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         </thead>
                         <tbody>
                             <?php foreach ($allUsersAndAdmins as $user): ?>
-                                <tr data-user-type="<?php echo $user['userType']; ?>">
-                                    <td><?php echo $user['UserID']; ?></td>
-                                    <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
-                                    <td><?php echo $user['Email']; ?></td>
-                                    <td><?php echo $user['Affiliation']; ?></td>
-                                    <td><?php echo $user['Role']; ?></td>
-                                    <td>
-                                        <button class="action-button" data-userid="<?php echo $user['UserID']; ?>"
-                                            data-fullname="<?php echo $user['FirstName'] . ' ' . $user['LastName']; ?>"
-                                            data-email="<?php echo $user['Email']; ?>" 
-                                            data-image="<?php echo $user['Image']; ?>"
-                                            data-gender="<?php echo $user['Gender']; ?>"
-                                            data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
-                                            data-affiliation="<?php echo $user['Affiliation']; ?>"
-                                            data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
-                                            data-contact="<?php echo $user['ContactNo']; ?>"
-                                            data-position="<?php echo $user['Position']; ?>"
-                                            data-role="<?php echo $user['Role']; ?>" 
-                                            onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
+                                <?php if ($user['Role'] !== 'superadmin'): ?> <!-- Check if role is not superadmin -->
+                                    <tr data-user-type="<?php echo $user['userType']; ?>">
+                                        <td><?php echo $user['UserID']; ?></td>
+                                        <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
+                                        <td><?php echo $user['Email']; ?></td>
+                                        <td><?php echo $user['Affiliation']; ?></td>
+                                        <td><?php echo $user['Role']; ?></td>
+                                        <td>
+                                            <button class="action-button"
+                                                data-userid="<?php echo $user['userType'] . '_' . $user['UserID']; ?>"
+                                                data-fullname="<?php echo $user['FirstName'] . ' ' . $user['LastName']; ?>"
+                                                data-email="<?php echo $user['Email']; ?>"
+                                                data-image="<?php echo $user['Image']; ?>"
+                                                data-gender="<?php echo $user['Gender']; ?>"
+                                                data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
+                                                data-affiliation="<?php echo $user['Affiliation']; ?>"
+                                                data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
+                                                data-contact="<?php echo $user['ContactNo']; ?>"
+                                                data-position="<?php echo $user['Position']; ?>"
+                                                data-role="<?php echo $user['Role']; ?>"
+                                                onclick="showUserProfile('<?php echo $user['userType'] . '_' . $user['UserID']; ?>')">View
+                                                Profile</button>
 
-                                        <?php if ($_SESSION['Role'] === 'superadmin'): ?>
-                                            <button class="btn_delete"
-                                                onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
+                                            <?php if ($_SESSION['Role'] === 'superadmin'): ?>
+                                                <button class="btn_delete"
+                                                    onclick="confirmDeleteEvent('<?php echo $user['userType'] . '_' . $user['UserID']; ?>')">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </tbody>
+
 
                     </table>
                 </div>
@@ -293,81 +309,85 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
 
     <script>
-    function showUserProfile(userId) {
-        const button = document.querySelector(`button[data-userid="${userId}"]`);
-        const fullName = button.dataset.fullname;
-        const email = button.dataset.email;
-        const affiliation = button.dataset.affiliation;
-        const gender = button.dataset.gender;
-        const age = button.dataset.age;
-        const educationalAttainment = button.dataset.educationalattainment;
-        const contact = button.dataset.contact;
-        const position = button.dataset.position;
-        const role = button.dataset.role;
-        const image = button.dataset.image;
+        function showUserProfile(userId) {
+            const button = document.querySelector(`button[data-userid="${userId}"]`);
+            const fullName = button.dataset.fullname;
+            const email = button.dataset.email;
+            const affiliation = button.dataset.affiliation;
+            const gender = button.dataset.gender;
+            const age = button.dataset.age;
+            const educationalAttainment = button.dataset.educationalattainment;
+            const contact = button.dataset.contact;
+            const position = button.dataset.position;
+            const role = button.dataset.role;
+            const image = button.dataset.image;
 
-        Swal.fire({
-            title: 'User Profile',
-            html: `
-                <div style="text-align: left; padding:2rem;">
-                    <div style="text-align: center; margin-bottom: 1rem;">
-                        <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
-                             alt="Profile Image" 
-                             style="width: 100px; height: 100px; border-radius: 50%;">
-                    </div>
-
-                    <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
-                    <strong>Name:</strong> ${fullName} <br/>
-                    <strong>Age:</strong> ${age} <br/>
-                    <strong>Gender:</strong> ${gender} <br/>
-                    <strong>Educational Attainment:</strong> ${educationalAttainment} <br/><br/>
-                    
-                    <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
-                    <strong>Email:</strong> ${email} <br/>
-                    <strong>Contact:</strong> ${contact} <br/><br/>
-                    
-                    <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
-                    <strong>Affiliation:</strong> ${affiliation} <br/>
-                    <strong>Occupation:</strong> ${position} <br/><br/>
-                    <strong>Role:</strong> ${role} <br/><br/>
-
-                    <button id="editProfileButton" style="background-color: #28a745; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">Edit Profile</button>
+            Swal.fire({
+                title: 'User Profile',
+                html: `
+            <div style="text-align: left; padding:2rem;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="${image ? '../assets/img/profilePhoto/' + image : '../assets/img/profile.jpg'}" 
+                         alt="Profile Image" 
+                         style="width: 100px; height: 100px; border-radius: 50%;">
                 </div>
-            `,
-            showCancelButton: true,
-            cancelButtonText: 'Close',
-            customClass: {
-                popup: 'larger-swal'
-            },
-        });
 
-        document.getElementById('editProfileButton').addEventListener('click', function () {
+                <strong><h3 style="margin-bottom: 0.25rem; margin-top: 4rem">Personal Info:</h3></strong>
+                <strong>Name:</strong> ${fullName} <br/>
+                ${role !== 'Admin' ? `<strong>Age:</strong> ${age} <br/>` : ''}
+                <strong>Gender:</strong> ${gender} <br/>
+                <strong>Educational Attainment:</strong> ${educationalAttainment} <br/><br/>
+                
+                <strong><h3 style="margin-bottom: 0.25rem;">Contact Info:</h3></strong>
+                <strong>Email:</strong> ${email} <br/>
+                <strong>Contact:</strong> ${contact} <br/><br/>
+                
+                <strong><h3 style="margin-bottom: 0.25rem;">Profile Details:</h3></strong>
+                <strong>Affiliation:</strong> ${affiliation} <br/>
+                <strong>Occupation:</strong> ${position} <br/><br/>
+                <strong>Role:</strong> ${role} <br/><br/>
+
+                <button id="editProfileButton" style="background-color: #28a745; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">Edit Profile</button>
+            </div>
+        `,
+                showCancelButton: true,
+                cancelButtonText: 'Close',
+                customClass: {
+                    popup: 'larger-swal'
+                },
+            });
+
+            document.getElementById('editProfileButton').addEventListener('click', function () {
+                editUserProfile(userId, fullName, email, affiliation, gender, age, educationalAttainment, contact, position, role);
+            });
+        }
+
+        function editUserProfile(userId, fullName, email, affiliation, gender, age, educationalAttainment, contact, position, role) {
             Swal.fire({
                 title: 'Edit User Profile',
                 html: `
-                    <div style="text-align: left; padding: 2.5rem; font-size:2rem;">
-                        <label>Name:</label>
-                        <input type="text" id="editName" value="${fullName}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Email:</label>
-                        <input type="email" id="editEmail" value="${email}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Affiliation:</label>
-                        <input type="text" id="editAffiliation" value="${affiliation}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Gender:</label>
-                        <select id="editGender" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                            <option value="Male" ${gender === 'Male' ? 'selected' : ''}>Male</option>
-                            <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
-                            <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
-                        </select>
-                        <label>Age:</label>
-                        <input type="number" id="editAge" value="${age}" ${role === 'Admin' ? 'disabled' : ''} style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Contact:</label>
-                        <input type="text" id="editContact" value="${contact}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Position:</label>
-                        <input type="text" id="editPosition" value="${position}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                        <label>Profile Photo:</label>
-                        <input type="file" id="editProfilePhoto" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
-                    </div>
-                `,
+            <div style="text-align: left; padding: 2.5rem; font-size:2rem;">
+                <label>Name:</label>
+                <input type="text" id="editName" value="${fullName}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                <label>Email:</label>
+                <input type="email" id="editEmail" value="${email}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                <label>Affiliation:</label>
+                <input type="text" id="editAffiliation" value="${affiliation}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                <label>Gender:</label>
+                <select id="editGender" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                    <option value="Male" ${gender === 'Male' ? 'selected' : ''}>Male</option>
+                    <option value="Female" ${gender === 'Female' ? 'selected' : ''}>Female</option>
+                    <option value="Other" ${gender === 'Other' ? 'selected' : ''}>Other</option>
+                </select>
+                ${role !== 'Admin' ? `<label>Age:</label><input type="number" id="editAge" value="${age}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">` : ''}
+                <label>Contact:</label>
+                <input type="text" id="editContact" value="${contact}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                <label>Position:</label>
+                <input type="text" id="editPosition" value="${position}" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+                <label>Profile Photo:</label>
+                <input type="file" id="editProfilePhoto" style="width: 100%; margin-bottom: 1rem; font-size:1.6rem;">
+            </div>
+        `,
                 showCancelButton: true,
                 confirmButtonText: 'Save',
                 cancelButtonText: 'Cancel',
@@ -387,7 +407,6 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         image: document.getElementById('editProfilePhoto').files[0]
                     };
 
-                    // only include age if role is not 'Admin'
                     if (role !== 'Admin') {
                         updatedUser.age = document.getElementById('editAge').value;
                     }
@@ -430,19 +449,20 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         .catch(error => {
                             console.error('Error updating user:', error);
                             Swal.fire({
-                                    title: 'Error!',
-                                    text: 'An error occurred while updating the profile.',
-                                    icon: 'error',
-                                    customClass: {
-                                        popup: 'larger-swal'
-                                    },
-                                });
+                                title: 'Error!',
+                                text: 'An error occurred while updating the profile.',
+                                icon: 'error',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                },
+                            });
                         });
                 }
             });
-        });
-    }
-</script>
+        }
+
+
+    </script>
 
 
 

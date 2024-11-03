@@ -385,7 +385,7 @@ function hasCanceledEvent($conn, $eventId, $UserID)
                                 <ul>
                                     <?php if (!empty($_SESSION['event_data']['sponsors'])): ?>
                                         <?php foreach ($_SESSION['event_data']['sponsors'] as $sponsor): ?>
-                                            <li><?php echo $sponsor['sponsor_firstName'] . ' ' . $sponsor['sponsor_MI'] . ' ' . $sponsor['sponsor_lastName']; ?>
+                                            <li><?php echo $sponsor['sponsor_Name']; ?>
                                             </li>
                                         <?php endforeach; ?>
                                     <?php else: ?>
