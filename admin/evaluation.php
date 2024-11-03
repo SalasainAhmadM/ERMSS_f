@@ -670,6 +670,7 @@ WHERE eventParticipants.event_id =
                                 console.error('Error updating evaluation status:', error);
                             });
                     }
+
                     function saveEvaluation(participantId, eventId, status, remarks) {
                         fetch('save_evaluation.php', {
                             method: 'POST',
