@@ -96,8 +96,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventDescription = $_POST['event_description'];
     $eventType = $_POST['event_type'];
     $eventMode = $_POST['event_mode'];
-    $audienceType = $_POST['audience_type'];
     $eventLocation = strtolower(trim($_POST['location']));
+    if (empty($eventLocation)) {
+        $eventLocation = "N/A";
+    }
     $eventDateStart = trim($_POST['date_start']);
     $eventDateEnd = trim($_POST['date_end']);
     $eventTimeStart = trim($_POST['time_start']);
@@ -149,29 +151,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $eventLink = isset($_POST['zoom_link']) ? $_POST['zoom_link'] : '';
 
-    // Check if location is already occupied at the specified date and time
-    $sqlCheckExisting = "SELECT * FROM events WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
-    $stmtCheckExisting = $conn->prepare($sqlCheckExisting);
-    $stmtCheckExisting->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
-    $stmtCheckExisting->execute();
-    $resultCheckExisting = $stmtCheckExisting->get_result();
 
-    if ($resultCheckExisting->num_rows > 0) {
-        $_SESSION['error'] = 'Location venue is already occupied on this date in the current events!';
-        header("Location: addEvent.php");
-        exit();
-    }
+    if ($eventLocation !== "N/A") {
+        
+        $sqlCheckExisting = "SELECT * FROM events WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
+        $stmtCheckExisting = $conn->prepare($sqlCheckExisting);
+        $stmtCheckExisting->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
+        $stmtCheckExisting->execute();
+        $resultCheckExisting = $stmtCheckExisting->get_result();
 
-    $sqlCheckPending = "SELECT * FROM pendingevents WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
-    $stmtCheckPending = $conn->prepare($sqlCheckPending);
-    $stmtCheckPending->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
-    $stmtCheckPending->execute();
-    $resultCheckPending = $stmtCheckPending->get_result();
+        if ($resultCheckExisting->num_rows > 0) {
+            $_SESSION['error'] = 'Location venue is already occupied on this date in the current events!';
+            header("Location: addEvent.php");
+            exit();
+        }
 
-    if ($resultCheckPending->num_rows > 0) {
-        $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events!';
-        header("Location: addEvent.php");
-        exit();
+        // Check for pending events with the same location, date, and time
+        $sqlCheckPending = "SELECT * FROM pendingevents WHERE location = ? AND date_start = ? AND time_start = ? LIMIT 1";
+        $stmtCheckPending = $conn->prepare($sqlCheckPending);
+        $stmtCheckPending->bind_param("sss", $eventLocation, $eventDateStart, $eventTimeStart);
+        $stmtCheckPending->execute();
+        $resultCheckPending = $stmtCheckPending->get_result();
+
+        if ($resultCheckPending->num_rows > 0) {
+            $_SESSION['error'] = 'Location venue is already occupied on this date in the pending events!';
+            header("Location: addEvent.php");
+            exit();
+        }
     }
 
     // Generate new unique event ID

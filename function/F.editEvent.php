@@ -43,6 +43,20 @@ if (isset($_GET['event_id'])) {
         $eventPhotoPath = $eventDetails['event_photo_path'];
         $participantLimit = $eventDetails['participant_limit'];
 
+        // Get current date and time in the event's timezone
+        $eventTimeZone = new DateTimeZone('Asia/Manila');
+        $currentDateTime = new DateTime('now', $eventTimeZone);
+        $eventStartDateTime = new DateTime($eventDetails['date_start'] . ' ' . $eventDetails['time_start'], $eventTimeZone);
+        $eventEndDateTime = new DateTime($eventDetails['date_end'] . ' ' . $eventDetails['time_end'], $eventTimeZone);
+
+        // Determine the event status as either 'ongoing' or 'upcoming'
+        if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
+            $eventStatus = 'ongoing';
+        } elseif ($currentDateTime < $eventStartDateTime) {
+            $eventStatus = 'upcoming';
+        }
+
+
         $result->close();
 
         // Fetch speakers for the event

@@ -52,11 +52,20 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <button class="btn_edit"><i class="fa fa-pencil"></i></button>
             </a>
         </td>
-        <td data-label="Delete" class="pad">
+        <?php if ($eventStatus === 'upcoming'): ?>
+            <td data-label="Delete" class="pad">
             <button class="btn_delete" onclick="confirmDeleteEvent('<?php echo $eventId; ?>')">
                 <i class="fa fa-trash"></i>
             </button>
-        </td>
+            </td>
+        <?php elseif ($eventStatus === 'ongoing'): ?>
+            <td data-label="Delete" class="pad">
+            <button class="btn_delete" onclick="confirmDeleteEvent_Warning('<?php echo $eventId; ?>')">
+                <i class="fa fa-trash"></i>
+            </button>
+            </td>
+        <?php endif; ?>
+
         <?php
         echo '</tr>';
     }
@@ -88,5 +97,17 @@ mysqli_close($conn);
                 window.location.href = `deleteEvent.php?event_id=${eventId}`;
             }
         });
+    }
+
+    function confirmDeleteEvent_Warning(eventId) {
+        Swal.fire({
+            title: 'Event is Ongoing!',
+            text: 'The event is already ongoing! failed to delete.',
+            icon: 'warning',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        })
     }
 </script>
