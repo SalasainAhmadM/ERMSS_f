@@ -251,38 +251,45 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($allUsersAndAdmins as $user): ?>
-                                <?php if ($user['Role'] === 'superadmin')
-                                    continue; ?>
-                                <tr data-user-type="<?php echo $user['userType']; ?>">
-                                    <td><?php echo $user['UserID']; ?></td>
-                                    <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
-                                    <td><?php echo $user['Email']; ?></td>
-                                    <td><?php echo $user['Affiliation']; ?></td>
-                                    <td><?php echo $user['Role']; ?></td>
-                                    <td>
-                                        <button class="action-button" data-userid="<?php echo $user['UserID']; ?>"
-                                            data-image="<?php echo $user['Image']; ?>"
-                                            data-gender="<?php echo $user['Gender']; ?>"
-                                            data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
-                                            data-affiliation="<?php echo $user['Affiliation']; ?>"
-                                            data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
-                                            data-contact="<?php echo $user['ContactNo']; ?>"
-                                            data-position="<?php echo $user['Position']; ?>"
-                                            onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
 
-                                        <?php if ($_SESSION['Role'] === 'superadmin'): ?>
+                        <tbody>
+                        <?php foreach ($allUsersAndAdmins as $user): ?>
+                            <?php if ($user['Role'] === 'superadmin') continue; ?>
+                            <tr data-user-type="<?php echo $user['userType']; ?>">
+                                <td><?php echo $user['UserID']; ?></td>
+                                <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
+                                <td><?php echo $user['Email']; ?></td>
+                                <td><?php echo $user['Affiliation']; ?></td>
+                                <td><?php echo $user['Role']; ?></td>
+                                <td>
+                                    <button class="action-button" data-userid="<?php echo $user['UserID']; ?>" 
+                                        data-fullname="<?php echo $user['FirstName'] . ' ' . $user['LastName']; ?>"
+                                        data-email="<?php echo $user['Email']; ?>"
+                                        data-image="<?php echo $user['Image']; ?>"
+                                        data-gender="<?php echo $user['Gender']; ?>"
+                                        data-age="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['Age']; ?>"
+                                        data-affiliation="<?php echo $user['Affiliation']; ?>"
+                                        data-educationalattainment="<?php echo $user['userType'] === 'admin' ? 'N/A' : $user['EducationalAttainment']; ?>"
+                                        data-contact="<?php echo $user['ContactNo']; ?>"
+                                        data-position="<?php echo $user['Position']; ?>"
+                                        onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
+
+
+                                        <?php if ($user['Role'] === 'User'): ?>
                                             <button class="btn_delete"
-                                                onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
+                                                onclick="confirmDeleteEventUser('<?php echo $user['UserID']; ?>')">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        <?php elseif ($user['Role'] === 'Admin'): ?>
+                                            <button class="btn_delete"
+                                                onclick="confirmDeleteEventAdmin('<?php echo $user['UserID']; ?>')">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
 
                     </table>
                 </div>
@@ -294,8 +301,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
     <script>
         function showUserProfile(userId) {
-            const fullName = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
-            const email = document.querySelector(`button[data-userid="${userId}"]`).parentElement.previousElementSibling.previousElementSibling.innerText;
+            const fullName = document.querySelector(`button[data-userid="${userId}"]`).dataset.fullname;
+            const email = document.querySelector(`button[data-userid="${userId}"]`).dataset.email;
             const affiliation = document.querySelector(`button[data-userid="${userId}"]`).dataset.affiliation;
             const gender = document.querySelector(`button[data-userid="${userId}"]`).dataset.gender;
             const age = document.querySelector(`button[data-userid="${userId}"]`).dataset.age;
@@ -599,7 +606,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
 
 <script>
-    function confirmDeleteEvent(userId) {
+    function confirmDeleteEventUser(userId) {
         Swal.fire({
             title: 'Delete User?',
             text: 'Are you sure you want to delete this user?',
@@ -616,6 +623,30 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = `deleteUser.php?user_id=${userId}`;
+            }
+        });
+    }
+</script>
+
+
+<script>
+    function confirmDeleteEventAdmin(userId) {
+        Swal.fire({
+            title: 'Delete User?',
+            text: 'Are you sure you want to delete this admin?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            padding: '3rem',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `deleteAdmin.php?user_id=${userId}`;
             }
         });
     }
