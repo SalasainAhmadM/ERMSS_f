@@ -222,17 +222,16 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
         <div class="containerr">
             <div class="tables container">
                 <div class="table_header">
-                <div class="select-container" style="position: relative; display: inline-block;">
-                    <select id="userDropdown" onchange="filterByUserType()"
-                        style="width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; 
+                    <div class="select-container" style="position: relative; display: inline-block;">
+                        <select id="userDropdown" onchange="filterByUserType()" style="width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; 
                             background-color: #f9f9f9; color: #333; font-size: 16px; cursor: pointer; 
                             transition: border-color 0.3s ease; -webkit-appearance: none; 
                             -moz-appearance: none; appearance: none;">
-                        <option value="all" selected>All Users</option>
-                        <option value="user">User</option>
-                        <option value="admin">Admins</option>
-                    </select>
-                </div>
+                            <option value="all" selected>All Users</option>
+                            <option value="user">User</option>
+                            <option value="admin">Admins</option>
+                        </select>
+                    </div>
 
 
                     <div>
@@ -254,6 +253,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                         </thead>
                         <tbody>
                             <?php foreach ($allUsersAndAdmins as $user): ?>
+                                <?php if ($user['Role'] === 'superadmin')
+                                    continue; ?>
                                 <tr data-user-type="<?php echo $user['userType']; ?>">
                                     <td><?php echo $user['UserID']; ?></td>
                                     <td><?php echo $user['FirstName'] . ' ' . $user['LastName']; ?></td>
@@ -272,7 +273,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                                             onclick="showUserProfile(<?php echo $user['UserID']; ?>)">View Profile</button>
 
                                         <?php if ($_SESSION['Role'] === 'superadmin'): ?>
-                                            <button class="btn_delete" onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
+                                            <button class="btn_delete"
+                                                onclick="confirmDeleteEvent('<?php echo $user['UserID']; ?>')">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         <?php endif; ?>
@@ -280,6 +282,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+
 
                     </table>
                 </div>
@@ -620,18 +623,18 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
 
 <script>
-function filterByUserType() {
-    const userType = document.getElementById("userDropdown").value;
-    const rows = document.querySelectorAll("#userTable tbody tr");
+    function filterByUserType() {
+        const userType = document.getElementById("userDropdown").value;
+        const rows = document.querySelectorAll("#userTable tbody tr");
 
-    rows.forEach(row => {
-        if (userType === "all" || row.getAttribute("data-user-type") === userType) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-    });
-}
+        rows.forEach(row => {
+            if (userType === "all" || row.getAttribute("data-user-type") === userType) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
 
 </script>
 
