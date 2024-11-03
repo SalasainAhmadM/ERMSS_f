@@ -96,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $eventDescription = $_POST['event_description'];
     $eventType = $_POST['event_type'];
     $eventMode = $_POST['event_mode'];
+    $audienceType = $_POST['audience_type'];
     $eventLocation = strtolower(trim($_POST['location']));
     $eventDateStart = trim($_POST['date_start']);
     $eventDateEnd = trim($_POST['date_end']);
@@ -178,11 +179,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Insert the event based on user role
     if ($Role == 'superadmin') {
-        $sql = "INSERT INTO events (event_id, event_title, event_description, event_type, event_mode, location, date_start, date_end, time_start, time_end, participant_limit, event_photo_path, event_link) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO events (event_id, event_title, event_description, event_type, event_mode, audience_type, location, date_start, date_end, time_start, time_end, participant_limit, event_photo_path, event_link) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     } elseif ($Role == 'Admin') {
-        $sql = "INSERT INTO pendingevents (event_id, event_title, event_description, event_type, event_mode, location, date_start, date_end, time_start, time_end, participant_limit, event_photo_path, event_link) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO pendingevents (event_id, event_title, event_description, event_type, event_mode, audience_type, location, date_start, date_end, time_start, time_end, participant_limit, event_photo_path, event_link) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     } else {
         echo "<script>alert('You do not have the necessary permissions to create an event.'); window.location.href='landingPage.php';</script>";
         exit();
@@ -190,12 +191,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "issssssssssss",
+        "isssssssssssss",
         $newEventID,
         $eventTitle,
         $eventDescription,
         $eventType,
         $eventMode,
+        $audienceType,
         $eventLocation,
         $eventDateStart,
         $eventDateEnd,

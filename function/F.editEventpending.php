@@ -36,6 +36,7 @@ if (isset($_GET['event_id'])) {
         $eventMode = $eventDetails['event_mode'];
         $eventLink = ($eventMode === 'Face-to-Face') ? '' : $eventDetails['event_link'];
         $eventLocation = ($eventMode === 'Online') ? '' : $eventDetails['location'];
+        $audienceType = $eventDetails['audience_type'];
         $eventDateStart = $eventDetails['date_start'];
         $eventDateEnd = $eventDetails['date_end'];
         $eventTimeStart = $eventDetails['time_start'];
@@ -77,6 +78,7 @@ if (isset($_GET['event_id'])) {
             $eventDescription = cleanInput($_POST['event_description']);
             $eventType = cleanInput($_POST['event_type']);
             $eventMode = cleanInput($_POST['event_mode']);
+            $audienceType = cleanInput($_POST['audience_type']);
             $eventLocation = cleanInput($_POST['location']);
             $eventDateStart = cleanInput($_POST['date_start']);
             $eventDateEnd = cleanInput($_POST['date_end']);
@@ -123,6 +125,7 @@ if (isset($_GET['event_id'])) {
                     event_description = ?, 
                     event_type = ?, 
                     event_mode = ?, 
+                    audience_type = ?, 
                     event_link = ?, 
                     location = ?, 
                     date_start = ?, 
@@ -137,11 +140,12 @@ if (isset($_GET['event_id'])) {
 
                 $updateStmt = $conn->prepare($updateSql);
                 $updateStmt->bind_param(
-                    "sssssssssssssii",
+                    "ssssssssssssssii",
                     $eventTitle,
                     $eventDescription,
                     $eventType,
                     $eventMode,
+                    $audienceType,
                     $eventLink,
                     $eventLocation,
                     $eventDateStart,

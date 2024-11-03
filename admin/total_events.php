@@ -314,7 +314,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
         <section class="event-filter"> <!--dapat naka drop down ito-->
 
             <h1 class="heading"></h1>
-            <h1 class="heading">filter events</h1>
+            <!-- <h1 class="heading">filter events</h1> -->
 
             <div class="flex2" style=" gap: 10px; margin-bottom:10px">
 

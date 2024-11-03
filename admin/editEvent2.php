@@ -255,16 +255,23 @@ include('../function/F.editEvent2.php');
 
                     <div class="input_field">
                         <label>Event Type</label>
-                        <!-- <input type="text" class="input" name="event_type" value="<?php echo $eventType; ?>" required> -->
                         <div class="custom_select">
                             <select name="event_type" required>
-                                <option value="">Select</option>
-                                <option value="Training Sessions" <?php echo ($eventType === 'Training Sessions') ? 'selected' : ''; ?>>Training Sessions</option>
-                                <option value="Specialized Seminars" <?php echo ($eventType === 'Specialized Seminars') ? 'selected' : ''; ?>>Specialized Seminars</option>
-                                <option value="Cluster-specific gathering" <?php echo ($eventType === 'Cluster-specific gathering') ? 'selected' : ''; ?>>Cluster-specific gathering</option>
-                                <option value="General Assembly" <?php echo ($eventType === 'General Assembly') ? 'selected' : ''; ?>>General Assembly</option>
-                                <option value="Workshop" <?php echo ($eventType === 'Workshop') ? 'selected' : ''; ?>>
-                                    Workshop</option>
+                                <option value="<?php echo $eventType; ?>"><?php echo $eventType; ?></option>
+                                <?php
+                                $query = "SELECT event_type_id, event_type_name FROM event_type";
+                                $result = mysqli_query($conn, $query);
+                                if ($result) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        // Skip the option if it matches the current value
+                                        if ($row['event_type_name'] != $eventType) {
+                                            echo '<option value="' . $row['event_type_name'] . '">' . $row['event_type_name'] . '</option>';
+                                        }
+                                    }
+                                } else {
+                                    echo '<option value="">No event types found</option>';
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -273,12 +280,44 @@ include('../function/F.editEvent2.php');
                         <label>Event Mode</label>
                         <div class="custom_select">
                             <select name="event_mode" required>
-                                <option value="">Select</option>
-                                <option value="Face-to-Face" <?php echo ($eventMode === 'Face-to-Face') ? 'selected' : ''; ?>>Face-to-Face</option>
-                                <option value="Online" <?php echo ($eventMode === 'Online') ? 'selected' : ''; ?>>Online
-                                </option>
-                                <option value="Hybrid" <?php echo ($eventMode === 'Hybrid') ? 'selected' : ''; ?>>Hybrid
-                                </option>
+                                <option value="<?php echo $eventMode; ?>"><?php echo $eventMode; ?></option>
+                                <?php
+                                $query = "SELECT event_mode_id, event_mode_name FROM event_mode";
+                                $result = mysqli_query($conn, $query);
+                                if ($result) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        // Skip the option if it matches the current value
+                                        if ($row['event_mode_name'] != $eventMode) {
+                                            echo '<option value="' . $row['event_mode_name'] . '">' . $row['event_mode_name'] . '</option>';
+                                        }
+                                    }
+                                } else {
+                                    echo '<option value="">No event modes found</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input_field">
+                        <label>Audience Type</label>
+                        <div class="custom_select">
+                            <select name="audience_type" required>
+                                <option value="<?php echo $audienceType; ?>"><?php echo $audienceType; ?></option>
+                                <?php
+                                $query = "SELECT audience_type_id, audience_type_name FROM audience_type";
+                                $result = mysqli_query($conn, $query);
+                                if ($result) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        // Skip the option if it matches the current value
+                                        if ($row['audience_type_name'] != $audienceType) {
+                                            echo '<option value="' . $row['audience_type_name'] . '">' . $row['audience_type_name'] . '</option>';
+                                        }
+                                    }
+                                } else {
+                                    echo '<option value="">No audience types found</option>';
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
