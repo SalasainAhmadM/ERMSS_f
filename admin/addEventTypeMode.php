@@ -32,7 +32,7 @@
     }
 
     .event-table {
-        width: 48%;
+        width: 30%;
         margin-bottom: 20px;
     }
 
@@ -106,6 +106,9 @@
 
     $sql_event_mode = "SELECT event_mode_name ,event_mode_id as id FROM event_mode";
     $result_event_mode = $conn->query($sql_event_mode);
+
+    $sql_audience_type = "SELECT audience_type_name ,audience_type_id as id FROM audience_type";
+    $result_audience_type = $conn->query($sql_audience_type);
     function countPendingUsers($conn)
     {
         $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
@@ -313,6 +316,7 @@
                                 <div class="lists">
                                     <p class="items" onclick="openEventTypeModal()">Event Type</p>
                                     <p class="items" onclick="openEventModeModal()">Event Mode</p>
+                                    <p class="items" onclick="openAudienceTypeModal()">Audience Type</p>
                                 </div>
                             </div>
                         </div>
@@ -332,7 +336,7 @@
                         <table class="tbl">
                             <thead>
                                 <tr>
-                                    <th>Event Title</th>
+                                    <th>Event Type Name</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -365,7 +369,7 @@
                         <table class="tbl">
                             <thead>
                                 <tr>
-                                    <th>Event Title</th>
+                                    <th>Event Mode Name</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -393,6 +397,41 @@
                     </div>
 
                 </div>
+
+                <div class="event-table">
+                    <div class="tbl-container">
+                        <h2>Audience</h2>
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>Audience</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                if ($result_audience_type->num_rows > 0) {
+                                    while ($row = $result_audience_type->fetch_assoc()) {
+                                        // Escape the audience_type name to handle special characters
+                                        $escapedAudienceTypeName = htmlspecialchars($row['audience_type_name'], ENT_QUOTES, 'UTF-8');
+
+                                        echo "<tr>";
+                                        echo "<td data-label='Audience'>" . $escapedAudienceTypeName . "</td>";
+                                        echo "<td data-label='Action'>
+                                <button class='btn_edit' onclick=\"editAudienceType('" . $row['id'] . "', '" . $escapedAudienceTypeName . "')\"><i class='fa fa-pencil'></i></button>
+                                <button class='btn_delete' onclick=\"confirmDeleteAudienceType('" . $row['id'] . "')\"><i class='fa fa-trash'></i></button>
+                              </td>";
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='2'>No audience types available</td></tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -463,6 +502,177 @@
 </body>
 
 <script>
+
+    function openAudienceTypeModal() {
+        Swal.fire({
+            title: 'Add Audience Type',
+            input: 'text',
+            inputLabel: 'Enter Audience Type',
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                addAudienceType(result.value);
+            }
+        });
+    }
+
+    function addAudienceType(audienceTypeName) {
+        fetch('add_audience_type.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ audience_type_name: audienceTypeName })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Audience Type has been added: ' + audienceTypeName,
+                        icon: 'success',
+                        customClass: {
+                            popup: 'larger-swal'
+                        }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Audience Type has already been added.',
+                        icon: 'error',
+                        customClass: {
+                            popup: 'larger-swal'
+                        }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            });
+    }
+    // Edit
+    function editAudienceType(audienceTypeId, audienceTypeName) {
+        const originalAudienceTypes = [
+            "Training Sessions",
+            "Specialized Seminars",
+            "Cluster-specific gathering",
+            "General Assembly",
+            "Workshop"
+        ];
+
+        if (originalAudienceTypes.includes(audienceTypeName)) {
+            Swal.fire({
+                title: 'Cannot Edit',
+                text: `cannot edit origin audience type: ${audienceTypeName}`,
+                icon: 'warning',
+                customClass: {
+                    popup: 'larger-swal'
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Edit Audience Type',
+                input: 'text',
+                inputValue: audienceTypeName,
+                inputLabel: 'Enter New Audience Type',
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                customClass: {
+                    popup: 'larger-swal'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('edit_audience_type.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            audience_type_id: audienceTypeId,
+                            audience_type_name: result.value
+                        })
+                    }).then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Audience Type has been updated.',
+                                    icon: 'success',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    }
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'larger-swal'
+                                    }
+                                });
+                            }
+                        });
+                }
+            });
+        }
+    }
+    function confirmDeleteAudienceType(audienceTypeId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to undo this action!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'larger-swal'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('delete_audience_type.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        audience_type_id: audienceTypeId
+                    })
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: 'Audience type has been deleted.',
+                                icon: 'success',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                }
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                customClass: {
+                                    popup: 'larger-swal'
+                                }
+                            });
+                        }
+                    });
+            }
+        });
+    }
+
+
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
 

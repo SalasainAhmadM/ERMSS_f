@@ -103,6 +103,7 @@ function addEventMode(eventModeName) {
           }
       });
 }
+
 // Edit
 function editEventType(eventTypeId, eventTypeName) {
     const originalEventTypes = [

@@ -388,6 +388,14 @@ if (isset($_GET['download'])) {
                             <span><?php echo $totalEnded; ?> Events</span>
                         </div>
                     </a>
+
+                    <!-- <a href="sponsors.php" class="box">
+                        <i class='bx bx-archive'></i>
+                        <div>
+                            <h3>Sponsors</h3>
+                            <span><?php echo $totalEnded; ?> Events</span>
+                        </div>
+                    </a> -->
                 </div>
             </section>
 

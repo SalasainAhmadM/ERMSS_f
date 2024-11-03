@@ -24,19 +24,20 @@ if (isset($eventId)) {
 
             // Insert into events table using nextEventId
             $sqlInsertEvent = "INSERT INTO events (
-                event_id, event_title, event_description, event_type, event_mode, 
+                event_id, event_title, event_description, event_type, audience_type, event_mode, 
                 event_photo_path, location, date_start, date_end, 
                 time_start, time_end, date_created, event_link, participant_limit
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             $stmtInsertEvent = mysqli_prepare($conn, $sqlInsertEvent);
             mysqli_stmt_bind_param(
                 $stmtInsertEvent,
-                "issssssssssssi",
+                "isssssssssssssi",
                 $nextEventId,
                 $eventRow['event_title'],
                 $eventRow['event_description'],
                 $eventRow['event_type'],
+                $eventRow['audience_type'],
                 $eventRow['event_mode'],
                 $eventRow['event_photo_path'],
                 $eventRow['location'],

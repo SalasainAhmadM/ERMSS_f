@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $eventMode = $row['event_mode'];
                 $eventLink = $row['event_link'];
                 $eventType = $row['event_type'];
+                $audienceType = $row['audience_type'];
                 $eventPhoto = $row['event_photo_path'];
                 $eventCancel = $row['cancel_status']; // Use the cancel_status as event status
                 $cancelReason = $row['cancelReason'];
@@ -63,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'eventMode' => $eventMode,
                     'eventLink' => $eventLink,
                     'eventType' => $eventType,
+                    'audienceType' => $audienceType,
                     'eventPhoto' => $eventPhoto,
                     'eventStatus' => $eventStatus,
                     'cancelReason' => $cancelReason, // Include cancel reason in session data

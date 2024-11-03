@@ -261,6 +261,27 @@ include('../function/F.addEvent.php');
                         </div>
                     </div>
 
+                    <div class="input_field">
+                        <label>Audience Type</label>
+                        <!-- <input type="text" class="input" name="audience_type" required> -->
+                        <div class="custom_select">
+                            <select name="audience_type" required>
+                                <option value="">Select</option>
+                                <?php
+                                $query = "SELECT audience_type_id, audience_type_name FROM audience_type";
+                                $result = mysqli_query($conn, $query);
+                                if ($result) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo '<option value="' . $row['audience_type_name'] . '">' . $row['audience_type_name'] . '</option>';
+                                    }
+                                } else {
+                                    echo '<option value="">No audience types found</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="input_field" id="zoomLinkField">
                         <label>Event Link</label>
                         <input type="text" class="input" name="zoom_link">
