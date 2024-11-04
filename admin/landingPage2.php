@@ -23,7 +23,6 @@
 <body>
 
     <?php
-    session_start();
     require_once('../db.connection/connection.php');
 
     function countPendingUsers($conn)
@@ -51,43 +50,10 @@
         }
     }
 
+    // Example usage of the countPendingUsers function
+    $pendingUsersCount = countPendingUsers($conn);
+    $pendingEventsCount = countPendingEvents($conn);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Check if AdminID is set in the session
-        if (isset($_SESSION['AdminID'])) {
-            $AdminID = $_SESSION['AdminID'];
-
-            // Prepare and execute a query to fetch the specific admin's data
-            $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-            $stmtAdmin = $conn->prepare($sqlAdmin);
-            $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
-            $stmtAdmin->execute();
-            $resultAdmin = $stmtAdmin->get_result();
-
-            if ($resultAdmin->num_rows > 0) {
-                while ($row = $resultAdmin->fetch_assoc()) {
-                    $LastName = $row['LastName'];
-                    $FirstName = $row['FirstName'];
-                    $MI = $row['MI'];
-                    $Email = $row['Email'];
-                    $ContactNo = $row['ContactNo'];
-                    $Position = $row['Position']; // Corrected the column name
-                    $Affiliation = $row['Affiliation'];
-                    $Image = $row['Image'];
-
-                    // Now, you have the specific admin's data
-                }
-            } else {
-                echo "No records found";
-            }
-
-            $stmtAdmin->close();
-
-            // Example usage of the countPendingUsers function
-            $pendingUsersCount = countPendingUsers($conn);
-            $pendingEventsCount = countPendingEvents($conn);
-        }
-    }
     ?>
     <?php
     if (isset($_SESSION['success'])) {
@@ -126,18 +92,40 @@
             </div>
             <i class="bx bx-menu" id="btnn"></i>
         </div>
-        <div class="user">
+        <?php
+        session_start();
 
-            <?php if (!empty($Image)): ?>
-                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" class="user-img">
-            <?php else: ?>
-                <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
-            <?php endif; ?>
-            <div>
-                <p class="bold"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></p>
-                <p><?php echo $Position; ?></p>
+        if (isset($_SESSION['AdminID'])) {
+            $adminID = $_SESSION['AdminID'];
+
+            $query = "SELECT FirstName, MI, LastName, Position, Image FROM admin WHERE AdminID = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $adminID);
+            $stmt->execute();
+            $stmt->bind_result($FirstName, $MI, $LastName, $Position, $Image);
+            $stmt->fetch();
+            $stmt->close();
+
+            // Use the variables in your HTML output
+            ?>
+            <div class="user">
+                <?php if (!empty($Image)): ?>
+                    <img src="../assets/img/profilePhoto/<?php echo htmlspecialchars($Image); ?>" alt="user" class="user-img">
+                <?php else: ?>
+                    <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
+                <?php endif; ?>
+                <div>
+                    <p class="bold">
+                        <?php echo htmlspecialchars($FirstName) . ' ' . htmlspecialchars($MI) . ' ' . htmlspecialchars($LastName); ?>
+                    </p>
+                    <p><?php echo htmlspecialchars($Position); ?></p>
+                </div>
             </div>
-        </div>
+            <?php
+        } else {
+            echo "User not logged in.";
+        }
+        ?>
 
         <ul>
             <li class="nav-sidebar">

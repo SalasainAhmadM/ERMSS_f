@@ -529,18 +529,16 @@ CREATE TABLE `pendinguser` (
 CREATE TABLE `sponsor` (
   `sponsor_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
-  `sponsor_firstName` varchar(255) NOT NULL,
-  `sponsor_MI` varchar(255) DEFAULT NULL,
-  `sponsor_lastName` varchar(255) DEFAULT NULL
+  `sponsor_Name` varchar(255) NOT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sponsor`
 --
 
-INSERT INTO `sponsor` (`sponsor_id`, `event_id`, `sponsor_firstName`, `sponsor_MI`, `sponsor_lastName`) VALUES
-(8, 214, 'Gol', 'D', 'Roger'),
-(9, 214, 'Monkey', 'D', 'Garp');
+INSERT INTO `sponsor` (`sponsor_id`, `event_id`, `sponsor_Name`) VALUES
+(8, 214, 'Gol Roger'),
+(9, 214, 'Monkey Garp');
 
 -- --------------------------------------------------------
 

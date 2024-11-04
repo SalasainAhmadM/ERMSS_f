@@ -7,7 +7,6 @@ $yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM Events ORDER B
 $yearResult = mysqli_query($conn, $yearQuery);
 $years = mysqli_fetch_all($yearResult, MYSQLI_ASSOC);
 
-
 // Fetch total events
 $totalEventsQuery = "SELECT COUNT(*) AS totalEvents FROM Events";
 $totalEventsResult = mysqli_query($conn, $totalEventsQuery);
@@ -18,7 +17,6 @@ $totalUpcomingQuery = "SELECT COUNT(*) AS totalUpcoming FROM Events WHERE (NOW()
 $totalUpcomingResult = mysqli_query($conn, $totalUpcomingQuery);
 $totalUpcoming = mysqli_fetch_assoc($totalUpcomingResult)['totalUpcoming'];
 
-
 // Fetch total ongoing events (excluding cancelled events)
 $totalOngoingQuery = "SELECT COUNT(*) AS totalOngoing FROM Events WHERE (NOW() BETWEEN CONCAT(date_start, ' ', time_start) AND CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
 $totalOngoingResult = mysqli_query($conn, $totalOngoingQuery);
@@ -28,6 +26,33 @@ $totalOngoing = mysqli_fetch_assoc($totalOngoingResult)['totalOngoing'];
 $totalEndedQuery = "SELECT COUNT(*) AS totalEnded FROM Events WHERE (NOW() > CONCAT(date_end, ' ', time_end)) AND (event_cancel IS NULL OR event_cancel = '')";
 $totalEndedResult = mysqli_query($conn, $totalEndedQuery);
 $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
+function countPendingUsers($conn)
+{
+    $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
+    $result = $conn->query($sqls);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalPendingUsers'];
+    } else {
+        return 0; // Return 0 if there is an error or no pending users
+    }
+}
+function countPendingEvents($conn)
+{
+    $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
+    $result = $conn->query($sqls);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['totalPendingEvents'];
+    } else {
+        return 0;
+    }
+}
+
+$pendingUsersCount = countPendingUsers($conn);
+$pendingEventsCount = countPendingEvents($conn);
 ?>
 
 
@@ -53,73 +78,6 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
 <body>
 
-    <?php
-    session_start();
-    require_once('../db.connection/connection.php');
-
-    function countPendingUsers($conn)
-    {
-        $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
-        $result = $conn->query($sqls);
-
-        if ($result) {
-            $row = $result->fetch_assoc();
-            return $row['totalPendingUsers'];
-        } else {
-            return 0; // Return 0 if there is an error or no pending users
-        }
-    }
-    function countPendingEvents($conn)
-    {
-        $sqls = "SELECT COUNT(*) AS totalPendingEvents FROM pendingevents";
-        $result = $conn->query($sqls);
-
-        if ($result) {
-            $row = $result->fetch_assoc();
-            return $row['totalPendingEvents'];
-        } else {
-            return 0;
-        }
-    }
-
-
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Check if AdminID is set in the session
-        if (isset($_SESSION['AdminID'])) {
-            $AdminID = $_SESSION['AdminID'];
-
-            // Prepare and execute a query to fetch the specific admin's data
-            $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-            $stmtAdmin = $conn->prepare($sqlAdmin);
-            $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
-            $stmtAdmin->execute();
-            $resultAdmin = $stmtAdmin->get_result();
-
-            if ($resultAdmin->num_rows > 0) {
-                while ($row = $resultAdmin->fetch_assoc()) {
-                    $LastName = $row['LastName'];
-                    $FirstName = $row['FirstName'];
-                    $MI = $row['MI'];
-                    $Email = $row['Email'];
-                    $ContactNo = $row['ContactNo'];
-                    $Position = $row['Position']; // Corrected the column name
-                    $Affiliation = $row['Affiliation'];
-                    $Image = $row['Image'];
-
-                    // Now, you have the specific admin's data
-                }
-            } else {
-                echo "No records found";
-            }
-
-            $stmtAdmin->close();
-
-            // Example usage of the countPendingUsers function
-            $pendingUsersCount = countPendingUsers($conn);
-            $pendingEventsCount = countPendingEvents($conn);
-        }
-    }
-    ?>
 
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
@@ -130,18 +88,40 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             </div>
             <i class="bx bx-menu" id="btnn"></i>
         </div>
-        <div class="user">
+        <?php
+        session_start();
 
-            <?php if (!empty($Image)): ?>
-                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" class="user-img">
-            <?php else: ?>
-                <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
-            <?php endif; ?>
-            <div>
-                <p class="bold"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></p>
-                <p><?php echo $Position; ?></p>
+        if (isset($_SESSION['AdminID'])) {
+            $adminID = $_SESSION['AdminID'];
+
+            $query = "SELECT FirstName, MI, LastName, Position, Image FROM admin WHERE AdminID = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $adminID);
+            $stmt->execute();
+            $stmt->bind_result($FirstName, $MI, $LastName, $Position, $Image);
+            $stmt->fetch();
+            $stmt->close();
+
+            // Use the variables in your HTML output
+            ?>
+            <div class="user">
+                <?php if (!empty($Image)): ?>
+                    <img src="../assets/img/profilePhoto/<?php echo htmlspecialchars($Image); ?>" alt="user" class="user-img">
+                <?php else: ?>
+                    <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
+                <?php endif; ?>
+                <div>
+                    <p class="bold">
+                        <?php echo htmlspecialchars($FirstName) . ' ' . htmlspecialchars($MI) . ' ' . htmlspecialchars($LastName); ?>
+                    </p>
+                    <p><?php echo htmlspecialchars($Position); ?></p>
+                </div>
             </div>
-        </div>
+            <?php
+        } else {
+            echo "User not logged in.";
+        }
+        ?>
 
 
         <ul>
@@ -313,7 +293,6 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
         <!--======= event filter starts ======= -->
         <section class="event-filter"> <!--dapat naka drop down ito-->
 
-            <h1 class="heading"></h1>
             <!-- <h1 class="heading">filter events</h1> -->
 
             <div class="flex2" style=" gap: 10px; margin-bottom:10px">
@@ -379,6 +358,85 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
                 </form>
             </div>
+            <div class="flex2" style="gap: 10px; margin-bottom:10px">
+                <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem; height:10%;">
+                    <div class="dropdown-container">
+                        <div class="dropdown">
+                            <input type="text" readonly name="sponsorDisplay" placeholder="Filter by Sponsor"
+                                maxlength="20" class="output">
+                            <input type="hidden" name="sponsorEventId" id="sponsorEventId" />
+                            <div class="lists">
+                                <p class="items" onclick='filterBySponsor("All Sponsors")'>All Sponsors</p>
+                                <?php
+                                // Get unique sponsor names from the database
+                                require_once('../db.connection/connection.php');
+                                $query = "SELECT DISTINCT sponsor_Name FROM sponsor";
+                                $result = $conn->query($query);
+
+                                while ($row = $result->fetch_assoc()) {
+                                    $sponsorName = htmlspecialchars($row['sponsor_Name']);
+                                    echo "<p class='items' onclick='filterBySponsor(\"$sponsorName\")'>$sponsorName</p>";
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <script>
+                    function filterBySponsor(sponsorName) {
+                        document.querySelector('input[name="sponsorDisplay"]').value = sponsorName;
+                        document.querySelector('input[name="sponsorEventId"]').value = sponsorName;
+                        document.getElementById('sponsorFilterForm').submit();
+                    }
+                </script>
+
+
+                <!-- Filter by Year -->
+                <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                    <div class="dropdown-container">
+                        <div class="dropdown">
+                            <input type="text" readonly name="yearDisplay" id="yearDisplay" placeholder="Filter by Year"
+                                maxlength="20" class="output">
+                            <div class="lists">
+                                <p class="items" onclick='filterByYear("All Years")'>All Years</p>
+                                <?php foreach ($years as $year): ?>
+                                    <p class="items" onclick='filterByYear("<?php echo $year['event_year']; ?>")'>
+                                        <?php echo htmlspecialchars($year['event_year']); ?>
+                                    </p>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Filter by Month -->
+                <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                    <div class="dropdown-container">
+                        <div class="dropdown">
+                            <input type="text" readonly name="monthDisplay" id="monthDisplay"
+                                placeholder="Filter by Month" maxlength="20" class="output">
+                            <div class="lists">
+                                <p class="items" onclick='filterByMonth("All Months")'>All Months</p>
+                                <p class="items" onclick='filterByMonth("January")'>January</p>
+                                <p class="items" onclick='filterByMonth("February")'>February</p>
+                                <p class="items" onclick='filterByMonth("March")'>March</p>
+                                <p class="items" onclick='filterByMonth("April")'>April</p>
+                                <p class="items" onclick='filterByMonth("May")'>May</p>
+                                <p class="items" onclick='filterByMonth("June")'>June</p>
+                                <p class="items" onclick='filterByMonth("July")'>July</p>
+                                <p class="items" onclick='filterByMonth("August")'>August</p>
+                                <p class="items" onclick='filterByMonth("September")'>September</p>
+                                <p class="items" onclick='filterByMonth("October")'>October</p>
+                                <p class="items" onclick='filterByMonth("November")'>November</p>
+                                <p class="items" onclick='filterByMonth("December")'>December</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
 
         </section>
 
@@ -455,10 +513,6 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             }
         });
     });
-</script>
-
-
-<script>
     function filterEvents(eventType) {
         // Get all rows in the events table
         const rows = document.querySelectorAll('.event-table tbody tr');
@@ -475,9 +529,6 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             }
         });
     }
-</script>
-
-<script>
     document.addEventListener('DOMContentLoaded', function () {
         const eventTitleInput = document.getElementById('eventTitleInput');
 
@@ -501,6 +552,26 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             });
         });
     });
+
+    function filterByYear(year) {
+        const rows = document.querySelectorAll('.event-table tbody tr');
+        rows.forEach(row => {
+            const eventYear = row.getAttribute('data-start-date').split('-')[0];
+            row.style.display = (year === 'All Years' || eventYear === year) ? '' : 'none';
+        });
+    }
+
+    function filterByMonth(month) {
+        const monthNames = ["All Months", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthIndex = monthNames.indexOf(month);
+
+        const rows = document.querySelectorAll('.event-table tbody tr');
+        rows.forEach(row => {
+            const eventMonth = parseInt(row.getAttribute('data-start-date').split('-')[1], 10);
+            row.style.display = (monthIndex === 0 || eventMonth === monthIndex) ? '' : 'none';
+        });
+    }
+
 </script>
 
 <!--real-time update-->
