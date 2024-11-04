@@ -291,6 +291,8 @@ $pendingEventsCount = countPendingEvents($conn);
             }
         </style>
 
+
+
         <section class="event-filter"> <!--dapat naka drop down ito-->
 
             <div class="flex2" style=" gap: 10px; margin-bottom:10px">
@@ -356,6 +358,11 @@ $pendingEventsCount = countPendingEvents($conn);
 
                 </form>
             </div>
+
+
+
+
+            
             <div class="flex2" style="gap: 10px; margin-bottom:10px">
                 <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem;">
                     <div class="dropdown-container">
@@ -399,7 +406,7 @@ $pendingEventsCount = countPendingEvents($conn);
                             <div class="lists">
                                 <p class="items" onclick='filterByYear("All Years")'>All Years</p>
                                 <?php foreach ($years as $year): ?>
-                                    <p class="items" onclick='filterByYear("<?php echo $year['event_year']; ?>")'>
+                                    <p class="items" onclick="filterByYear('<?php echo htmlspecialchars($year['event_year']); ?>')">
                                         <?php echo htmlspecialchars($year['event_year']); ?>
                                     </p>
                                 <?php endforeach; ?>
@@ -518,6 +525,38 @@ $pendingEventsCount = countPendingEvents($conn);
 
     </script>
 
+
+    <script>
+    // Function to filter events
+    function filterEvents() {
+        const selectedYear = document.getElementById('yearFilter').value;
+        const selectedMonth = document.getElementById('monthFilter').value;
+
+        // Get all event boxes
+        const eventBoxes = document.querySelectorAll('.box');
+
+        eventBoxes.forEach(box => {
+            const startDate = new Date(box.getAttribute('data-start-date'));
+            const eventYear = startDate.getFullYear();
+            const eventMonth = startDate.toLocaleString('default', { month: 'long' });
+
+            // Check if the event matches the selected filters
+            const matchesYear = selectedYear === '' || eventYear == selectedYear;
+            const matchesMonth = selectedMonth === '' || eventMonth === selectedMonth;
+
+            // Show or hide the event box based on the filter
+            if (matchesYear && matchesMonth && matchesSponsor) {
+                box.style.display = '';
+            } else {
+                box.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners for dropdowns
+    document.getElementById('yearFilter').addEventListener('change', filterEvents);
+    document.getElementById('monthFilter').addEventListener('change', filterEvents);
+    </script>
 
 
 

@@ -358,6 +358,7 @@ $pendingEventsCount = countPendingEvents($conn);
 
                 </form>
             </div>
+            
             <div class="flex2" style="gap: 10px; margin-bottom:10px">
                 <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem; height:10%;">
                     <div class="dropdown-container">
