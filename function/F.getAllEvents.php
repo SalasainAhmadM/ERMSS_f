@@ -1,40 +1,6 @@
 <?php
 require_once('../db.connection/connection.php');
 
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Check if AdminID is set in the session
-    if (isset($_SESSION['AdminID'])) {
-        $AdminID = $_SESSION['AdminID'];
-
-        // Prepare and execute a query to fetch the specific admin's data
-        $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-        $stmtAdmin = $conn->prepare($sqlAdmin);
-        $stmtAdmin->bind_param("i", $AdminID); // Assuming AdminID is an integer
-        $stmtAdmin->execute();
-        $resultAdmin = $stmtAdmin->get_result();
-
-        // Populate variables with fetched data if the admin record exists
-        if ($resultAdmin->num_rows > 0) {
-            $row = $resultAdmin->fetch_assoc();
-
-            // Assign variables only if values are found in the database row
-            $FirstName = isset($row['FirstName']) ? $row['FirstName'] : null;
-            $MI = isset($row['MI']) ? $row['MI'] : null;
-            $LastName = isset($row['LastName']) ? $row['LastName'] : null;
-            $Position = isset($row['Position']) ? $row['Position'] : null;
-            $Email = isset($row['Email']) ? $row['Email'] : null;
-            $ContactNo = isset($row['ContactNo']) ? $row['ContactNo'] : null;
-            $Affiliation = isset($row['Affiliation']) ? $row['Affiliation'] : null;
-            $Image = isset($row['Image']) ? $row['Image'] : null;
-        } else {
-            echo "No records found for the specified admin.";
-        }
-
-        $stmtAdmin->close();
-
-    }
-}
 $sponsorFilter = $_POST['sponsorEventId'] ?? 'All Sponsors';
 
 $sql = "SELECT e.* FROM Events e";

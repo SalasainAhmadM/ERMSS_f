@@ -2,29 +2,37 @@
 // Include your database connection code here
 require_once('../db.connection/connection.php');
 
+// Get the sponsor, year, and month filters
 $sponsorFilter = isset($_POST['sponsorEventId']) && $_POST['sponsorEventId'] !== 'All Sponsors' ? $_POST['sponsorEventId'] : null;
 $yearFilter = isset($_POST['selectedYear']) && $_POST['selectedYear'] !== '' ? $_POST['selectedYear'] : null;
 $monthFilter = isset($_POST['selectedMonth']) && $_POST['selectedMonth'] !== '' ? $_POST['selectedMonth'] : null;
 
-// Modify the SQL query to include sponsor, year, and month filtering
+// Modify the SQL query to include filtering
 $sql = "SELECT Events.*, sponsor.sponsor_Name FROM Events 
         LEFT JOIN sponsor ON Events.event_id = sponsor.event_id 
         WHERE (event_cancel IS NULL OR event_cancel = '')";
 
+// Apply sponsor filter if specified
 if ($sponsorFilter) {
     $sql .= " AND sponsor.sponsor_Name = '" . mysqli_real_escape_string($conn, $sponsorFilter) . "'";
 }
+
+// Apply year filter if specified
 if ($yearFilter) {
     $sql .= " AND YEAR(date_start) = '" . mysqli_real_escape_string($conn, $yearFilter) . "'";
 }
+
+// Apply month filter if specified
 if ($monthFilter) {
     $sql .= " AND MONTHNAME(date_start) = '" . mysqli_real_escape_string($conn, $monthFilter) . "'";
 }
 
+// Order the results by date
 $sql .= " ORDER BY date_created DESC";
+
 $result = mysqli_query($conn, $sql);
 
-// Loop through each event and generate a box
+// Generate HTML for each event
 while ($row = mysqli_fetch_assoc($result)) {
     $eventTitle = $row['event_title'];
     $eventLocation = $row['location'];
@@ -41,6 +49,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $eventStartDateTime = new DateTime($row['date_start'] . ' ' . $row['time_start'], $eventTimeZone);
     $eventEndDateTime = new DateTime($row['date_end'] . ' ' . $row['time_end'], $eventTimeZone);
 
+    // Determine event status
     $eventStatus = '';
     if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
         $eventStatus = 'ongoing';

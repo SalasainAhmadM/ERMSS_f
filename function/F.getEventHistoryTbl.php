@@ -57,7 +57,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <td data-label="View Event" class="pad">
                 <a href="view_eventHistory.php?event_id=<?php echo $row['event_id']; ?>"><button class="btn_view"><i
                             class="fa-solid fa-eye"></i></button></a>
+                <button class="btn_delete" onclick="confirmDeleteEvent(<?php echo $eventId; ?>)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </td>
+
             <?php
             echo '</tr>';
         }
