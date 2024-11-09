@@ -362,7 +362,7 @@ $pendingEventsCount = countPendingEvents($conn);
 
 
 
-            
+
             <div class="flex2" style="gap: 10px; margin-bottom:10px">
                 <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem;">
                     <div class="dropdown-container">
@@ -397,16 +397,16 @@ $pendingEventsCount = countPendingEvents($conn);
 
 
                 <!-- Filter by Year -->
-                <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                <form action="" method="post" id="yearForm">
                     <input type="hidden" name="selectedYear" id="selectedYear">
                     <div class="dropdown-container">
                         <div class="dropdown">
                             <input type="text" readonly name="yearDisplay" id="yearDisplay" placeholder="Filter by Year"
-                                maxlength="20" class="output">
+                                class="output">
                             <div class="lists">
                                 <p class="items" onclick='filterByYear("All Years")'>All Years</p>
                                 <?php foreach ($years as $year): ?>
-                                    <p class="items" onclick="filterByYear('<?php echo htmlspecialchars($year['event_year']); ?>')">
+                                    <p class="items" onclick='filterByYear("<?php echo $year['event_year']; ?>")'>
                                         <?php echo htmlspecialchars($year['event_year']); ?>
                                     </p>
                                 <?php endforeach; ?>
@@ -416,25 +416,31 @@ $pendingEventsCount = countPendingEvents($conn);
                 </form>
 
                 <!-- Filter by Month -->
-                <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                <form action="" method="post" id="monthForm">
                     <input type="hidden" name="selectedMonth" id="selectedMonth">
                     <div class="dropdown-container">
                         <div class="dropdown">
                             <input type="text" readonly name="monthDisplay" id="monthDisplay"
-                                placeholder="Filter by Month" maxlength="20" class="output">
+                                placeholder="Filter by Month" class="output">
                             <div class="lists">
                                 <p class="items" onclick='filterByMonth("All Months")'>All Months</p>
-                                <!-- Month items -->
-                                <?php
-                                $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                                foreach ($months as $month): ?>
-                                    <p class="items" onclick='filterByMonth("<?php echo $month; ?>")'><?php echo $month; ?>
-                                    </p>
-                                <?php endforeach; ?>
+                                <p class="items" onclick='filterByMonth("January")'>January</p>
+                                <p class="items" onclick='filterByMonth("February")'>February</p>
+                                <p class="items" onclick='filterByMonth("March")'>March</p>
+                                <p class="items" onclick='filterByMonth("April")'>April</p>
+                                <p class="items" onclick='filterByMonth("May")'>May</p>
+                                <p class="items" onclick='filterByMonth("June")'>June</p>
+                                <p class="items" onclick='filterByMonth("July")'>July</p>
+                                <p class="items" onclick='filterByMonth("August")'>August</p>
+                                <p class="items" onclick='filterByMonth("September")'>September</p>
+                                <p class="items" onclick='filterByMonth("October")'>October</p>
+                                <p class="items" onclick='filterByMonth("November")'>November</p>
+                                <p class="items" onclick='filterByMonth("December")'>December</p>
                             </div>
                         </div>
                     </div>
                 </form>
+
 
             </div>
 
@@ -512,50 +518,51 @@ $pendingEventsCount = countPendingEvents($conn);
         });
 
         function filterByYear(year) {
-            document.getElementById('yearDisplay').value = year;
-            document.getElementById('selectedYear').value = year === 'All Years' ? '' : year;
-            document.forms[0].submit(); // Automatically submit the form
+            document.getElementById("selectedYear").value = year;
+            document.getElementById("yearForm").submit();
         }
 
         function filterByMonth(month) {
-            document.getElementById('monthDisplay').value = month;
-            document.getElementById('selectedMonth').value = month === 'All Months' ? '' : month;
-            document.forms[1].submit(); // Automatically submit the form
+            document.getElementById("selectedMonth").value = month;
+            document.getElementById("monthForm").submit();
         }
 
     </script>
 
 
+    </script>
+
+
     <script>
-    // Function to filter events
-    function filterEvents() {
-        const selectedYear = document.getElementById('yearFilter').value;
-        const selectedMonth = document.getElementById('monthFilter').value;
+        // Function to filter events
+        function filterEvents() {
+            const selectedYear = document.getElementById('yearFilter').value;
+            const selectedMonth = document.getElementById('monthFilter').value;
 
-        // Get all event boxes
-        const eventBoxes = document.querySelectorAll('.box');
+            // Get all event boxes
+            const eventBoxes = document.querySelectorAll('.box');
 
-        eventBoxes.forEach(box => {
-            const startDate = new Date(box.getAttribute('data-start-date'));
-            const eventYear = startDate.getFullYear();
-            const eventMonth = startDate.toLocaleString('default', { month: 'long' });
+            eventBoxes.forEach(box => {
+                const startDate = new Date(box.getAttribute('data-start-date'));
+                const eventYear = startDate.getFullYear();
+                const eventMonth = startDate.toLocaleString('default', { month: 'long' });
 
-            // Check if the event matches the selected filters
-            const matchesYear = selectedYear === '' || eventYear == selectedYear;
-            const matchesMonth = selectedMonth === '' || eventMonth === selectedMonth;
+                // Check if the event matches the selected filters
+                const matchesYear = selectedYear === '' || eventYear == selectedYear;
+                const matchesMonth = selectedMonth === '' || eventMonth === selectedMonth;
 
-            // Show or hide the event box based on the filter
-            if (matchesYear && matchesMonth && matchesSponsor) {
-                box.style.display = '';
-            } else {
-                box.style.display = 'none';
-            }
-        });
-    }
+                // Show or hide the event box based on the filter
+                if (matchesYear && matchesMonth && matchesSponsor) {
+                    box.style.display = '';
+                } else {
+                    box.style.display = 'none';
+                }
+            });
+        }
 
-    // Event listeners for dropdowns
-    document.getElementById('yearFilter').addEventListener('change', filterEvents);
-    document.getElementById('monthFilter').addEventListener('change', filterEvents);
+        // Event listeners for dropdowns
+        document.getElementById('yearFilter').addEventListener('change', filterEvents);
+        document.getElementById('monthFilter').addEventListener('change', filterEvents);
     </script>
 
 

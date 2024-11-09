@@ -1,8 +1,28 @@
 <?php
 require_once('../db.connection/connection.php');
 
-$sql = "SELECT *, IF(event_cancel IS NULL OR event_cancel = '', '', event_cancel) AS event_status FROM Events WHERE NOW() < CONCAT(date_end, ' ', time_end) ORDER BY date_created DESC";
-$result = mysqli_query($conn, $sql);
+// Check if a sponsor filter is set
+$selectedSponsor = isset($_POST['sponsorEventId']) ? $_POST['sponsorEventId'] : 'All Sponsors';
+
+// Adjust the SQL query based on the selected sponsor
+$sql = "SELECT e.*, IF(e.event_cancel IS NULL OR e.event_cancel = '', '', e.event_cancel) AS event_status 
+        FROM Events e 
+        LEFT JOIN sponsor s ON e.event_id = s.event_id";
+
+// Apply sponsor filter if it's not 'All Sponsors'
+if ($selectedSponsor !== 'All Sponsors') {
+    $sql .= " WHERE s.sponsor_Name = ?";
+}
+
+$sql .= " AND NOW() < CONCAT(e.date_end, ' ', e.time_end) ORDER BY e.date_created DESC";
+
+// Prepare and execute the statement
+$stmt = $conn->prepare($sql);
+if ($selectedSponsor !== 'All Sponsors') {
+    $stmt->bind_param("s", $selectedSponsor);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 
 while ($row = mysqli_fetch_assoc($result)) {
     $eventTitle = $row['event_title'];

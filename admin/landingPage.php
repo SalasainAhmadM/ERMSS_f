@@ -27,7 +27,7 @@
 
     <?php
     require_once('../db.connection/connection.php');
-
+    $selectedSponsor = isset($_POST['sponsorDisplay']) ? $_POST['sponsorDisplay'] : '';
     // Fetch distinct years from the Events table
     $yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM Events ORDER BY event_year DESC";
     $yearResult = mysqli_query($conn, $yearQuery);

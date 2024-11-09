@@ -528,7 +528,7 @@ include('../function/F.editEvent.php');
                     <div class="input_field">
                         <input type="submit" value="Save" class="createBtn" id="saveEventButton">
                         <?php if ($eventStatus === 'upcoming'): ?>
-                        <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
+                            <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
                         <?php endif; ?>
                     </div>
 

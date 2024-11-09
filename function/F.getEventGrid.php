@@ -1,79 +1,114 @@
 <?php
-    // Include your database connection code here
-    require_once('../db.connection/connection.php');
+// Include your database connection
+require_once('../db.connection/connection.php');
 
-    // Fetch upcoming and ongoing events from the database, excluding events with non-empty event_cancel
-    $sql = "SELECT * FROM Events WHERE NOW() < CONCAT(date_end, ' ', time_end) AND (event_cancel IS NULL OR event_cancel = '') ORDER BY date_created DESC";
-    $result = mysqli_query($conn, $sql);
+// Get selected year and month from form submission, default to 'All'
+$selectedYear = $_POST['selectedYear'] ?? 'All Years';
+$selectedMonth = $_POST['selectedMonth'] ?? 'All Months';
+$sponsorName = $_POST['sponsorName'] ?? 'All Sponsors';
 
-    // Loop through each event and generate a box
-    while ($row = mysqli_fetch_assoc($result)) {
-        $eventTitle = $row['event_title'];
-        $eventLocation = $row['location'];
-        $eventDateStart = date('F j, Y', strtotime($row['date_start'])); // Format date as Month day, Year
-        $eventDateEnd = date('F j, Y', strtotime($row['date_end'])); // Format date as Month day, Year
-        $eventTimeStart = date('h:ia', strtotime($row['time_start'])); // Format time as Hour:Minute AM/PM
-        $eventTimeEnd = date('h:ia', strtotime($row['time_end'])); // Format time as Hour:Minute AM/PM
-        $eventMode = $row['event_mode'];
-        $eventType = $row['event_type'];
-        $eventId = $row['event_id'];
+// Base SQL query for upcoming and ongoing events
+$sql = "SELECT E.* FROM Events E
+        LEFT JOIN sponsor S ON E.event_id = S.event_id
+        WHERE NOW() < CONCAT(E.date_end, ' ', E.time_end)
+        AND (E.event_cancel IS NULL OR E.event_cancel = '')";
 
-        // Get current date and time in the event's timezone
-        $eventTimeZone = new DateTimeZone('Asia/Manila');
-        $currentDateTime = new DateTime('now', $eventTimeZone);
-        $eventStartDateTime = new DateTime($row['date_start'] . ' ' . $row['time_start'], $eventTimeZone);
-        $eventEndDateTime = new DateTime($row['date_end'] . ' ' . $row['time_end'], $eventTimeZone);
+// Filter by sponsor name if specified
+if ($sponsorName !== 'All Sponsors') {
+    $sql .= " AND S.sponsor_Name = ?";
+}
 
-        // Check if the event is ongoing or upcoming
-        $eventStatus = '';
+// Filter by year if specified
+if ($selectedYear !== 'All Years') {
+    $sql .= " AND YEAR(E.date_start) = ?";
+}
 
-        if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
-            $eventStatus = 'ongoing';
-        } elseif ($currentDateTime < $eventStartDateTime) {
-            $eventStatus = 'upcoming';
-        }
+// Filter by month if specified
+if ($selectedMonth !== 'All Months') {
+    $sql .= " AND MONTHNAME(E.date_start) = ?";
+}
 
-        // Only display upcoming and ongoing events
-        if ($eventStatus === 'upcoming' || $eventStatus === 'ongoing') {
-?>
-            <div class="box" data-start-date="<?php echo $eventStartDateTime->format('Y-m-d H:i:s'); ?>" data-end-date="<?php echo $eventEndDateTime->format('Y-m-d H:i:s'); ?>">
-                <div class="company">
-                    <img src="img/wesmaarrdec-removebg-preview.png" alt="">
-                    <div>
-                        <h3><?php echo $eventTitle; ?></h3>
-                        <span><?php echo $eventMode; ?></span>
-                    </div>
-                </div>
+// Order by creation date
+$sql .= " ORDER BY E.date_created DESC";
 
-                <h3 class="event-title"><?php echo $eventType; ?></h3>
+// Prepare the statement with dynamic parameters
+$stmt = $conn->prepare($sql);
 
-                <p class="location"><i class="fas fa-map-marker-alt"></i> <span><?php echo $eventLocation; ?></span></p>
-                <div class="tags">
-                    <p><i class='bx bx-calendar' ></i> <span><?php echo "$eventDateStart - $eventDateEnd"; ?></span></p>
-                    <p><i class='bx bxs-timer'></i> <span><?php echo $eventStatus; ?></span></p>
-                    <p><i class="fas fa-clock"></i> <span><?php echo "$eventTimeStart - $eventTimeEnd"; ?></span></p>
-                </div>
+// Bind parameters dynamically based on selected filters
+$params = [];
+if ($sponsorName !== 'All Sponsors')
+    $params[] = $sponsorName;
+if ($selectedYear !== 'All Years')
+    $params[] = $selectedYear;
+if ($selectedMonth !== 'All Months')
+    $params[] = $selectedMonth;
 
-                <div class="flex-btn">
-                    <a href="view_event.php?event_id=<?php echo $row['event_id']; ?>" class="btn">view event</a>
-                    <a href="editEventGrid.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
-                    <!-- <a href="javascript:void(0);" onclick="confirmDeleteEvent(<?php echo $eventId; ?>);">
-                        <button class="btn_delete"><i class="fa fa-trash"></i></button>
-                    </a> -->
-                </a>
-                
+// Only call bind_param if there are parameters
+if (!empty($params)) {
+    $stmt->bind_param(str_repeat('s', count($params)), ...$params);
+}
+
+// Execute the statement
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Generate HTML for each event
+while ($row = $result->fetch_assoc()) {
+    $eventTitle = htmlspecialchars($row['event_title']);
+    $eventLocation = htmlspecialchars($row['location']);
+    $eventDateStart = date('F j, Y', strtotime($row['date_start']));
+    $eventDateEnd = date('F j, Y', strtotime($row['date_end']));
+    $eventTimeStart = date('h:ia', strtotime($row['time_start']));
+    $eventTimeEnd = date('h:ia', strtotime($row['time_end']));
+    $eventMode = htmlspecialchars($row['event_mode']);
+    $eventType = htmlspecialchars($row['event_type']);
+    $eventId = htmlspecialchars($row['event_id']);
+
+    $currentDateTime = new DateTime('now', new DateTimeZone('Asia/Manila'));
+    $eventStartDateTime = new DateTime($row['date_start'] . ' ' . $row['time_start'], new DateTimeZone('Asia/Manila'));
+    $eventEndDateTime = new DateTime($row['date_end'] . ' ' . $row['time_end'], new DateTimeZone('Asia/Manila'));
+
+    $eventStatus = '';
+    if ($currentDateTime >= $eventStartDateTime && $currentDateTime <= $eventEndDateTime) {
+        $eventStatus = 'ongoing';
+    } elseif ($currentDateTime < $eventStartDateTime) {
+        $eventStatus = 'upcoming';
+    }
+
+    if ($eventStatus) {
+        ?>
+        <div class="box">
+            <div class="company">
+                <img src="img/wesmaarrdec-removebg-preview.png" alt="">
+                <div>
+                    <h3><?php echo $eventTitle; ?></h3>
+                    <span><?php echo $eventMode; ?></span>
                 </div>
             </div>
-<?php
-        }
+            <h3 class="event-title"><?php echo $eventType; ?></h3>
+            <p class="location"><i class="fas fa-map-marker-alt"></i> <span><?php echo $eventLocation; ?></span></p>
+            <div class="tags">
+                <p><i class='bx bx-calendar'></i> <span><?php echo "$eventDateStart - $eventDateEnd"; ?></span></p>
+                <p><i class='bx bxs-timer'></i> <span><?php echo $eventStatus; ?></span></p>
+                <p><i class="fas fa-clock"></i> <span><?php echo "$eventTimeStart - $eventTimeEnd"; ?></span></p>
+            </div>
+            <div class="flex-btn">
+                <a href="view_event.php?event_id=<?php echo $eventId; ?>" class="btn">View Event</a>
+                <a href="editEventGrid.php?event_id=<?php echo $eventId; ?>" class="fa-solid fa-pen-to-square"></a>
+            </div>
+        </div>
+        <?php
     }
-    // Close the result set
-    mysqli_free_result($result);
+}
 
-    // Close database connection
-    mysqli_close($conn);
+// Free result and close the connection
+$result->free();
+$conn->close();
 ?>
- <script>
+
+
+
+<script>
     function confirmDeleteEvent(eventId) {
         Swal.fire({
             title: 'Delete Event?',
@@ -84,10 +119,10 @@
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'No, cancel!',
-            padding: '3rem', 
+            padding: '3rem',
             customClass: {
                 popup: 'larger-swal'
-            }          
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = `deleteEvent2.php?event_id=${eventId}`;

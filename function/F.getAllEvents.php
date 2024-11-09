@@ -2,7 +2,7 @@
 require_once('../db.connection/connection.php');
 
 $sponsorFilter = $_POST['sponsorEventId'] ?? 'All Sponsors';
-
+$selectedSponsor = isset($_POST['sponsorDisplay']) ? $_POST['sponsorDisplay'] : '';
 $sql = "SELECT e.* FROM Events e";
 
 // Join with the sponsor table if a specific sponsor is selected
