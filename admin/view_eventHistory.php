@@ -129,6 +129,7 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                             </li>
                             <li>Event Type: <?php echo $_SESSION['event_data']['eventType']; ?></li>
                             <li>Event Mode: <?php echo $_SESSION['event_data']['eventMode']; ?></li>
+                            <li>Audience: <?php echo $_SESSION['event_data']['audienceType']; ?></li>
                             <?php if ($_SESSION['event_data']['eventMode'] !== 'Face-to-Face'): ?>
                                 <li>Event link: <a href="<?php echo $_SESSION['event_data']['eventLink']; ?>"
                                         target="_blank"><?php echo $_SESSION['event_data']['eventLink']; ?></a></li>
@@ -174,10 +175,10 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
 
                     <div class="flex-btn">
                         <!-- Can only add participant if upcoming -->
-                        <?php if ($_SESSION['event_data']['eventStatus'] === 'Upcoming'): ?> 
+                        <?php if ($_SESSION['event_data']['eventStatus'] === 'Upcoming'): ?>
                             <a href="applyEvent.php?event_id=<?php echo $eventId; ?>" class="btn">Add Participant</a>
                         <?php endif; ?>
-                        
+
                         <div class="participants-links">
                             <a href="participants_check.php?eventTitle=<?php echo urlencode($_SESSION['event_data']['eventTitle']); ?>"
                                 class="save"><i class='bx bx-body'></i> <span>Check Participants</span></a>

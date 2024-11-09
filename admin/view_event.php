@@ -210,8 +210,8 @@ $participantRatio = $totalParticipants . "/" . $participantLimit;
                     </style>
 
                     <div class="flex-btn">
-                         <!-- Can only add participant if upcoming -->
-                        <?php if ($_SESSION['event_data']['eventStatus'] === 'Upcoming'): ?> 
+                        <!-- Can only add participant if upcoming -->
+                        <?php if ($_SESSION['event_data']['eventStatus'] === 'Upcoming'): ?>
                             <a href="applyEvent.php?event_id=<?php echo $eventId; ?>" class="btn">Add Participant</a>
                         <?php endif; ?>
 
