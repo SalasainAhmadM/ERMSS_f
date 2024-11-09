@@ -23,9 +23,8 @@
 <body>
 
     <?php
-    session_start();
     require_once('../db.connection/connection.php');
-
+    $selectedSponsor = isset($_POST['sponsorDisplay']) ? $_POST['sponsorDisplay'] : '';
     function countPendingUsers($conn)
     {
         $sqls = "SELECT COUNT(*) AS totalPendingUsers FROM pendinguser";
@@ -51,41 +50,9 @@
         }
     }
 
+    $pendingUsersCount = countPendingUsers($conn);
+    $pendingEventsCount = countPendingEvents($conn);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Check if AdminID is set in the session
-        if (isset($_SESSION['AdminID'])) {
-            $AdminID = $_SESSION['AdminID'];
-
-            $sqlAdmin = "SELECT * FROM admin WHERE AdminID = ?";
-            $stmtAdmin = $conn->prepare($sqlAdmin);
-            $stmtAdmin->bind_param("i", $AdminID);
-            $stmtAdmin->execute();
-            $resultAdmin = $stmtAdmin->get_result();
-
-            if ($resultAdmin->num_rows > 0) {
-                while ($row = $resultAdmin->fetch_assoc()) {
-                    $LastName = $row['LastName'];
-                    $FirstName = $row['FirstName'];
-                    $MI = $row['MI'];
-                    $Email = $row['Email'];
-                    $ContactNo = $row['ContactNo'];
-                    $Position = $row['Position'];
-                    $Affiliation = $row['Affiliation'];
-                    $Image = $row['Image'];
-                    $Role = $row['Role'];
-
-                }
-            } else {
-                echo "No records found";
-            }
-
-            $stmtAdmin->close();
-
-            $pendingUsersCount = countPendingUsers($conn);
-            $pendingEventsCount = countPendingEvents($conn);
-        }
-    }
     ?>
     <?php
     if (isset($_SESSION['success'])) {
@@ -124,18 +91,40 @@
             </div>
             <i class="bx bx-menu" id="btnn"></i>
         </div>
-        <div class="user">
+        <?php
+        session_start();
 
-            <?php if (!empty($Image)): ?>
-                <img src="../assets/img/profilePhoto/<?php echo $Image; ?>" alt="user" class="user-img">
-            <?php else: ?>
-                <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
-            <?php endif; ?>
-            <div>
-                <p class="bold"><?php echo $FirstName . ' ' . $MI . ' ' . $LastName; ?></p>
-                <p><?php echo $Position; ?></p>
+        if (isset($_SESSION['AdminID'])) {
+            $adminID = $_SESSION['AdminID'];
+
+            $query = "SELECT FirstName, MI, LastName, Position, Image FROM admin WHERE AdminID = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $adminID);
+            $stmt->execute();
+            $stmt->bind_result($FirstName, $MI, $LastName, $Position, $Image);
+            $stmt->fetch();
+            $stmt->close();
+
+            // Use the variables in your HTML output
+            ?>
+            <div class="user">
+                <?php if (!empty($Image)): ?>
+                    <img src="../assets/img/profilePhoto/<?php echo htmlspecialchars($Image); ?>" alt="user" class="user-img">
+                <?php else: ?>
+                    <img src="../assets/img/profile.jpg" alt="default user" class="user-img">
+                <?php endif; ?>
+                <div>
+                    <p class="bold">
+                        <?php echo htmlspecialchars($FirstName) . ' ' . htmlspecialchars($MI) . ' ' . htmlspecialchars($LastName); ?>
+                    </p>
+                    <p><?php echo htmlspecialchars($Position); ?></p>
+                </div>
             </div>
-        </div>
+            <?php
+        } else {
+            echo "User not logged in.";
+        }
+        ?>
 
 
         <ul>
@@ -331,7 +320,87 @@
 
                     </form>
                 </div>
+                <!-- <div class="flex2" style="gap: 10px; margin-bottom:10px">
+                    <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem;">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="sponsorDisplay" placeholder="Filter by Sponsor"
+                                    maxlength="20" class="output"
+                                    value="<?php echo htmlspecialchars($selectedSponsor); ?>">
+                                <input type="hidden" name="sponsorEventId" id="sponsorEventId" />
+                                <div class="lists">
+                                    <p class="items" onclick='filterBySponsor("All Sponsors")'>All Sponsors</p>
+                                    <?php
+                                    $query = "SELECT DISTINCT sponsor_Name FROM sponsor";
+                                    $resultSponsor = $conn->query($query);
+                                    while ($row = $resultSponsor->fetch_assoc()) {
+                                        $sponsorName = htmlspecialchars($row['sponsor_Name']);
+                                        echo "<p class='items' onclick='filterBySponsor(\"$sponsorName\")'>$sponsorName</p>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <script>
+                        function filterBySponsor(sponsorName) {
+                            document.querySelector('input[name="sponsorDisplay"]').value = sponsorName;
+                            document.querySelector('input[name="sponsorEventId"]').value = sponsorName;
+                            document.getElementById('sponsorFilterForm').submit();
+                        }
+                    </script>
 
+
+                    <form action="" method="post" style="margin-bottom:1rem;">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="yearDisplay" id="yearDisplay"
+                                    placeholder="Filter by Year" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items" onclick='filterByYear("All Years")'>All Years</p>
+                                    <?php
+                                    $yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM pendingevents ORDER BY event_year DESC";
+                                    $yearResult = $conn->query($yearQuery);
+                                    while ($row = $yearResult->fetch_assoc()) {
+                                        echo "<p class='items' onclick='filterByYear(\"{$row['event_year']}\")'>{$row['event_year']}</p>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <script>
+                        function filterByYear(year) {
+                            document.querySelector('input[name="yearDisplay"]').value = year;
+                            document.querySelector('form[action=""]').submit();
+                        }
+                    </script>
+
+                    <form action="" method="post" style="margin-bottom:1rem;">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="monthDisplay" id="monthDisplay"
+                                    placeholder="Filter by Month" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items" onclick='filterByMonth("All Months")'>All Months</p>
+                                    <?php
+                                    $months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                                    foreach ($months as $month) {
+                                        echo "<p class='items' onclick='filterByMonth(\"$month\")'>$month</p>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <script>
+                        function filterByMonth(month) {
+                            document.querySelector('input[name="monthDisplay"]').value = month;
+                            document.querySelector('form[action=""]').submit();
+                        }
+                    </script>
+
+                </div> -->
             </section>
             <!-- ======= event filter ends ========-->
 
