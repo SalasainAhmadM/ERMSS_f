@@ -56,6 +56,11 @@ if ($result->num_rows === 0) {
             $eventStatus = 'ended';
         }
 
+          // Skip the event if its status is "ended"
+        if ($eventStatus === 'ended') {
+            continue;
+        }
+
         // Display the event row
         echo "<tr data-start-date='{$row['date_start']}' data-end-date='{$row['date_end']}'>";
         echo "<td data-label='Event Title'>{$eventTitle}</td>";
