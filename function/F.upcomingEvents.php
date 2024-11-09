@@ -56,8 +56,11 @@ if ($result->num_rows === 0) {
             $eventStatus = 'ended';
         }
 
-          // Skip the event if its status is "ended"
+          // Skip the event if its status is "ended" and "ongoing"
         if ($eventStatus === 'ended') {
+            continue;
+        }
+        if ($eventStatus === 'ongoing') {
             continue;
         }
 
