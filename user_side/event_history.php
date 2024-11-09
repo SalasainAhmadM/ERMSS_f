@@ -298,6 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                             </li>
                             <li>Event Type: <?php echo $_SESSION['event_data']['eventType']; ?></li>
                             <li>Event Mode: <?php echo $_SESSION['event_data']['eventMode']; ?></li>
+                            <li>Audience: <?php echo $_SESSION['event_data']['audienceType']; ?></li>
                             <?php if ($_SESSION['event_data']['eventMode'] !== 'Face-to-Face'): ?>
                                 <li>Event link: <a href="<?php echo $_SESSION['event_data']['eventLink']; ?>"
                                         target="_blank"><?php echo $_SESSION['event_data']['eventLink']; ?></a></li>
@@ -309,7 +310,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_event'])) {
                         </ul>
                     </div>
 
-
+                    <!-- Back Button -->
+                    <div class="back-button-container">
+                        <a href="./history.php" class="back-button">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
                     <!-- <form action="" method="post" class="flex-btn">
                             <a href="applyEvent.php" class="btn">Join Event</a>
                         </form> -->

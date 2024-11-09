@@ -182,8 +182,31 @@ section{
     padding: 1rem;
 }
 
+.back-button-container {
+    margin: 20px 0;
+}
 
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--first-color);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
 
+.back-button i {
+    margin-right: 8px;
+}
+
+.back-button:hover {
+    background-color: var(--first-color-alt);
+    /* Darker shade for hover effect */
+}
+                        
 
 
 /* ========= SIDEBAR STARTS =========*/

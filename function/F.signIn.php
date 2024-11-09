@@ -37,6 +37,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($Password, $row["password"])) {
             // User login successful, set UserID in the session and redirect
             $_SESSION["UserID"] = $row["userID"];
+
+            // Insert "absent" record if not already done today
+            $userID = $row["userID"];
+            $sqlAbsent = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, created_at, day)
+                SELECT 
+                    ep.participant_id,
+                    ep.event_id,
+                    CURDATE() AS attendance_date,
+                    'absent' AS status,
+                    NOW() AS created_at,
+                    DATEDIFF(CURDATE(), e.date_start) + 1 AS day
+                FROM 
+                    eventparticipants ep
+                INNER JOIN 
+                    events e ON ep.event_id = e.event_id
+                LEFT JOIN 
+                    attendance a ON a.participant_id = ep.participant_id 
+                    AND a.event_id = ep.event_id 
+                    AND a.attendance_date = CURDATE()
+                WHERE 
+                    e.date_start <= CURDATE() 
+                    AND e.date_end >= CURDATE() 
+                    AND a.attendance_date IS NULL
+                    AND ep.participant_id = ?";
+
+            $stmtAbsent = $conn->prepare($sqlAbsent);
+            $stmtAbsent->bind_param("i", $userID);
+            $stmtAbsent->execute();
+
             header("Location: ../user_side/userDashboard.php");
             exit();
         }
