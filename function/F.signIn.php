@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = $resultAdmins->fetch_assoc();
         if (password_verify($Password, $row["password"])) {
             $_SESSION['AdminID'] = $row['adminID'];
-            $_SESSION['Role'] = $row['role']; // corrected 'Admin' to 'role'
+            $_SESSION['Role'] = $row['role'];
             header("Location: ../admin/adminDashboard.php");
             exit();
         }
@@ -35,36 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($resultUsers->num_rows == 1) {
         $row = $resultUsers->fetch_assoc();
         if (password_verify($Password, $row["password"])) {
-            // User login successful, set UserID in the session and redirect
+            // User login successful, set UserID in the session
             $_SESSION["UserID"] = $row["userID"];
 
-            // Insert "absent" record if not already done today
-            $userID = $row["userID"];
-            $sqlAbsent = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, created_at, day)
-                SELECT 
-                    ep.participant_id,
-                    ep.event_id,
-                    CURDATE() AS attendance_date,
-                    'absent' AS status,
-                    NOW() AS created_at,
-                    DATEDIFF(CURDATE(), e.date_start) + 1 AS day
-                FROM 
-                    eventparticipants ep
-                INNER JOIN 
-                    events e ON ep.event_id = e.event_id
-                LEFT JOIN 
-                    attendance a ON a.participant_id = ep.participant_id 
-                    AND a.event_id = ep.event_id 
-                    AND a.attendance_date = CURDATE()
-                WHERE 
-                    e.date_start <= CURDATE() 
-                    AND e.date_end >= CURDATE() 
-                    AND a.attendance_date IS NULL
-                    AND ep.participant_id = ?";
-
-            $stmtAbsent = $conn->prepare($sqlAbsent);
-            $stmtAbsent->bind_param("i", $userID);
-            $stmtAbsent->execute();
+            // Check for missing attendance and insert "absent" records for all participants
+            markAbsentDaysForAll($conn);
 
             header("Location: ../user_side/userDashboard.php");
             exit();
@@ -74,5 +49,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If no match found, redirect to an error page or handle accordingly
     header("Location: error/errorLogin.php");
     exit();
+}
+
+// Function to mark absent days for all participants
+function markAbsentDaysForAll($conn)
+{
+    $today = date('Y-m-d');
+
+    // Fetch all events and their participants whose end date has not passed
+    $sqlEventsParticipants = "SELECT ep.participant_id, ep.event_id, e.date_start, e.date_end 
+                              FROM eventparticipants ep
+                              JOIN events e ON ep.event_id = e.event_id
+                              WHERE e.date_end >= ?";
+    $stmtEventsParticipants = $conn->prepare($sqlEventsParticipants);
+    $stmtEventsParticipants->bind_param("s", $today);
+    $stmtEventsParticipants->execute();
+    $resultEventsParticipants = $stmtEventsParticipants->get_result();
+
+    while ($eventParticipant = $resultEventsParticipants->fetch_assoc()) {
+        $participantID = $eventParticipant['participant_id'];
+        $eventID = $eventParticipant['event_id'];
+        $dateStart = $eventParticipant['date_start'];
+        $dateEnd = $eventParticipant['date_end'];
+
+        // Generate dates from the start date to the day before today
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod(new DateTime($dateStart), $interval, new DateTime($today));
+
+        foreach ($period as $date) {
+            $attendanceDate = $date->format("Y-m-d");
+
+            // Check if an attendance record exists for this date
+            $sqlCheck = "SELECT * FROM attendance 
+                         WHERE participant_id = ? 
+                         AND event_id = ? 
+                         AND attendance_date = ?";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->bind_param("iis", $participantID, $eventID, $attendanceDate);
+            $stmtCheck->execute();
+            $resultCheck = $stmtCheck->get_result();
+
+            // If no attendance record, insert an "absent" entry
+            if ($resultCheck->num_rows == 0) {
+                $dayNumber = (new DateTime($attendanceDate))->diff(new DateTime($dateStart))->days + 1;
+
+                $sqlInsert = "INSERT INTO attendance (participant_id, event_id, attendance_date, status, day)
+                              VALUES (?, ?, ?, 'absent', ?)";
+                $stmtInsert = $conn->prepare($sqlInsert);
+                $stmtInsert->bind_param("iisi", $participantID, $eventID, $attendanceDate, $dayNumber);
+                $stmtInsert->execute();
+            }
+        }
+    }
+
+    echo "Absent records inserted for missed days.";
 }
 ?>
