@@ -282,7 +282,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             <!-- <h1 class="heading">filter events</h1> -->
 
 
-            <div class="flex2" style=" gap: 10px; margin-bottom:10px">
+            <div class="flex2" style=" gap: 10px; margin-bottom:10px; margin-left:7.5rem">
                 <!-- 
     <form action="" method="post" style="margin-bottom:1rem; height:10%">
 
@@ -345,7 +345,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
                 </form>
             </div>
-            <div class="flex2" style="gap: 10px; margin-bottom:10px">
+            <div class="flex2" style="gap: 10px; margin-bottom:10px; margin-left:7.5rem">
                 <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem; height:10%;">
                     <div class="dropdown-container">
                         <div class="dropdown">
