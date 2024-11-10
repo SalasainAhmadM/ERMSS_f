@@ -445,7 +445,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
                             </thead>
 
                             <tbody>
-                                <?php include('../function/F.getEventHistoryTbl.php'); ?>
+                                <?php include('../function/F.getEventHistoryTblcompleted.php'); ?>
                             </tbody>
                         </table>
                     </div>
