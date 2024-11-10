@@ -90,7 +90,8 @@ require_once('db.connection/connection.php');
                         <h2 class="home__profession">MANAGEMENT SYSTEM</h2> <!-- MODIFY MODIFY MODIFY -->
 
                         <div class="home__social">
-                            <a href="" target="_blank" class="home__social-link">
+                            <a href="https://www.facebook.com/WESMAARRDEC?mibextid=ZbWKwL" target="_blank"
+                                class="home__social-link">
                                 <i class="ri-facebook-circle-line"></i>
                             </a>
 
