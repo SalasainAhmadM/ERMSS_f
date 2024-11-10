@@ -583,7 +583,7 @@ $pendingEventsCount = countPendingEvents($conn);
 
 </body>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--real-time update-->
 <script src="js/realTimeUpdate.js"></script>
 

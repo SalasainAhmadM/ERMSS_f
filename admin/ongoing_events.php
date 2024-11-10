@@ -220,12 +220,32 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
             </li>
 
             <li class="nav-sidebar">
-                <a href="../login.php">
+                <a href="#" onclick="confirmLogout(event)">
                     <i class="bx bx-log-out"></i>
                     <span class="nav-item">Logout</span>
                 </a>
                 <span class="tooltip">Logout</span>
             </li>
+
+            <script>
+                function confirmLogout(event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You will be logged out.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, logout'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "../login.php";
+                        }
+                    });
+                }
+            </script>
         </ul>
     </div>
 
@@ -563,7 +583,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
 </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!--real-time update-->
 <script src="js/realTimeUpdate.js"></script>
 
