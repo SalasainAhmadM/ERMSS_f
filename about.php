@@ -302,7 +302,8 @@ require_once('db.connection/connection.php');
                 </ul>
 
                 <div class="footer__social">
-                    <a href="" target="_blank" class="footer__social-link">
+                    <a href="https://www.facebook.com/WESMAARRDEC?mibextid=ZbWKwL" target="_blank"
+                        class="footer__social-link">
                         <i class="ri-facebook-circle-fill"></i>
                     </a>
 

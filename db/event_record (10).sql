@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2024 at 01:02 AM
+-- Generation Time: Nov 10, 2024 at 03:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -460,31 +460,11 @@ INSERT INTO `events` (`event_id`, `event_title`, `event_description`, `event_typ
 (135, 'dasf w', 'fww', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-10-02', '2020-10-28', '12:59:00', '13:01:00', '2024-03-12 00:13:54', '', '', '', 0, ''),
 (136, 'sdfaswe afawfw', 'faskjkjhrflifhjkdf', 'Training Sessions', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2020-11-01', '2020-11-21', '11:00:00', '13:00:00', '2024-03-12 00:14:29', '', '', '', 0, ''),
 (137, 'dasfwfwewfw', 'sdfawf wefwa', 'Cluster-specific gathering', 'Hybrid', '', 'Tetuan, Zamboanga City', '2020-12-01', '2020-12-30', '12:59:00', '14:00:00', '2024-03-12 00:15:09', 'https://meet.google.com/sgm-jdfr-ucn?authuser=2', '', '', 0, ''),
-(138, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
 (139, 'jhjhljk', 'jhkhlk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-02-05', '2022-03-06', '13:00:00', '14:00:00', '2024-03-12 00:19:45', '', '', '', 0, ''),
 (140, 'hgggg', 'hhhhhh', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-06-02', '2022-06-03', '13:00:00', '14:59:00', '2024-03-12 00:20:28', '', '', '', 0, ''),
 (143, 'jkhlkhkj', 'jhljhk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2023-02-01', '2023-02-04', '13:00:00', '14:59:00', '2024-03-12 00:22:35', '', '', '', 0, ''),
 (212, 'NZRO 2015', '', 'Training Sessions', 'Face-to-Face', '', 'zamboanga city city city', '2024-10-26', '2024-10-27', '08:00:00', '17:00:00', '2024-10-25 15:17:55', '', '', '', 2, ''),
-(214, 'NZRO NZRO 2099', 'Nzro D Roger', 'Training Sessions', 'Face-to-Face', '', 'zamboanga  citycitycitycitycity', '2024-10-27', '2024-11-11', '08:00:00', '17:00:00', '2024-10-25 15:26:18', '', '', '', 5, ''),
-(270, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(271, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(272, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(273, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(274, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(275, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(276, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(277, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(278, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(279, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(280, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(281, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(282, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(283, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(284, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(285, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(286, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(287, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
-(288, 'kjljkhkjhkjbhb', 'jhjkhjk', 'Specialized Seminars', 'Face-to-Face', '', 'Tetuan, Zamboanga City', '2022-03-01', '2022-03-02', '15:00:00', '16:00:00', '2024-03-12 00:19:10', '', '', '', 0, ''),
+(214, 'NZRO NZRO 2099', 'Nzro D Roger', 'Training Sessions', 'Face-to-Face', '', 'zamboanga  citycitycitycitycity', '2024-10-27', '2024-11-11', '08:00:00', '17:00:00', '2024-10-25 15:26:18', '', '', '', 8, ''),
 (289, 'dsadasdsakl;klqweq', 'qewew', 'Training Sessions', 'Face-to-Face', '', 'zamboanga citywqeq', '2024-10-30', '2024-11-02', '08:00:00', '17:00:00', '2024-10-31 08:08:21', '', '', '', 1, ''),
 (290, 'YOYOY', '23123', 'Training Sessions', 'Face-to-Face', '', 'zamboanga city12312', '2024-11-26', '2024-11-27', '08:00:00', '17:00:00', '2024-10-31 08:08:57', '', '', '', 12, ''),
 (291, 'SAMMY DAY', '123', 'Training Sessions', 'Face-to-Face', '', 'zamboanga city12312313', '2024-11-09', '2024-11-10', '08:00:00', '17:00:00', '2024-10-31 08:10:05', '', '', '', 1, ''),
