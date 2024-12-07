@@ -24,7 +24,7 @@ require_once('db.connection/connection.php');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css" />
 
 
-    <title>Event Management Systemd</title>
+    <title>Event Management System</title>
 </head>
 
 <body>
