@@ -141,7 +141,34 @@
                 <p><?php echo $Position; ?></p>
             </div>
         </div>
-
+        <?php
+        if (isset($_SESSION['success'])) {
+            echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+            popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+            unset($_SESSION['success']);
+        }
+        if (isset($_SESSION['error'])) {
+            echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+            unset($_SESSION['error']);
+        }
+        ?>
 
         <ul>
             <li class="nav-sidebar">
@@ -336,90 +363,90 @@
 
                     </form>
 
-                    
+
                 </div>
 
 
-                
-            <div class="flex2" style="gap: 10px; margin-bottom:10px">
-  
-            <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem;">
-                    <div class="dropdown-container">
-                        <div class="dropdown">
-                            <input type="text" readonly name="sponsorDisplay" placeholder="Filter by Sponsor"
-                                maxlength="20" class="output">
-                            <input type="hidden" name="sponsorEventId" id="sponsorEventId" />
-                            <div class="lists">
-                                <p class="items" onclick='filterBySponsor("All Sponsors")'>All Sponsors</p>
-                                <?php
-                                require_once('../db.connection/connection.php');
-                                $query = "SELECT DISTINCT sponsor_Name FROM sponsor";
-                                $result = $conn->query($query);
 
-                                while ($row = $result->fetch_assoc()) {
-                                    $sponsorName = htmlspecialchars($row['sponsor_Name']);
-                                    echo "<p class='items' onclick='filterBySponsor(\"$sponsorName\")'>$sponsorName</p>";
-                                }
-                                ?>
+                <div class="flex2" style="gap: 10px; margin-bottom:10px">
+
+                    <form id="sponsorFilterForm" action="" method="post" style="margin-bottom:1rem;">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="sponsorDisplay" placeholder="Filter by Sponsor"
+                                    maxlength="20" class="output">
+                                <input type="hidden" name="sponsorEventId" id="sponsorEventId" />
+                                <div class="lists">
+                                    <p class="items" onclick='filterBySponsor("All Sponsors")'>All Sponsors</p>
+                                    <?php
+                                    require_once('../db.connection/connection.php');
+                                    $query = "SELECT DISTINCT sponsor_Name FROM sponsor";
+                                    $result = $conn->query($query);
+
+                                    while ($row = $result->fetch_assoc()) {
+                                        $sponsorName = htmlspecialchars($row['sponsor_Name']);
+                                        echo "<p class='items' onclick='filterBySponsor(\"$sponsorName\")'>$sponsorName</p>";
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
 
-                <script>
-                    function filterBySponsor(sponsorName) {
-                        document.querySelector('input[name="sponsorDisplay"]').value = sponsorName;
-                        document.querySelector('input[name="sponsorEventId"]').value = sponsorName;
-                        document.getElementById('sponsorFilterForm').submit();
-                    }
-                </script>
-
+                    <script>
+                        function filterBySponsor(sponsorName) {
+                            document.querySelector('input[name="sponsorDisplay"]').value = sponsorName;
+                            document.querySelector('input[name="sponsorEventId"]').value = sponsorName;
+                            document.getElementById('sponsorFilterForm').submit();
+                        }
+                    </script>
 
 
-                <!-- Filter by Year -->
-                <form action="" method="post" style="margin-bottom:1rem; height:10%">
-                    <div class="dropdown-container">
-                        <div class="dropdown">
-                            <input type="text" readonly name="yearDisplay" id="yearDisplay" placeholder="Filter by Year"
-                                maxlength="20" class="output">
-                            <div class="lists">
-                                <p class="items" onclick='filterByYear("All Years")'>All Years</p>
-                                <?php foreach ($years as $year): ?>
-                                    <p class="items" onclick='filterByYear("<?php echo $year['event_year']; ?>")'>
-                                        <?php echo htmlspecialchars($year['event_year']); ?>
-                                    </p>
-                                <?php endforeach; ?>
+
+                    <!-- Filter by Year -->
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="yearDisplay" id="yearDisplay"
+                                    placeholder="Filter by Year" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items" onclick='filterByYear("All Years")'>All Years</p>
+                                    <?php foreach ($years as $year): ?>
+                                        <p class="items" onclick='filterByYear("<?php echo $year['event_year']; ?>")'>
+                                            <?php echo htmlspecialchars($year['event_year']); ?>
+                                        </p>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
 
-                <!-- Filter by Month -->
-                <form action="" method="post" style="margin-bottom:1rem; height:10%">
-                    <div class="dropdown-container">
-                        <div class="dropdown">
-                            <input type="text" readonly name="monthDisplay" id="monthDisplay"
-                                placeholder="Filter by Month" maxlength="20" class="output">
-                            <div class="lists">
-                                <p class="items" onclick='filterByMonth("All Months")'>All Months</p>
-                                <p class="items" onclick='filterByMonth("January")'>January</p>
-                                <p class="items" onclick='filterByMonth("February")'>February</p>
-                                <p class="items" onclick='filterByMonth("March")'>March</p>
-                                <p class="items" onclick='filterByMonth("April")'>April</p>
-                                <p class="items" onclick='filterByMonth("May")'>May</p>
-                                <p class="items" onclick='filterByMonth("June")'>June</p>
-                                <p class="items" onclick='filterByMonth("July")'>July</p>
-                                <p class="items" onclick='filterByMonth("August")'>August</p>
-                                <p class="items" onclick='filterByMonth("September")'>September</p>
-                                <p class="items" onclick='filterByMonth("October")'>October</p>
-                                <p class="items" onclick='filterByMonth("November")'>November</p>
-                                <p class="items" onclick='filterByMonth("December")'>December</p>
+                    <!-- Filter by Month -->
+                    <form action="" method="post" style="margin-bottom:1rem; height:10%">
+                        <div class="dropdown-container">
+                            <div class="dropdown">
+                                <input type="text" readonly name="monthDisplay" id="monthDisplay"
+                                    placeholder="Filter by Month" maxlength="20" class="output">
+                                <div class="lists">
+                                    <p class="items" onclick='filterByMonth("All Months")'>All Months</p>
+                                    <p class="items" onclick='filterByMonth("January")'>January</p>
+                                    <p class="items" onclick='filterByMonth("February")'>February</p>
+                                    <p class="items" onclick='filterByMonth("March")'>March</p>
+                                    <p class="items" onclick='filterByMonth("April")'>April</p>
+                                    <p class="items" onclick='filterByMonth("May")'>May</p>
+                                    <p class="items" onclick='filterByMonth("June")'>June</p>
+                                    <p class="items" onclick='filterByMonth("July")'>July</p>
+                                    <p class="items" onclick='filterByMonth("August")'>August</p>
+                                    <p class="items" onclick='filterByMonth("September")'>September</p>
+                                    <p class="items" onclick='filterByMonth("October")'>October</p>
+                                    <p class="items" onclick='filterByMonth("November")'>November</p>
+                                    <p class="items" onclick='filterByMonth("December")'>December</p>
 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
 
             </section>
             <!-- ======= event filter ends ========-->

@@ -1,155 +1,84 @@
 <?php
-session_start();
 require_once('../db.connection/connection.php');
 
+// Get event_id from the URL
 $eventId = $_GET['event_id'];
 
-if (isset($eventId)) {
-    mysqli_begin_transaction($conn);
+// Begin transaction
+mysqli_begin_transaction($conn);
 
-    try {
-        // Fetch event details from pendingevents
-        $sqlFetchEvent = "SELECT * FROM pendingevents WHERE event_id = ?";
-        $stmtEvent = mysqli_prepare($conn, $sqlFetchEvent);
-        mysqli_stmt_bind_param($stmtEvent, "i", $eventId);
-        mysqli_stmt_execute($stmtEvent);
-        $eventResult = mysqli_stmt_get_result($stmtEvent);
+try {
+    // 1. Fetch event data from `pendingevents`
+    $sqlFetchEvent = "SELECT * FROM pendingevents WHERE event_id = $eventId";
+    $resultFetchEvent = mysqli_query($conn, $sqlFetchEvent);
 
-        if ($eventRow = mysqli_fetch_assoc($eventResult)) {
-            // Get the next event_id by fetching the latest event_id from the events table
-            $sqlLatestEventId = "SELECT MAX(event_id) AS latest_event_id FROM events";
-            $resultLatestEventId = mysqli_query($conn, $sqlLatestEventId);
-            $latestEventIdRow = mysqli_fetch_assoc($resultLatestEventId);
-            $nextEventId = $latestEventIdRow['latest_event_id'] + 1;
+    if (mysqli_num_rows($resultFetchEvent) > 0) {
+        $eventData = mysqli_fetch_assoc($resultFetchEvent);
 
-            // Insert into events table using nextEventId
-            $sqlInsertEvent = "INSERT INTO events (
-                event_id, event_title, event_description, event_type, audience_type, event_mode, 
-                event_photo_path, location, date_start, date_end, 
-                time_start, time_end, date_created, event_link, participant_limit
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // 2. Insert event data into `events`
+        $sqlInsertEvent = "
+            INSERT INTO events (
+                event_title, event_description, event_type, event_mode, event_photo_path, location, 
+                date_start, date_end, time_start, time_end, date_created, event_link, cancelReason, 
+                event_cancel, participant_limit, audience_type
+            ) VALUES (
+                '{$eventData['event_title']}', '{$eventData['event_description']}', '{$eventData['event_type']}', 
+                '{$eventData['event_mode']}', '{$eventData['event_photo_path']}', '{$eventData['location']}', 
+                '{$eventData['date_start']}', '{$eventData['date_end']}', '{$eventData['time_start']}', 
+                '{$eventData['time_end']}', '{$eventData['date_created']}', '{$eventData['event_link']}', 
+                '{$eventData['cancelReason']}', '{$eventData['event_cancel']}', 
+                {$eventData['participant_limit']}, '{$eventData['audience_type']}'
+            )";
+        mysqli_query($conn, $sqlInsertEvent);
+        $newEventId = mysqli_insert_id($conn); // Get the new event ID
 
-            $stmtInsertEvent = mysqli_prepare($conn, $sqlInsertEvent);
-            mysqli_stmt_bind_param(
-                $stmtInsertEvent,
-                "isssssssssssssi",
-                $nextEventId,
-                $eventRow['event_title'],
-                $eventRow['event_description'],
-                $eventRow['event_type'],
-                $eventRow['audience_type'],
-                $eventRow['event_mode'],
-                $eventRow['event_photo_path'],
-                $eventRow['location'],
-                $eventRow['date_start'],
-                $eventRow['date_end'],
-                $eventRow['time_start'],
-                $eventRow['time_end'],
-                $eventRow['date_created'],
-                $eventRow['event_link'],
-                $eventRow['participant_limit']
-            );
+        // 3. Fetch and insert related speakers into `speaker`
+        $sqlFetchSpeakers = "SELECT * FROM pendingspeaker WHERE event_id = $eventId";
+        $resultFetchSpeakers = mysqli_query($conn, $sqlFetchSpeakers);
 
-            mysqli_stmt_execute($stmtInsertEvent);
-
-            // Fetch up to 5 sponsors related to this event from pendingsponsor
-            $sqlFetchSponsors = "SELECT * FROM pendingsponsor WHERE event_id = ? LIMIT 5";
-            $stmtSponsors = mysqli_prepare($conn, $sqlFetchSponsors);
-            mysqli_stmt_bind_param($stmtSponsors, "i", $eventId);
-            mysqli_stmt_execute($stmtSponsors);
-            $sponsorResult = mysqli_stmt_get_result($stmtSponsors);
-
-            // Only proceed if there are sponsors
-            if (mysqli_num_rows($sponsorResult) > 0) {
-                $sqlInsertSponsor = "INSERT INTO sponsor (sponsor_id, event_id, sponsor_Name)
-                                     VALUES (?, ?, ?)";
-                $stmtInsertSponsor = mysqli_prepare($conn, $sqlInsertSponsor);
-
-                $sponsorCount = 0;
-                while ($sponsorRow = mysqli_fetch_assoc($sponsorResult)) {
-                    mysqli_stmt_bind_param(
-                        $stmtInsertSponsor,
-                        "iis",
-                        $sponsorRow['sponsor_id'],
-                        $nextEventId,
-                        $sponsorRow['sponsor_Name']
-                    );
-                    mysqli_stmt_execute($stmtInsertSponsor);
-                    $sponsorCount++;
-
-                    if ($sponsorCount >= 5) {
-                        break;
-                    }
-                }
-
-                // Delete sponsors from pendingsponsor
-                $sqlDeleteSponsors = "DELETE FROM pendingsponsor WHERE event_id = ?";
-                $stmtDeleteSponsors = mysqli_prepare($conn, $sqlDeleteSponsors);
-                mysqli_stmt_bind_param($stmtDeleteSponsors, "i", $eventId);
-                mysqli_stmt_execute($stmtDeleteSponsors);
-            }
-
-            // Fetch up to 5 speakers related to this event from pendingspeaker
-            $sqlFetchSpeakers = "SELECT * FROM pendingspeaker WHERE event_id = ? LIMIT 5";
-            $stmtSpeakers = mysqli_prepare($conn, $sqlFetchSpeakers);
-            mysqli_stmt_bind_param($stmtSpeakers, "i", $eventId);
-            mysqli_stmt_execute($stmtSpeakers);
-            $speakerResult = mysqli_stmt_get_result($stmtSpeakers);
-
-            // Only proceed if there are speakers
-            if (mysqli_num_rows($speakerResult) > 0) {
-                $sqlInsertSpeaker = "INSERT INTO speaker (speaker_id, event_id, speaker_firstName, speaker_MI, speaker_lastName)
-                                     VALUES (?, ?, ?, ?, ?)";
-                $stmtInsertSpeaker = mysqli_prepare($conn, $sqlInsertSpeaker);
-
-                $speakerCount = 0;
-                while ($speakerRow = mysqli_fetch_assoc($speakerResult)) {
-                    mysqli_stmt_bind_param(
-                        $stmtInsertSpeaker,
-                        "iisss",
-                        $speakerRow['speaker_id'],
-                        $nextEventId,
-                        $speakerRow['speaker_firstName'],
-                        $speakerRow['speaker_MI'],
-                        $speakerRow['speaker_lastName']
-                    );
-                    mysqli_stmt_execute($stmtInsertSpeaker);
-                    $speakerCount++;
-
-                    if ($speakerCount >= 5) {
-                        break;
-                    }
-                }
-
-                // Delete the speakers from pendingspeaker
-                $sqlDeleteSpeakers = "DELETE FROM pendingspeaker WHERE event_id = ?";
-                $stmtDeleteSpeakers = mysqli_prepare($conn, $sqlDeleteSpeakers);
-                mysqli_stmt_bind_param($stmtDeleteSpeakers, "i", $eventId);
-                mysqli_stmt_execute($stmtDeleteSpeakers);
-            }
-
-            // Now delete the event from pendingevents
-            $sqlDeleteEvent = "DELETE FROM pendingevents WHERE event_id = ?";
-            $stmtDeleteEvent = mysqli_prepare($conn, $sqlDeleteEvent);
-            mysqli_stmt_bind_param($stmtDeleteEvent, "i", $eventId);
-            mysqli_stmt_execute($stmtDeleteEvent);
-
-            // Commit the transaction
-            mysqli_commit($conn);
-
-            $_SESSION['success'] = "Event Approved successfully.";
-        } else {
-            $_SESSION['error'] = "Event not found.";
+        while ($speaker = mysqli_fetch_assoc($resultFetchSpeakers)) {
+            $sqlInsertSpeaker = "
+                INSERT INTO speaker (event_id, speaker_firstName, speaker_MI, speaker_lastName) 
+                VALUES ($newEventId, '{$speaker['speaker_firstName']}', '{$speaker['speaker_MI']}', '{$speaker['speaker_lastName']}')";
+            mysqli_query($conn, $sqlInsertSpeaker);
         }
-    } catch (Exception $e) {
-        mysqli_rollback($conn);
-        $_SESSION['error'] = "Error: " . $e->getMessage();
-    }
 
-    // Close statements and connection if defined
-    mysqli_close($conn);
+        // 4. Fetch and insert related sponsors into `sponsor`
+        $sqlFetchSponsors = "SELECT * FROM pendingsponsor WHERE event_id = $eventId";
+        $resultFetchSponsors = mysqli_query($conn, $sqlFetchSponsors);
+
+        while ($sponsor = mysqli_fetch_assoc($resultFetchSponsors)) {
+            $sqlInsertSponsor = "
+                INSERT INTO sponsor (event_id, sponsor_firstName, sponsor_MI, sponsor_lastName, sponsor_Name) 
+                VALUES ($newEventId, '{$sponsor['sponsor_firstName']}', '{$sponsor['sponsor_MI']}', '{$sponsor['sponsor_lastName']}', '{$sponsor['sponsor_Name']}')";
+            mysqli_query($conn, $sqlInsertSponsor);
+        }
+
+        // 5. Delete related entries from `pendingspeaker` and `pendingsponsor`
+        $sqlDeleteSpeakers = "DELETE FROM pendingspeaker WHERE event_id = $eventId";
+        mysqli_query($conn, $sqlDeleteSpeakers);
+
+        $sqlDeleteSponsors = "DELETE FROM pendingsponsor WHERE event_id = $eventId";
+        mysqli_query($conn, $sqlDeleteSponsors);
+
+        // 6. Delete the event from `pendingevents`
+        $sqlDeleteEvent = "DELETE FROM pendingevents WHERE event_id = $eventId";
+        mysqli_query($conn, $sqlDeleteEvent);
+
+        // Commit transaction
+        mysqli_commit($conn);
+
+        // Redirect back with success message
+        header("Location: eventsValidation.php?status=approved");
+    } else {
+        echo "Event not found.";
+    }
+} catch (mysqli_sql_exception $exception) {
+    // Rollback transaction on error
+    mysqli_rollback($conn);
+    echo "Failed to approve event: " . $exception->getMessage();
 }
 
-header('Location: landingPage.php');
-exit;
+// Close the connection
+mysqli_close($conn);
 ?>

@@ -439,27 +439,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function filterTable() {
             var input, filter, table, tr, td, i, txtValue;
             input = document.querySelector('.tb_input');
-            filter = input.value.toUpperCase();
+            filter = input.value.toUpperCase(); // Convert the input to uppercase for case-insensitive comparison
             console.log("Filter text:", filter);
 
             table = document.getElementById("userTable");
             tr = table.getElementsByTagName("tr");
 
             for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+                // Change this to target the Name column, which is the first column (td[0])
+                td = tr[i].getElementsByTagName("td")[0];
                 if (td) {
                     txtValue = td.textContent || td.innerText;
                     console.log("Text content:", txtValue);
                     if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
+                        tr[i].style.display = ""; // Show the row if match found
                     } else {
-                        tr[i].style.display = "none";
+                        tr[i].style.display = "none"; // Hide the row if no match
                     }
                 }
             }
         }
-
     </script>
+
 
 
 

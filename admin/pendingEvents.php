@@ -54,34 +54,7 @@
     $pendingEventsCount = countPendingEvents($conn);
 
     ?>
-    <?php
-    if (isset($_SESSION['success'])) {
-        echo "<script>
-        Swal.fire({
-            title: 'Success!',
-            text: '" . $_SESSION['success'] . "',
-            icon: 'success',
-            customClass: {
-            popup: 'larger-swal' 
-        }  
-        });
-    </script>";
-        unset($_SESSION['success']);
-    }
-    if (isset($_SESSION['error'])) {
-        echo "<script>
-        Swal.fire({
-          title: 'Error!',
-          text: '" . $_SESSION['error'] . "',
-          icon: 'error',
-          customClass: {
-          popup: 'larger-swal' 
-        }  
-        });
-    </script>";
-        unset($_SESSION['error']);
-    }
-    ?>
+
     <!-- ====SIDEBAR==== -->
     <div class="sidebar">
         <div class="top">
@@ -125,7 +98,34 @@
             echo "User not logged in.";
         }
         ?>
-
+        <?php
+        if (isset($_SESSION['success'])) {
+            echo "<script>
+        Swal.fire({
+            title: 'Success!',
+            text: '" . $_SESSION['success'] . "',
+            icon: 'success',
+            customClass: {
+            popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+            unset($_SESSION['success']);
+        }
+        if (isset($_SESSION['error'])) {
+            echo "<script>
+        Swal.fire({
+          title: 'Error!',
+          text: '" . $_SESSION['error'] . "',
+          icon: 'error',
+          customClass: {
+          popup: 'larger-swal' 
+        }  
+        });
+    </script>";
+            unset($_SESSION['error']);
+        }
+        ?>
 
         <ul>
             <li class="nav-sidebar">
