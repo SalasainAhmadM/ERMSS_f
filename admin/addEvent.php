@@ -202,7 +202,7 @@ include('../function/F.addEvent.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">ADD EVENTS</h3>
 
 
             <div class="wrapper">

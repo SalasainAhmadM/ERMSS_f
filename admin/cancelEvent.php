@@ -254,6 +254,7 @@
 
 
         <div class="containerr">
+            <h3 class="dashboard">CANCELLED EVENTS</h3>
             <!--========= all event start =============-->
 
 

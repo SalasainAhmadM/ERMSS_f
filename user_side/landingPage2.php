@@ -228,7 +228,7 @@
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <h3 class="dashboard">EVENTS</h3>
+            <h3 class="dashboard">JOIN EVENTS</h3>
 
             <section class="event-filter"> <!--dapat naka drop down ito-->
 

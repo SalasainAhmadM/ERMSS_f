@@ -220,6 +220,7 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
+            <h3 class="dashboard">ALL USERS</h3>
             <div class="tables container">
                 <div class="table_header">
                     <div class="select-container" style="position: relative; display: inline-block;">

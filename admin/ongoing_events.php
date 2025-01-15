@@ -259,7 +259,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
     <div class="main-content">
 
         <div class="containerr">
-            <h3 class="dashboard apply">EVENT MANAGEMENT</h3>
+            <h3 class="dashboard apply">ONGOING EVENTS</h3>
 
             <section class="category">
 

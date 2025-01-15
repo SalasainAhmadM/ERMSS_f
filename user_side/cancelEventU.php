@@ -220,6 +220,7 @@ $canceledEventsCount = countCanceledEvents($conn, $UserID);
 
         <div class="containerr">
             <!--========= all event start =============-->
+            <h3 class="dashboard">CANCELLED EVENTS</h3>
 
 
             <!-- ALL EVENTS TABULAR FORM-->
