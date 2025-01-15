@@ -152,7 +152,7 @@ include('../function/F.newAccount.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">CREATE NEW ACCOUNT</h3>
 
 
             <div class="wrapper">

@@ -380,7 +380,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <td><?php echo $user['Affiliation']; ?></td>
                                         <td>
                                             <form class="confirmationForm" action="" method="post">
-                                                <button type="button" class="confirmBtn action-button">
+                                                <button style="background-color: #1d3557" type="button"
+                                                    class="confirmBtn action-button">
                                                     <i class="fa-solid fa-plus"></i>
                                                 </button>
                                                 <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">

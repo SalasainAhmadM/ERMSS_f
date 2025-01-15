@@ -233,7 +233,7 @@ include('../function/F.editEvent2.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">EDIT EVENTS</h3>
 
 
             <div class="wrapper">

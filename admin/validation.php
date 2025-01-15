@@ -94,7 +94,7 @@ include('../function/F.userValidation.php');
                 <span class="tooltip">Dashboard</span>
             </li>
 
-            <li class="events-side nav-sidebar">
+            <li class="events-side2 nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-archive'></i>
                     <span class="nav-item">Events</span>
@@ -118,7 +118,7 @@ include('../function/F.userValidation.php');
                 </div>
             </li>
 
-            <li class="events-side2 nav-sidebar">
+            <li class="events-side nav-sidebar">
                 <a href="#" class="a-events">
                     <i class='bx bx-user'></i>
                     <span class="nav-item">Account</span>

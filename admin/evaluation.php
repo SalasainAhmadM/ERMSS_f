@@ -324,7 +324,8 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
             </section> -->
 
             <div class="parent-evaluation">
-                <button class="aButton" onclick="navigateToAttendance()">Back to Attendance</button>
+                <button style="background-color: #1d3557" class="aButton" onclick="navigateToAttendance()">Back to
+                    Attendance</button>
             </div>
             <script>
                 function navigateToAttendance() {
@@ -406,7 +407,7 @@ WHERE eventParticipants.event_id =
                                             value="<?php echo $row['participant_id']; ?>">
                                         <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
                                         <div class="status attendance-btn-container">
-                                            <button type="button"
+                                            <button style="background-color: #1d3557" type="button"
                                                 onclick="fetchAttendance('<?php echo $row['participant_id']; ?>', '<?php echo $row['event_id']; ?>', '<?php echo $fullName; ?>', '<?php echo $eventTitle; ?>')"
                                                 class="attendance-btn">
                                                 <i class='fa-solid fa-clipboard-check'></i>

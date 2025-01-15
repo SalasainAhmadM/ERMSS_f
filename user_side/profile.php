@@ -59,7 +59,7 @@ $canceledEventsCount = countCanceledEvents($conn, $UserID);
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <!--browser icon-->
     <link rel="icon" href="img/wesmaarrdec.jpg" type="image/png">
 
@@ -72,6 +72,8 @@ $canceledEventsCount = countCanceledEvents($conn, $UserID);
 
 
     <div class="main-content">
+        <h3 style="font-size: 2rem;
+    color: var(--first-color);" class="dashboard apply">PROFILE</h3>
         <section class="accounts section--lg">
             <div class="accounts__container container grid">
                 <div class="account__tabs">

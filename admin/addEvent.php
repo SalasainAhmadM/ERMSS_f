@@ -202,7 +202,7 @@ include('../function/F.addEvent.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">ADD EVENTS</h3>
 
 
             <div class="wrapper">
@@ -566,7 +566,7 @@ include('../function/F.addEvent.php');
                     </script>
 
                     <div class="input_field">
-                        <input type="submit" value="Create" class="createBtn">
+                        <input style="background-color: #1d3557" type="submit" value="Create" class="createBtn">
                     </div>
 
                 </form>

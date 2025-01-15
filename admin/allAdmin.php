@@ -219,6 +219,8 @@ $allUsersAndAdmins = array_merge($allUsers, $allAdmins);
 
     <!-- ============ CONTENT ============-->
     <div class="main-content">
+        <h3 style="font-size: 2rem;
+    color: var(--first-color);" class="dashboard apply">PROFILE</h3>
         <div class="containerr">
             <div class="tables container">
                 <div class="table_header">

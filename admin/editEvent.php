@@ -248,7 +248,7 @@ include('../function/F.editEvent.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">EDIT EVENTS</h3>
 
 
             <div class="wrapper">
@@ -526,7 +526,8 @@ include('../function/F.editEvent.php');
 
 
                     <div class="input_field">
-                        <input type="submit" value="Save" class="createBtn" id="saveEventButton">
+                        <input style="background-color: #1d3557" type="submit" value="Save" class="createBtn"
+                            id="saveEventButton">
                         <?php if ($eventStatus === 'upcoming'): ?>
                             <input type="button" value="Cancel Event" class="createBtn cancel" id="cancelEventButton">
                         <?php endif; ?>

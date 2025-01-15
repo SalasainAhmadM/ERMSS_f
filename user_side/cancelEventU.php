@@ -214,7 +214,7 @@ $canceledEventsCount = countCanceledEvents($conn, $UserID);
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <h3 class="dashboard"></h3>
+            <h3 class="dashboard">CANCELLED EVENTS</h3>
         </div>
 
 

@@ -250,7 +250,7 @@
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <h3 class="dashboard">EVENTS</h3>
+            <h3 class="dashboard">PENDING EVENTS</h3>
 
             <!--======= event filter starts ======= -->
             <section class="event-filter"> <!--dapat naka drop down ito-->

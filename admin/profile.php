@@ -129,6 +129,8 @@ include('../function/F.profile_retrieve.php');
     </div>
 
     <div class="main-content">
+        <h3 style="font-size: 2rem;
+    color: var(--first-color);" class="dashboard apply">PROFILE</h3>
         <section class="accounts section--lg">
             <div class="accounts__container container grid">
                 <div class="account__tabs">

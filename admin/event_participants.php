@@ -376,7 +376,8 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                 }
             </style>
             <div class="parent-evaluation">
-                <button class="aButton" onclick="navigateToEvaluation()">Go to Evaluation</button>
+                <button style="background-color: #1d3557" class="aButton" onclick="navigateToEvaluation()">Go to
+                    Evaluation</button>
             </div>
             <script>
                 function navigateToEvaluation() {
@@ -470,13 +471,13 @@ $eventDates = generateDateRange($dateStart, $dateEnd);
                                                     value="<?php echo $row['participant_id']; ?>">
                                                 <input type="hidden" name="event_id" value="<?php echo $row['event_id']; ?>">
 
-                                                <button type="button"
+                                                <button style="background-color: #1d3557" type="button"
                                                     onclick="triggerAttendance('<?php echo $row['participant_id']; ?>')"
                                                     class="attendance-btn">
                                                     <i class="fas fa-user-check"></i>
                                                 </button>
 
-                                                <button type="button"
+                                                <button style="background-color: #1d3557" type="button"
                                                     onclick="resetAttendance('<?php echo $row['participant_id']; ?>', '<?php echo $row['event_id']; ?>')"
                                                     class="attendance-btn">
                                                     <i class="fa-solid fa-file-pen"></i>

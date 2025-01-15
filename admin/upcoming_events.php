@@ -254,7 +254,7 @@ $pendingEventsCount = countPendingEvents($conn);
     <div class="main-content">
 
         <div class="containerr">
-            <h3 class="dashboard apply">EVENT MANAGEMENT</h3>
+            <h3 class="dashboard apply">UPCOMING EVENTS</h3>
 
             <section class="category">
 

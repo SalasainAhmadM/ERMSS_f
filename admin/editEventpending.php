@@ -248,7 +248,7 @@ include('../function/F.editEventpending.php');
     <!-- ============ CONTENT ============-->
     <div class="main-content">
         <div class="containerr">
-            <!-- <h3 class="dashboard">EVENTS</h3> -->
+            <h3 class="dashboard">EDIT PENDING EVENTS</h3>
 
 
             <div class="wrapper">
