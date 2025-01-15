@@ -79,6 +79,20 @@ if (isset($_GET['download'])) {
     $pdf->SetAutoPageBreak(TRUE, 15);
     $pdf->AddPage();
 
+    // Add header with images and title
+    $pdf->Image('img/wesmaarrdec-removebg-preview.png', 10, 8, 30);
+    $pdf->Image('img/wmsu_logo.png', 170, 8, 30);
+    // Set smaller font for the title and center the text
+    // Add title in the center
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetXY(5, 15); // Adjust Y position
+    $pdf->SetFont('Arial', '', 12);
+    $pdf->MultiCell(0, 10, 'Western Mindanao Agriculture, 
+        Aquatic and Natural Resources Research and 
+        Development Consortium 
+        (WESMAARRDEC)', 0, 'C');
+    $pdf->Ln(10);
+
     // Title
     $pdf->SetFont("Arial", 'B', 16);
     $pdf->Cell(0, 10, 'Event Details', 0, 1, 'C');
@@ -539,7 +553,7 @@ if (isset($_GET['download'])) {
                                     $contact = htmlspecialchars($row['ContactNo']);
                                     $educationalAttainment = htmlspecialchars($row['EducationalAttainment']);
 
-                                    ?>
+                            ?>
                                     <!-- Add the onclick event to trigger SweetAlert with participant info -->
                                     <tr
                                         onclick="showProfile('<?php echo $fullName; ?>', '<?php echo $age; ?>', '<?php echo $gender; ?>', '<?php echo $email; ?>', '<?php echo $affiliation; ?>', '<?php echo $position; ?>', '<?php echo $image; ?>' , '<?php echo $contact; ?>', '<?php echo $educationalAttainment; ?>')">
@@ -551,7 +565,7 @@ if (isset($_GET['download'])) {
                                         <!-- <td><?php echo $affiliation; ?></td> -->
                                         <td><?php echo $contact; ?></td>
                                     </tr>
-                                    <?php
+                            <?php
                                 }
                             } else {
                                 echo "<tr><td colspan='5' style='text-align: center;'>No participants found for this event.</td></tr>";
@@ -678,11 +692,11 @@ if (isset($_GET['download'])) {
 </body>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const tblWrapper = document.querySelector('.tbl-wrapper');
         const tblHead = document.querySelector('.tbl thead');
 
-        tblWrapper.addEventListener('scroll', function () {
+        tblWrapper.addEventListener('scroll', function() {
             const scrollLeft = tblWrapper.scrollLeft;
             const thElements = tblHead.getElementsByTagName('th');
 

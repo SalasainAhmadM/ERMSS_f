@@ -37,7 +37,7 @@ $totalEnded = mysqli_fetch_assoc($totalEndedResult)['totalEnded'];
 
 require('../fpdf186/fpdf.php');
 
-if (isset($_GET['download'])) {
+if (isset($_GET['download'])) { 
     $selectedYear = $_GET['year'];
     $selectedMonth = $_GET['month'] ?? null;
 
@@ -59,6 +59,21 @@ if (isset($_GET['download'])) {
     // Create PDF document
     $pdf = new FPDF('P');
     $pdf->AddPage();
+
+    // Add header with images and title
+    $pdf->Image('img/wesmaarrdec-removebg-preview.png', 10, 8, 30); 
+    $pdf->Image('img/wmsu_logo.png', 170, 8, 30); 
+    // Set smaller font for the title and center the text
+    // Add title in the center
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetXY(5, 15); // Adjust Y position
+    $pdf->SetFont('Arial', '', 12);
+    $pdf->MultiCell(0, 10, 'Western Mindanao Agriculture, 
+    Aquatic and Natural Resources Research and 
+    Development Consortium 
+    (WESMAARRDEC)', 0, 'C');
+    $pdf->Ln(10);
+  
 
     // Set title and header
     $pdf->SetFont('helvetica', 'B', 20);
@@ -139,6 +154,7 @@ if (isset($_GET['download'])) {
     $pdf->Output('events_report.pdf', 'D');
     exit();
 }
+
 
 ?>
 
